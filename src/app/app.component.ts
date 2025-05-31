@@ -9,5 +9,4 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'base_app';
-  title2= 'base_app';
 }
