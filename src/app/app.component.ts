@@ -1,12 +1,17 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
+  standalone: false,
 })
 export class AppComponent {
-  title = 'base_app';
+
+  constructor(private translate: TranslateService) {
+    this.translate.setDefaultLang('es'); // idioma por defecto
+    this.translate.use('es');            // idioma en uso
+  }
+
 }
