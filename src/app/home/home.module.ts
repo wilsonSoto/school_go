@@ -17,6 +17,9 @@ import { TranslateModule } from '@ngx-translate/core'; // 👈 Asegúrate de imp
     HomePageRoutingModule,
     TranslateModule 
   ],
-  declarations: [HomePage]
+  declarations: [HomePage],
+    exports: [
+    HomePage // <--- ¡MUY IMPORTANTE! Exporta el componente para que otros módulos puedan usarlo.
+  ],
 })
 export class HomePageModule {}

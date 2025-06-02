@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -16,23 +16,31 @@ import { initializeApp } from 'firebase/app';
 // import { AngularFireModule } from '@angular/fire';
 // import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { firebaseConfig } from './notificaciones/firebase-config';
+// import { HomePageModule } from './home/home.module';
 
 
 
-import { HomePageModule } from './home/home.module';
+import { LoginComponent } from './login/login.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
+
+
+// import { HomePageModule } from './home/home.module';
 export function HttpLoaderFactory(http: HttpClient) {
   // 👇 Aquí le dices que lea desde translate/
   return new TranslateHttpLoader(http, './assets/translate/', '.json');
 }
 
 @NgModule({
-  declarations: [AppComponent, HomePageModule],
+  declarations: [AppComponent,
+    LoginComponent
+  ],
   imports: [
     BrowserModule, 
     IonicModule.forRoot(), 
     AppRoutingModule,
     HttpClientModule,
+    ReactiveFormsModule,
     TranslateModule.forRoot({
       defaultLanguage: 'es',
       loader: {
@@ -47,5 +55,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     useClass: IonicRouteStrategy 
   }],
   bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule {}
