@@ -1,0 +1,194 @@
+// .login-content {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   height: 100%;
+
+//   .login-box {
+//     width: 100%;
+//     max-width: 360px;
+//     margin: auto;
+//     text-align: center;
+
+//     .logo {
+//       width: 120px;
+//       margin-bottom: 20px;
+//     }
+
+//     h2 {
+//       margin-bottom: 20px;
+//       color: var(--ion-color-primary);
+//     }
+
+//     ion-item {
+//       margin-bottom: 12px;
+//     }
+
+//     ion-button {
+//       margin-top: 10px;
+//     }
+//   }
+// }
+
+// .logo-back {
+//   height: 40%;
+  
+//     display: flex;
+    
+//     align-items: flex-end;
+//   background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(232 255 0 / 10%)), url('../../assets/images/logo-back.png');
+//   // background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)), url('../../assets/images/logo-back.png'); /* Degradado y luego imagen */
+//   background-blend-mode: multiply; /* Mezcla el degradado con la imagen */
+//    background-size: cover; /* Ajusta la imagen al tamaño del elemento */
+//   background-repeat: no-repeat; /* Evita que la imagen se repita */
+// }
+// .mi-elemento {
+//   background-image: url('../../assets/images/logo.png'); /* La ruta a tu imagen */
+//   background-size: cover; /* Ajusta la imagen al tamaño del elemento */
+//   background-repeat: no-repeat; /* Evita que la imagen se repita */
+// }
+
+.login-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; // Usa 100vh para asegurar que ocupe toda la altura de la ventana
+  padding: 20px;
+  // background-color: #f8f8f8; // Opcional: un color de fondo para toda la página
+
+  // Este nuevo div que envuelve login-box y logo-back
+  // Lo usaremos para el layout en desktop
+  > div { // Selector para el primer div hijo directo de .login-content
+    display: flex;
+    flex-direction: column; // Por defecto, se apilan verticalmente
+    align-items: center; // Centra los elementos hijos (login-box y logo-back) horizontalmente
+    width: 100%; // Ocupa todo el ancho
+    max-width: 400px; // Límite de ancho para el contenido principal en móvil
+    margin: auto; // Centra el contenedor principal en pantallas pequeñas
+    padding: auto; // Centra el contenedor principal en pantallas pequeñas
+  height: 95vh; // Usa 100vh para asegurar que ocupe toda la altura de la ventana
+  }
+
+
+  .login-box {
+    width: 100%;
+    max-width: 360px; // Mantiene el ancho máximo para la caja de login en móvil
+    text-align: center;
+    background: var(--ion-color-light, #ffffff);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2; // Asegura que la caja de login esté por encima del logo-back (si se superponen)
+    position: relative; // Necesario para z-index si .logo-back fuera absoluto dentro del mismo contexto
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: var(--ion-color-primary);
+    }
+
+    ion-item {
+      margin-bottom: 12px;
+    }
+
+    ion-button {
+      margin-top: 10px;
+    }
+  }
+
+  .logo-back {
+    height: 40%; // Altura por defecto para móvil
+    width: 100%; // Ancho por defecto para móvil
+    display: flex;
+    align-items: flex-end;
+    justify-content: center; // Centra el copyright horizontalmente
+
+    background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(232 255 0 / 10%)), url('../../assets/images/logo-back.png');
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center; // Centra la imagen de fondo
+    // En móvil, se apilará debajo de .login-box dentro del div padre.
+    // Puedes ajustar el margin-top para separarlo del login-box si es necesario.
+    margin-top: 20px;
+
+    ion-label {
+      color: var(--ion-color-medium);
+      font-size: 0.8em;
+      margin-bottom: 10px; // Espacio sobre el borde inferior
+    }
+  }
+
+  // --- MEDIA QUERY para pantallas GRANDES (mayor a 1023px) ---
+  @media (min-width: 1024px) {
+    // Estilos para el div contenedor principal de login-box y logo-back
+    > div {
+      flex-direction: row; // Ahora los elementos se disponen en fila (horizontal)
+      justify-content: center; // Centra el conjunto de login-box y logo-back horizontalmente
+      align-items: stretch; // Los elementos hijos se estiran para llenar el alto del contenedor padre
+      width: 90%; // Puedes hacer que el contenedor principal ocupe un % del ancho total de la pantalla
+      max-width: 1200px; // O establecer un ancho máximo para el contenedor en desktop
+      background: var(--ion-color-light, #ffffff); // Opcional: fondo para el contenedor principal
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); // Una sombra más prominente
+      height: 70vh; // Darle una altura fija o porcentual en desktop para que la imagen se vea bien
+      overflow: hidden; // Para que la imagen de fondo no se desborde si es muy grande
+    }
+
+    .login-box {
+      width: 45%; // Ocupa aproximadamente la mitad del div contenedor
+      max-width: none; // Elimina el max-width anterior para que se ajuste al 45%
+      margin: 0; // Elimina el margen automático al estar en flex-row
+      padding: 40px; // Más padding en desktop
+      border-radius: 0; // Opcional: si quieres bordes rectos para un look panel
+      box-shadow: none; // La sombra va en el contenedor padre ahora
+      display: flex; // Usar flexbox dentro de login-box
+      flex-direction: column; // Contenido de login-box apilado verticalmente
+      justify-content: center; // Centra el contenido del formulario verticalmente
+      align-items: center; // Centra los items del formulario horizontalmente
+      text-align: center; // Asegura que el texto y el logo se centren
+
+      .logo {
+        width: 180px; // Logo más grande en desktop
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        font-size: 2.5em; // Título más grande
+        margin-bottom: 40px;
+      }
+
+      ion-item {
+        margin-bottom: 15px;
+        width: 100%; // Asegura que los items ocupen todo el ancho disponible
+        max-width: 300px; // Opcional: limitar el ancho de los inputs
+      }
+
+      ion-button {
+        margin-top: 20px;
+        width: 100%; // Asegura que los botones ocupen todo el ancho disponible
+        max-width: 300px; // Opcional: limitar el ancho de los botones
+      }
+    }
+
+    .logo-back {
+      width: 55%; // La otra mitad (o porcentaje que desees) del div contenedor
+      height: 100%; // Ocupa toda la altura del div contenedor
+      margin: 0; // Elimina el margen automático
+      // La imagen de fondo ya está configurada con cover y no-repeat
+      // No necesita position: absolute aquí, ya que está en el flujo de flexbox
+      position: relative; // Mantenemos relative para que se comporte como un elemento en la fila
+      align-items: flex-end; // Mantiene el copyright abajo
+      justify-content: center; // Mantiene el copyright centrado horizontalmente
+      padding-bottom: 20px; // Añade padding para el copyright en la parte inferior
+
+      ion-label {
+        font-size: 1em; // Tamaño de fuente un poco más grande
+      }
+    }
+  }
+}

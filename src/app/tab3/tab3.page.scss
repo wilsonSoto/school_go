@@ -1,0 +1,101 @@
+.card-info{
+    margin-left: 10px;
+}
+.grey-text{
+    font-size: 12px;
+    color: #787878;
+}
+.item{
+    margin: 10px;
+}
+
+:host, ion-item{
+    --inner-padding-end: 0px;
+
+    .item-native{
+        background-color: #fff;
+    }
+}
+:host(.ion-color:not(.item-fill-solid):not(.item-fill-outline)) .item-native {
+    background: #fff;
+}
+
+:host(.toggle-checked) .toggle-icon {
+    background: rgb(42 189 83 / 50%);
+  }
+
+ion-input{
+    --background: #fff !important
+}
+ion-checkbox {
+    --size: 20px;
+    --checkbox-background-checked: #92f352;
+  }
+  
+  ion-checkbox::part(container) {
+    border-radius: 6px;
+    border: 2px solid #92f352;
+  }
+
+  ion-card{
+    display: flex;
+
+    ion-label{
+        margin-bottom: 3px;
+    }
+  }
+  ion-card-header{
+    padding-bottom: 0px;
+    color: #000;
+
+    .header-item{
+        h4{
+            font-size: 16px;
+            text-transform:uppercase;
+            margin: 0px 0px 2px;
+        }
+        ion-note{
+            font-size: 12px;
+        }
+    }
+  }
+
+  ion-card-content{
+    color: #000;
+    // display: flex;
+    // justify-content: space-between;
+    .item-content{
+        display: flex;
+    }
+  }
+  .aside-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    text-align: center;
+
+    ion-item{
+        margin: 0px;
+    }
+    ion-icon{
+        font-size: 22px;
+    }
+  }
+
+  ion-list{
+    margin-bottom: 35px !important;
+  }
+  .available-info{
+    font-weight: 600;
+  }
+  .no-clients{
+    text-align: center;
+
+    img{
+      width: 100px;
+    }
+  }
+    ion-avatar {
+      width: 97%;
+      height: 4vh;
+    }
