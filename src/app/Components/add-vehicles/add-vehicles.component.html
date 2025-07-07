@@ -1,0 +1,222 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Vehiculo </ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <ion-buttons *ngIf="action == 'edit'" slot="end">
+      <ion-button (click)="modal.dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+  <form [formGroup]="busForm">
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Auto"
+        labelPlacement="floating"
+        formControlName="name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('name')?.invalid &&
+          busForm.get('name')?.touched
+        "
+      >
+        auto es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Marca"
+        labelPlacement="floating"
+        formControlName="brand"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('brand')?.invalid && busForm.get('brand')?.touched
+        "
+      >
+        Marca requerido
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Modelo"
+        labelPlacement="floating"
+        formControlName="model"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('model')?.invalid && busForm.get('model')?.touched
+        "
+      >
+        Modelo es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Capacidad del Auto"
+        labelPlacement="floating"
+        formControlName="people_capacity"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('people_capacity')?.invalid && busForm.get('people_capacity')?.touched
+        "
+      >
+        Capacidad es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Color del Auto"
+        labelPlacement="floating"
+        formControlName="vehicle_color"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('vehicle_color')?.invalid &&
+          busForm.get('vehicle_color')?.touched
+        "
+      >
+        Color es requerida.
+      </ion-note>
+    </ion-item>
+
+     <!-- <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Licencia de conducir"
+        labelPlacement="floating"
+        formControlName="school_driver"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('school_driver')?.invalid &&
+          busForm.get('school_driver')?.touched
+        "
+      >
+        Licencia inválida o requerida (11 dígitos).
+      </ion-note>
+    </ion-item> -->
+
+<!--
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Dirección"
+        labelPlacement="floating"
+        formControlName="address"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          busForm.get('address')?.invalid &&
+          busForm.get('address')?.touched
+        "
+      >
+        Dirección es requerida.
+      </ion-note>
+    </ion-item> -->
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 1)"
+        ></app-camera>
+
+        <div
+          *ngIf="vehicule_image"
+          class="image-preview-container"
+          [ngClass]="{ center: vehicule_image }"
+        >
+          <img [src]="vehicule_image" alt="Captured Image" class="image-preview" />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(1)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!vehicule_image">Seleccione la imagen</ion-label>
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 2)"
+        ></app-camera>
+
+        <div
+          *ngIf="license_plate_image"
+          class="image-preview-container"
+          [ngClass]="{ center: license_plate_image }"
+        >
+          <img
+            [src]="license_plate_image"
+            alt="Captured Image"
+            class="image-preview"
+          />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(2)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!license_plate_image"
+          >Seleccione la imagen de la cedula</ion-label
+        >
+      </div>
+    </ion-item>
+
+  </form>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      class="login-button"
+      type="button"
+      (click)="onSubmit()"
+      expand="block"
+      [disabled]="busForm.invalid"
+    >
+      <span *ngIf="action !== 'edit'">Agregar</span>
+      <span *ngIf="action == 'edit'">Editar</span>
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,249 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Estudiante</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="modal.dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+  <form [formGroup]="studentForm">
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre y Apellido"
+        labelPlacement="floating"
+        formControlName="name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('name')?.invalid && studentForm.get('name')?.touched
+        "
+      >
+        Nombre y Apellido es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="date"
+        fill="solid"
+        label="Fecha de nacimiento"
+        labelPlacement="floating"
+        formControlName="birth_date"
+        (ionChange)="updateBirthDate()"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('birth_date')?.invalid &&
+          studentForm.get('birth_date')?.touched
+        "
+      >
+        La fecha de nacimiento es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Telefono"
+        labelPlacement="floating"
+        formControlName="phone"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched
+        "
+      >
+        Telefono es requerido del tutor.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Alergias"
+        labelPlacement="floating"
+        formControlName="allergies_or_illness"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('allergies_or_illness')?.invalid &&
+          studentForm.get('allergies_or_illness')?.touched
+        "
+      >
+        Es importante saber si tiene alergias.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre del padre"
+        labelPlacement="floating"
+        formControlName="father_name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('father_name')?.invalid &&
+          studentForm.get('father_name')?.touched
+        "
+      >
+        Es importante el nombre del padre.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre de la madre"
+        labelPlacement="floating"
+        formControlName="mother_name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('mother_name')?.invalid &&
+          studentForm.get('mother_name')?.touched
+        "
+      >
+        Es importante el nombre del madre.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Dirección"
+        labelPlacement="floating"
+        formControlName="full_address"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          studentForm.get('full_address')?.invalid &&
+          studentForm.get('full_address')?.touched
+        "
+      >
+        Dirección es requerida.
+      </ion-note>
+    </ion-item>
+
+    <ion-list>
+      <ion-item>
+        <ion-label>Género</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-radio-group formControlName="sex" justify="row">
+          <ion-radio
+            value="Masculino"
+            label="Masculino"
+            labelPlacement="end"
+            justify="start"
+            >Masculino</ion-radio
+          >
+          <ion-radio
+            value="Femenino"
+            label="Femenino"
+            labelPlacement="end"
+            justify="start"
+            >Femenino</ion-radio
+          >
+        </ion-radio-group>
+
+        <ion-note
+          slot="error"
+          *ngIf="
+            studentForm.get('sex')?.invalid && studentForm.get('sex')?.touched
+          "
+        >
+          El género es requerido.
+        </ion-note>
+
+      </ion-item>
+    </ion-list>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event)"
+        ></app-camera>
+        <div
+          *ngIf="profile"
+          class="image-preview-container"
+          [ngClass]="{ center: profile }"
+        >
+          <img [src]="profile" alt="Captured Image" class="image-preview" />
+        </div>
+        <ion-label *ngIf="!profile">Seleccione la imagen estudiante</ion-label>
+      </div>
+    </ion-item>
+
+      <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event)"
+        ></app-camera>
+
+        <div
+          *ngIf="profile"
+          class="image-preview-container"
+          [ngClass]="{ center: profile }"
+        >
+          <img
+            [src]="profile"
+            alt="Captured Image"
+            class="image-preview"
+          />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage()"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!profile"
+          >Seleccione la imagen de la cedula</ion-label
+        >
+      </div>
+    </ion-item>
+
+
+  </form>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      class="login-button"
+      type="button"
+      (click)="onSubmit()"
+      expand="block"
+      [disabled]="studentForm.invalid"
+    >
+      Agregar
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

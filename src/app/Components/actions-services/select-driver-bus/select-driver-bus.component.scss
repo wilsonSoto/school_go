@@ -1,0 +1,14 @@
+.loading-state, .error-state {
+  padding: 20px;
+  text-align: center;
+  ion-spinner {
+    margin-bottom: 10px;
+  }
+  ion-icon {
+    font-size: 3em;
+  }
+}
+.error-message {
+  font-size: 0.85em;
+  margin-top: 5px;
+}

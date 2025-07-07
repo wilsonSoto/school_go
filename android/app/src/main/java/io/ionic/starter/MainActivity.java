@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package io.school.go.starter;
 
 import com.getcapacitor.BridgeActivity;
 

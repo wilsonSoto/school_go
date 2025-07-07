@@ -1,0 +1,92 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Seleccione los dias de ruta</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="weekDaysForm">
+    <ion-item *ngFor="let weekDay of weeks; let i = index">
+      <ion-checkbox
+        labelPlacement="end"
+        [id]="'trigger-checkbox-' + weekDay.day"
+        [checked]="weekDay.checked"
+        (ionChange)="onCheckboxChange($event, weekDay)"
+      >
+        {{ weekDay.name }}
+      </ion-checkbox>
+
+      <ion-button
+        [id]="'trigger-popover-' + weekDay.day"
+        (click)="openTimePopover($event, weekDay)"
+        slot="end"
+        [disabled]="!weekDay.checked && !findDayFormGroup(weekDay.day)"
+      >
+        <ion-icon name="time-outline"></ion-icon>
+        <span
+          *ngIf="
+            weekDay.checked &&
+            findDayFormGroup(weekDay.day)?.get('session_start_time')?.value
+          "
+        >
+          {{ findDayFormGroup(weekDay.day)?.get("session_start_time")?.value }} -
+          {{ findDayFormGroup(weekDay.day)?.get("session_end_time")?.value }}
+        </span>
+      </ion-button>
+    </ion-item>
+  </form>
+
+  <ion-popover
+    #timePopover
+    [trigger]="'trigger-popover-' + selectedWeekDayForPopover?.day"
+    [isOpen]="isPopoverOpen"
+    (didDismiss)="isPopoverOpen = false"
+    [dismissOnSelect]="false"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <ion-list>
+          <ion-list-header *ngIf="selectedWeekDayForPopover">
+            Configurar Horas para {{ selectedWeekDayForPopover.name }}
+          </ion-list-header>
+          <ion-input
+            type="time"
+            fill="solid"
+            label="Hora de inicio de la ruta"
+            labelPlacement="floating"
+            [formControl]="getStartTimeControl(selectedWeekDayForPopover?.day!)"
+          ></ion-input>
+
+          <ion-input
+            type="time"
+            fill="solid"
+            label="Hora de fin de la ruta"
+            labelPlacement="floating"
+            [formControl]="getEndTimeControl(selectedWeekDayForPopover?.day!)"
+          ></ion-input>
+
+          <ion-button expand="block" (click)="closePopover()"
+            >Guardar Horas</ion-button>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-title>Footer</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="submitForm()">Guardar Ruta</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,85 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Seleccione Conductor y Autobús</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal('cancel')">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando conductores y autobuses...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="loadDriversAndBuses()">Reintentar</ion-button>
+  </div>
+
+  <form [formGroup]="selectForm" *ngIf="!isLoading && !errorMessage">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Conductor Disponible</ion-label>
+      </ion-list-header>
+      <ion-radio-group formControlName="driverId">
+        <ion-item *ngFor="let driver of availableDrivers">
+          <ion-radio [value]="driver.id" labelPlacement="start">
+            {{ driver.name }} (ID: {{ driver.id }})
+            </ion-radio>
+        </ion-item>
+        <ion-item *ngIf="availableDrivers.length === 0">
+          <ion-label color="medium">No hay conductores disponibles.</ion-label>
+        </ion-item>
+      </ion-radio-group>
+      <div *ngIf="selectForm.get('driverId')?.invalid && selectForm.get('driverId')?.touched" class="ion-padding-start error-message">
+  <ion-text color="danger">Debe seleccionar un conductor.</ion-text>
+</div>
+      <!-- <div *ngIf="selectForm.get('selectedDriver')?.invalid && selectForm.get('selectedDriver')?.touched" class="ion-padding-start error-message">
+        <ion-text color="danger">Debe seleccionar un conductor.</ion-text>
+      </div> -->
+    </ion-list>
+
+    <ion-list class="ion-margin-top">
+      <ion-list-header>
+        <ion-label>Autobús Disponible</ion-label>
+      </ion-list-header>
+      <ion-radio-group formControlName="busId">
+        <ion-item *ngFor="let bus of availableBuses">
+          <ion-radio [value]="bus.id" labelPlacement="start">
+            {{ bus.plate_number }} ({{ bus.model }} - Cap: {{ bus.capacity }})
+          </ion-radio>
+        </ion-item>
+        <ion-item *ngIf="availableBuses.length === 0">
+          <ion-label color="medium">No hay autobuses disponibles.</ion-label>
+        </ion-item>
+      </ion-radio-group>
+      <div *ngIf="selectForm.get('busId')?.invalid && selectForm.get('busId')?.touched" class="ion-padding-start error-message">
+  <ion-text color="danger">Debe seleccionar un autobús.</ion-text>
+</div>
+      <!-- <div *ngIf="selectForm.get('selectedBus')?.invalid && selectForm.get('selectedBus')?.touched" class="ion-padding-start error-message">
+        <ion-text color="danger">Debe seleccionar un autobús.</ion-text>
+      </div> -->
+    </ion-list>
+
+  </form>
+</ion-content>
+
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-title>Footer</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSelect()">Guardar Ruta</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -11,9 +11,10 @@ export class ToastService {
   ) {}
 
   async presentToast(msm: string, style: string = 'custom-danger-toast', time: number = 2000) {
+   const qtyTime =  style == 'custom-danger-toast' ? null : time
+
     const toast = await this.toastCtrl.create({
       message: msm,
-      duration: time,
       cssClass: style,
       buttons: [
         {
@@ -24,6 +25,12 @@ export class ToastService {
         },
       ],
     });
+
+    if (qtyTime) {
+      toast.duration =qtyTime;
+
+    }
+
     await toast.present();
   }
 

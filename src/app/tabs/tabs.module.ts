@@ -10,6 +10,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TabsPage } from './tabs.page';
 import { HttpClient } from '@angular/common/http';
 
+import { IonTabs } from '@ionic/angular'; // Si quieres tipar el evento
+import { ParentService } from '../services/parents.service';
 
 
 // import { HomePageModule } from './home/home.module';
@@ -39,7 +41,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         })
   ],
   declarations: [TabsPage],
-  providers: [  
+  providers: [  ParentService
     // DaterangepickerComponent,
     // DaterangepickerDirective,
    ],

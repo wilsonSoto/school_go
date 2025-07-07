@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AddRouteComponent } from '../Components/add-route/add-route.component';
 // import { RentalHistoryComponent } from '../rental-history/rental-history.component'
 const routes: Routes = [
   {
@@ -19,9 +20,17 @@ const routes: Routes = [
         path: 'tab3',
         loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
       },
+      //  {
+      //   path: 'tab3/route/:routeId',
+      //   component: AddRouteComponent,
+      // },
       {
         path: 'tab4',
         loadChildren: () => import('../tab4/tab4.module').then(m => m.Tab4PageModule)
+      },
+       {
+        path: 'driver',
+        loadChildren: () => import('../driver/driver.module').then(m => m.DriverPageModule)
       },
       // {
       //   path: 'report',
@@ -42,6 +51,11 @@ const routes: Routes = [
       }
     ]
   },
+   {
+        path: '',
+        redirectTo: '/tabs/tab1',
+        pathMatch: 'full'
+      },
   {
     path: 'tabs/tab1',
     redirectTo: '/tabs/tab1',
