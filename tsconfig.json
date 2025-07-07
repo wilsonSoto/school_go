@@ -18,11 +18,17 @@
     "importHelpers": true,
     "target": "es2022",
     "module": "es2020",
+    "resolveJsonModule": true,
+     "esModuleInterop": true,                // Esto también es importante y a menudo va de la mano
+    "allowSyntheticDefaultImports": true,   // ¡Añade o asegura que esto sea true!
+
     "lib": [
-      "es2018", 
+      "es2018",
       "dom"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+
+    // "types": ["node", "google.maps"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

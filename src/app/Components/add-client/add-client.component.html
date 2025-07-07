@@ -1,0 +1,286 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large"> Padres o Tutores </ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <ion-buttons *ngIf="action == 'edit'" slot="end">
+      <ion-button (click)="modal.dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+  <form [formGroup]="parentForm">
+    <!-- <ion-item *ngIf="action == 'edit'">
+      <ion-label class="toggle-edit">
+        Editar
+        <ion-note>
+          <ion-toggle
+            mode="ios"
+            aria-label="Warning toggle"
+            color="warning"
+            [checked]="true"
+          ></ion-toggle>
+        </ion-note>
+      </ion-label>
+    </ion-item> -->
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre y Apellido"
+        labelPlacement="floating"
+        formControlName="name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('name')?.invalid &&
+          parentForm.get('name')?.touched
+        "
+      >
+        Nombre y Apellido es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre del tutor"
+        labelPlacement="floating"
+        formControlName="responsibleGuardian"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('responsibleGuardian')?.invalid &&
+          parentForm.get('responsibleGuardian')?.touched
+        "
+      >
+        Nombre del tutor es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Telefono"
+        labelPlacement="floating"
+        formControlName="phone"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('phone')?.invalid && parentForm.get('phone')?.touched
+        "
+      >
+        Teléfono inválido o requerido (10 dígitos).
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Movil"
+        labelPlacement="floating"
+        formControlName="mobile"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('mobile')?.invalid && parentForm.get('mobile')?.touched
+        "
+      >
+        Móvil inválido o requerido (10 dígitos).
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="email"
+        fill="solid"
+        label="Email"
+        labelPlacement="floating"
+        formControlName="email"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('email')?.invalid && parentForm.get('email')?.touched
+        "
+      >
+        Email inválido o requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Cedula"
+        labelPlacement="floating"
+        formControlName="national_id"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('national_id')?.invalid &&
+          parentForm.get('national_id')?.touched
+        "
+      >
+        Cédula inválida o requerida (11 dígitos).
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Dirección"
+        labelPlacement="floating"
+        formControlName="address"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          parentForm.get('address')?.invalid &&
+          parentForm.get('address')?.touched
+        "
+      >
+        Dirección es requerida.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 1)"
+        ></app-camera>
+
+        <div
+          *ngIf="parentImage"
+          class="image-preview-container"
+          [ngClass]="{ center: parentImage }"
+        >
+          <img [src]="parentImage" alt="Captured Image" class="image-preview" />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(1)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!parentImage">Seleccione la imagen</ion-label>
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 2)"
+        ></app-camera>
+
+        <div
+          *ngIf="nationalIdImage"
+          class="image-preview-container"
+          [ngClass]="{ center: nationalIdImage }"
+        >
+          <img
+            [src]="nationalIdImage"
+            alt="Captured Image"
+            class="image-preview"
+          />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(2)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!nationalIdImage"
+          >Seleccione la imagen de la cedula</ion-label
+        >
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 3)"
+        ></app-camera>
+
+        <div
+          *ngIf="responsibleGuardianImage"
+          class="image-preview-container"
+          [ngClass]="{ center: responsibleGuardianImage }"
+        >
+          <img
+            [src]="responsibleGuardianImage"
+            alt="Captured Image"
+            class="image-preview"
+          />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(3)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!responsibleGuardianImage"
+          >Seleccione la imagen del tutor</ion-label
+        >
+      </div>
+    </ion-item>
+  </form>
+
+  <ion-list *ngIf="partner_id">
+    <ion-item>
+      <ion-label>Estudiantes Registrados</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <span *ngIf="partner_id">
+    <app-students
+      *ngFor="let student of students; let idx = index"
+      [student]="student"
+      (click)="handleOpenStudentsModal('edit', student, idx)"
+    ></app-students>
+  </span>
+  <!-- (handleActionStudents)="handleOpenStudentsModal($event)" -->
+
+  <ion-fab *ngIf="partner_id" slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="handleOpenStudentsModal('add')">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <!-- <ion-button class="login-button" type="button" (click)="handleOpenMapsModal()" expand="block" [disabled]="parentForm.invalid">
+      Establecer ubicacion
+    </ion-button> -->
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      class="login-button"
+      type="button"
+      (click)="onSubmit()"
+      expand="block"
+      [disabled]="parentForm.invalid"
+    >
+      <span *ngIf="action !== 'edit'">Agregar</span>
+      <span *ngIf="action == 'edit'">Editar</span>
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

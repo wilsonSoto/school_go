@@ -1,138 +1,99 @@
-
-<!-- <ion-header [translucent]="true">
+<ion-header class="i-header">
   <ion-toolbar>
-    <ion-buttons slot="end">
-      <ion-button (click)="navigate('profile')">
-        <ion-icon aria-hidden="true" name="person-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title>
-      Informe y Estadistica
-    </ion-title>
-  </ion-toolbar>
-</ion-header> -->
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+         <ion-col>
+          <ion-title size="large" >
+            Choferes y Vehiculos
+          </ion-title>
+        </ion-col>
+        <ion-col size="auto">
+          <div>
+            <ion-avatar  id="driver-bus-button">
+              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+            </ion-avatar>
 
-<!-- <app-report-and-statistics></app-report-and-statistics> -->
-<!-- <app-rental-history></app-rental-history> -->
+          </div>
+        </ion-col>
+      </ion-row>
 
-<!-- 
-<ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="100" [pullMax]="200" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
-  <ion-list [inset]="true">
-    <ion-item-sliding *ngFor="let item of products; let idx = index" class="list-items" >
-      <ion-item [button]="true">
-        <ion-thumbnail>
-          <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-        </ion-thumbnail>
-        <div class="card-info">
-          <div class="header-card">
-            <ion-label>{{item?.name}}</ion-label>
-          </div>
-          <div class="price">
-            RD${{getFormatQty(item?.price)}}
-          </div>
-          <div class="subtitle">
-            <span>Cantidad de Producto: {{item?.quantity}}</span>
-          </div>
-          <div class="subtitle">
-            <span>Disponibles: {{item?.quantity - item?.quantity_sold}}</span>
-          </div>
+
+    </div>
+
+    <div class="segment">
+
+      <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
+        <ion-segment-button value="first" content-id="first">
+          <ion-label>Choferes </ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="second" content-id="second">
+          <ion-label>Vehiculos</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+          <ion-searchbar size="mediun" mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar>
         </div>
-      </ion-item>
-      <ion-item-options slot="end">
-        <ion-item-option color="tertiary"  (click)="openAndCloseEdit(item)">
-          <ion-icon name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" expandable="true" (click)="alertDeleteUser(idx)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+      </ion-toolbar>
+</ion-header>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="showAddModal = true; formAddProducts.reset()">
+<ion-content [fullscreen]="true" class="">
+
+<ion-segment-view>
+  <ion-segment-content id="first">
+    <app-drivers
+    *ngFor="let driver of currentDrivers"
+    [currentDriver]="driver"
+    (handleActionDriver)="handleOpenDriverModal($event, driver)"
+    ></app-drivers>
+
+  </ion-segment-content>
+  <ion-segment-content id="second">
+       <app-vehicles
+    *ngFor="let bus of currentVehicles"
+    [currentVehicle]="bus"
+    (handleActionDriver)="handleOpenBusModal($event, bus)"
+    ></app-vehicles>
+
+  </ion-segment-content>
+  <!-- <ion-segment-content id="third">Third</ion-segment-content> -->
+</ion-segment-view>
+
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button [routerLink]="['/add-bus']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
+
   </ion-fab>
 
-  <ion-modal
-      [isOpen]="showAddModal"
-    >
-      <ng-template>
-        <div class="ion-page">
-          <ion-header>
-            <ion-toolbar>
-              <ion-title>Agregar Articulo</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="showAddModal = false">Cancelar</ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content>
-            <form [formGroup]="formAddProducts" (ngSubmit)="addProduct()">
-              <div class="item">
-                <ion-input label="Nombre del articulo" formControlName="name" label-placement="floating" fill="solid" placeholder="Nombre del articulo"></ion-input>
-              </div>
-              <div class="item">
-                <ion-input label="Descripcion" formControlName="description" label-placement="floating" fill="solid" placeholder="Descripcion"></ion-input>
-              </div>
-              <div class="item">
-                <ion-input label="Cantidad disponible" type="number" formControlName="quantity" label-placement="floating" fill="solid" placeholder="Cantidad disponible"></ion-input>
-              </div>
-              <div class="item">
-                <ion-input label="Precio estimado" type="number" formControlName="price"  (ionChange)="formatQty()"  label-placement="floating" fill="solid" placeholder="Precio estimado"></ion-input>
-              </div>
-            
-              <div class="item">
-                <ion-button expand="full" (click)="addProduct()">Agregar Articulo</ion-button>
-              </div>
-            </form>
-          </ion-content>
-        </div>
-      </ng-template>
-    </ion-modal>
-  
-    <ion-modal
-    [isOpen]="showEditModal"
-  >
-    <ng-template>
-      <div class="ion-page">
-        <ion-header>
-          <ion-toolbar>
-            <ion-title>Editar Articulo</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="showEditModal = false">Cancelar</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content>
-          <form [formGroup]="formAddProducts" (ngSubmit)="editProduct()">
-            <div class="item">
-              <ion-input label="Nombre del articulo" formControlName="name" label-placement="floating" fill="solid" placeholder="Nombre del articulo"></ion-input>
-            </div>
-            <div class="item">
-              <ion-input label="Descripcion" formControlName="description" label-placement="floating" fill="solid" placeholder="Descripcion"></ion-input>
-            </div>
-            <div class="item">
-              <ion-input label="Cantidad disponible" type="number" formControlName="quantity" label-placement="floating" fill="solid" placeholder="Cantidad disponible"></ion-input>
-            </div>
-            <div class="item">
-              <ion-input label="Precio estimado" type="number" formControlName="price"  (ionChange)="formatQty()"  label-placement="floating" fill="solid" placeholder="Precio estimado"></ion-input>
-            </div>
-          
-            <div class="item">
-              <ion-button expand="full" (click)="editProduct()">Editar Articulo</ion-button>
-            </div>
-          </form>
-        </ion-content>
-      </div>
-    </ng-template>
-  </ion-modal>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button [routerLink]="['/add-bus']">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab>
+
 </ion-content>
 
 
+<ion-popover trigger="driver-bus-button" [dismissOnSelect]="true">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
+        <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
+        <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
+        <ion-item [button]="true" [detail]="false" routerLink="/sign-in">Cerrar Sesión</ion-item>
 
-    -->
+        <!-- <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
+          <ng-template>
+            <ion-content>
+              <ion-list>
+                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover> -->
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>

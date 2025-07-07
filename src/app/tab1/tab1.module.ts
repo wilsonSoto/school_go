@@ -6,13 +6,16 @@ import { Tab1Page } from './tab1.page';
 // import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
+
+
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
+import { ParentsComponent } from '../Components/parents/parents.component';
+import { CapitalCasePipe } from '../pipes/capital-case.pipe';
+import { ParentService } from '../services/parents.service';
 
-// import { HomePageModule } from './home/home.module';
 export function HttpLoaderFactory(http: HttpClient) {
-  // 👇 Aquí le dices que lea desde translate/
   return new TranslateHttpLoader(http, './assets/translate/', '.json');
 }
 
@@ -22,7 +25,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    // ExploreContainerComponentModule,
+    CapitalCasePipe,
     Tab1PageRoutingModule,
     TranslateModule.forRoot({
       defaultLanguage: 'es',
@@ -35,14 +38,11 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   declarations: [
     Tab1Page,
-    // EditProfileComponent,
-    // VersionComponent,
-    // EditProductComponent,
-    // ScheduleComponent,
-    // EditVehicleComponent,
-    // InsurancePlusComponent,
+    ParentsComponent,
   ],
   providers: [
+    ParentService
+
     // DaterangepickerComponent, DaterangepickerDirective
   ],
 })

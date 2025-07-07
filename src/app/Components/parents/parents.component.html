@@ -1,0 +1,29 @@
+  <ion-card  (click)="showDetails()" class="ion-activatable ripple-parent" *ngIf="parent">
+    <ion-ripple-effect></ion-ripple-effect>
+      <ion-card-header>
+        <ion-avatar>
+          <img alt="Silhouette of a person's head" [src]="parent.image" />
+        </ion-avatar>
+        <span>
+          <ion-card-title>{{parent.name | capitalCase  }} </ion-card-title>
+          <ion-card-subtitle>{{parent.contact_address}} </ion-card-subtitle>
+        </span>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>
+
+        <ion-label>Telefono: <ion-note>{{ parent.phone}}</ion-note> </ion-label>
+      </p>
+      <p>
+        <ion-label># Estudiantes: <ion-note>{{ parent.number_students}}</ion-note> </ion-label>
+      </p>
+
+      <!-- Here's a small text description for the card content. Nothing more, nothing less. -->
+    </ion-card-content>
+
+    <div>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+</ion-card>

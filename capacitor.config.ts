@@ -1,9 +1,14 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'miApp',
-  webDir: 'www'
+  appId: 'io.school.go.starter',
+  appName: 'schoolGo',
+  webDir: 'www',
+  plugins: {
+    GoogleMap: {
+      apiKey: 'AIzaSyDcWETz-oJarwWF7lheeNKYOdw8BwaGrKk', // <--- ¡COLOCA TU CLAVE API REAL AQUÍ!
+    },
+  },
 };
 
 export default config;

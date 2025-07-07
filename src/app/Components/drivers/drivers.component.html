@@ -1,0 +1,26 @@
+ <ion-card *ngIf="currentDriver" (click)="showDetails()" class="ion-activatable ripple-parent ion-margin-top">
+    <ion-ripple-effect></ion-ripple-effect>
+    <ion-card-header>
+      <ion-avatar>
+        <img alt="Driver Profile" [src]="currentDriver.profile || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+      </ion-avatar>
+      <span>
+        <ion-card-title>{{ currentDriver.name }}</ion-card-title>
+        <ion-card-subtitle>{{ currentDriver.email }}</ion-card-subtitle>
+      </span>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><ion-label>Teléfono: <ion-note>{{ currentDriver.phone || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Móvil: <ion-note>{{ currentDriver.mobile || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Licencia: <ion-note>{{ currentDriver.driver_license || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Dirección: <ion-note>{{ currentDriver.address || 'N/A'}}</ion-note></ion-label></p>
+    </ion-card-content>
+    <div class="card-footer-buttons">
+      <!-- <ion-button fill="clear" (click)="openDriverBusSelectionModal()">
+        Cambiar Chofer
+      </ion-button> -->
+       <ion-icon name="chevron-forward-outline"></ion-icon>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+  </ion-card>

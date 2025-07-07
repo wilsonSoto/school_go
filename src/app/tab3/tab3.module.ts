@@ -6,6 +6,10 @@ import { Tab3Page } from './tab3.page';
 // import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab3PageRoutingModule } from './tab3-routing.module';
+import { RoutesVehiclesComponent } from '../Components/routes-vehicles/routes-vehicles.component';
+import { AllRouteComponent } from '../Components/all-rute/all-rute.component';
+import { CapitalCasePipe } from "../pipes/capital-case.pipe";
+import { RouteService } from '../services/route.service';
 
 @NgModule({
   imports: [
@@ -15,7 +19,17 @@ import { Tab3PageRoutingModule } from './tab3-routing.module';
     // ExploreContainerComponentModule,
     Tab3PageRoutingModule,
     ReactiveFormsModule,
+    CapitalCasePipe
+],
+  declarations: [
+    Tab3Page,
+    RoutesVehiclesComponent,
+    AllRouteComponent
   ],
-  declarations: [Tab3Page]
+   providers: [
+      RouteService
+
+      // DaterangepickerComponent, DaterangepickerDirective
+    ],
 })
 export class Tab3PageModule {}
