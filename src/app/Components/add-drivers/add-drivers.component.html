@@ -1,0 +1,222 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Chofer </ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <ion-buttons *ngIf="action == 'edit'" slot="end">
+      <ion-button (click)="modal.dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+  <form [formGroup]="driverForm">
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Nombre y Apellido"
+        labelPlacement="floating"
+        formControlName="name"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('name')?.invalid &&
+          driverForm.get('name')?.touched
+        "
+      >
+        Nombre y Apellido es requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Telefono"
+        labelPlacement="floating"
+        formControlName="phone"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('phone')?.invalid && driverForm.get('phone')?.touched
+        "
+      >
+        Teléfono inválido o requerido (10 dígitos).
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Movil"
+        labelPlacement="floating"
+        formControlName="mobile"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('mobile')?.invalid && driverForm.get('mobile')?.touched
+        "
+      >
+        Móvil inválido o requerido (10 dígitos).
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="email"
+        fill="solid"
+        label="Email"
+        labelPlacement="floating"
+        formControlName="email"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('email')?.invalid && driverForm.get('email')?.touched
+        "
+      >
+        Email inválido o requerido.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Cedula"
+        labelPlacement="floating"
+        formControlName="vat"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('vat')?.invalid &&
+          driverForm.get('vat')?.touched
+        "
+      >
+        Cédula inválida o requerida (11 dígitos).
+      </ion-note>
+    </ion-item>
+
+     <ion-item>
+      <ion-input
+        type="number"
+        fill="solid"
+        label="Licencia de conducir"
+        labelPlacement="floating"
+        formControlName="driver_license"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('driver_license')?.invalid &&
+          driverForm.get('driver_license')?.touched
+        "
+      >
+        Licencia inválida o requerida (11 dígitos).
+      </ion-note>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-input
+        type="text"
+        fill="solid"
+        label="Dirección"
+        labelPlacement="floating"
+        formControlName="address"
+      ></ion-input>
+      <ion-note
+        slot="error"
+        *ngIf="
+          driverForm.get('address')?.invalid &&
+          driverForm.get('address')?.touched
+        "
+      >
+        Dirección es requerida.
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 1)"
+        ></app-camera>
+
+        <div
+          *ngIf="profile"
+          class="image-preview-container"
+          [ngClass]="{ center: profile }"
+        >
+          <img [src]="profile" alt="Captured Image" class="image-preview" />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(1)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!profile">Seleccione la imagen</ion-label>
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <div class="image">
+        <app-camera
+          (handleActionImages)="handleImageCapture($event, 2)"
+        ></app-camera>
+
+        <div
+          *ngIf="driver_license_image"
+          class="image-preview-container"
+          [ngClass]="{ center: driver_license_image }"
+        >
+          <img
+            [src]="driver_license_image"
+            alt="Captured Image"
+            class="image-preview"
+          />
+
+          <ion-icon
+            name="close-circle"
+            class="delete-icon"
+            (click)="removeImage(2)"
+          ></ion-icon>
+        </div>
+        <ion-label *ngIf="!driver_license_image"
+          >Seleccione la imagen de la cedula</ion-label
+        >
+      </div>
+    </ion-item>
+
+  </form>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      class="login-button"
+      type="button"
+      (click)="onSubmit()"
+      expand="block"
+      [disabled]="driverForm.invalid"
+    >
+      <span *ngIf="action !== 'edit'">Agregar</span>
+      <span *ngIf="action == 'edit'">Editar</span>
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

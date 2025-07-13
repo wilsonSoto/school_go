@@ -1,0 +1,63 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+         <ion-col>
+          <ion-title size="large" >
+            Padres o Tutores
+          </ion-title>
+        </ion-col>
+        <ion-col size="auto">
+          <div>
+            <ion-avatar id="parent-button">
+              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+            </ion-avatar>
+
+          </div>
+        </ion-col>
+      </ion-row>
+
+
+    </div>
+    <ion-searchbar mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+ <app-parents
+  *ngFor="let parent of parents"
+  [parent]="parent"
+    (click)="handleOpenClientModal('edit', parent)"
+ ></app-parents>
+
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button  [routerLink]="['/add-client']">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab>
+</ion-content>
+
+<ion-popover trigger="parent-button" [dismissOnSelect]="true">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
+        <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
+        <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
+        <ion-item [button]="true" [detail]="false" routerLink="/sign-in">Cerrar Sesión</ion-item>
+
+        <!-- <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
+          <ng-template>
+            <ion-content>
+              <ion-list>
+                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover> -->
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>

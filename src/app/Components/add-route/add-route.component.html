@@ -1,0 +1,191 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Crear Ruta </ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <form [formGroup]="ruteForm">
+    <ion-list>
+      <ion-item>
+        <ion-input
+          type="text"
+          fill="solid"
+          label="Nombre de la ruta"
+          labelPlacement="floating"
+          formControlName="name"
+        ></ion-input>
+        <ion-note
+          slot="error"
+          *ngIf="
+            ruteForm.get('name')?.invalid &&
+            ruteForm.get('name')?.touched
+          "
+        >
+          Nombre de la ruta es requerido.
+        </ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          type="text"
+          fill="solid"
+          label="Seleccione los dias de la ruta"
+          labelPlacement="floating"
+          [value]="schedulesFormDays"
+          (ionFocus)="handleOpenSelectWeekDayToTimmeModal()"
+          readonly ></ion-input>
+          <!-- (click)="handleOpenSelectWeekDayToTimmeModal()" -->
+        <ion-note
+          slot="error"
+          *ngIf="
+            ruteForm.get('schedules')?.invalid &&
+            ruteForm.get('schedules')?.touched
+          "
+        >
+          Dias de la ruta es requerido.
+        </ion-note>
+      </ion-item>
+    </ion-list>
+  </form>
+
+  <ion-list class="ion-list-button">
+    <ion-button color="dark" expand="block" (click)="openDriverBusSelectionModal()">
+      Seleccionar Chofer y Autobús
+      <ion-icon slot="end" name="car-outline"></ion-icon>
+    </ion-button>
+  </ion-list>
+
+  <ion-card *ngIf="selectedDriver" class="ion-activatable ripple-parent ion-margin-top">
+    <ion-ripple-effect></ion-ripple-effect>
+    <ion-card-header>
+      <ion-avatar>
+        <img alt="Driver Profile" [src]="selectedDriver.profile || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+      </ion-avatar>
+      <span>
+        <ion-card-title>{{ selectedDriver.name }}</ion-card-title>
+        <ion-card-subtitle>{{ selectedDriver.email }}</ion-card-subtitle>
+      </span>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><ion-label>Teléfono: <ion-note>{{ selectedDriver.phone || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Móvil: <ion-note>{{ selectedDriver.mobile || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Licencia: <ion-note>{{ selectedDriver.driver_license || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Dirección: <ion-note>{{ selectedDriver.address || 'N/A'}}</ion-note></ion-label></p>
+    </ion-card-content>
+    <div class="card-footer-buttons">
+      <ion-button fill="clear" (click)="openDriverBusSelectionModal()">
+        Cambiar Chofer
+      </ion-button>
+    </div>
+  </ion-card>
+
+  <ion-card *ngIf="selectedBus" class="ion-activatable ripple-parent ion-margin-top">
+    <ion-ripple-effect></ion-ripple-effect>
+    <ion-card-header>
+      <ion-avatar>
+        <img alt="Bus Image" [src]="selectedBus.vehicule_image || 'https://ionicframework.com/docs/img/demos/bus.png'" />
+      </ion-avatar>
+      <span>
+        <ion-card-title>{{ selectedBus.name }}</ion-card-title>
+        <ion-card-subtitle>{{ selectedBus.brand || 'Marca no especificada'}} - {{ selectedBus.model || 'Modelo no especificado'}}</ion-card-subtitle>
+      </span>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><ion-label>Capacidad: <ion-note>{{ selectedBus.people_capacity || 'N/A'}} personas</ion-note></ion-label></p>
+      <p><ion-label>Color: <ion-note>{{ selectedBus.vehicle_color || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>Conductor Asignado: <ion-note>{{ selectedBus.school_driver?.name || 'N/A'}}</ion-note></ion-label></p>
+      <p><ion-label>ID de la Placa: <ion-note>{{ selectedBus.name }}</ion-note></ion-label></p>
+    </ion-card-content>
+    <div class="card-footer-buttons">
+      <ion-button fill="clear" (click)="openDriverBusSelectionModal()">
+        Cambiar Autobús
+      </ion-button>
+    </div>
+  </ion-card>
+
+
+  <ion-button color="dark" expand="block" (click)="openStudentsSelectionModal()" class="ion-margin-top">
+    <ion-icon slot="start" name="people-outline"></ion-icon>
+    Seleccionar Estudiantes ({{ studentIdsFormArray.length }})
+  </ion-button>
+
+  <!-- <ion-list *ngIf="selectedStudentsForRoute.length > 0">
+    <ion-list-header>
+      <ion-label>Estudiantes Seleccionados</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let student of selectedStudentsForRoute">
+      <ion-label>{{ student.name }} {{ student.last_name }}</ion-label>
+    </ion-item>
+  </ion-list> -->
+
+  <ion-button
+    expand="block"
+    color="dark"
+    [disabled]="studentIdsFormArray.length === 0"
+    class="ion-margin-top"
+    (click)="openReorderStudentsMapModal()"
+  >
+    <ion-icon slot="start" name="map-outline"></ion-icon>
+    Ajustar Ruta y Orden de Recogida
+  </ion-button>
+  <ion-list *ngIf="studentIdsPickupOrderFormArray.length > 0">
+  <ion-list-header>
+    <ion-label>Estudiantes Seleccionados en Orden de Recogida</ion-label>
+  </ion-list-header>
+<ion-item lines="full" color="light">
+      <ion-label>
+        <strong>Grupos:</strong>
+      </ion-label>
+    </ion-item>
+  <ng-container *ngFor="let group of studentIdsPickupOrderFormArray.value">
+    <ion-list>
+      <ion-item lines="full" >
+        <ion-label class="group">
+        <strong>{{ group.name }}</strong>
+      </ion-label>
+      </ion-item>
+
+      <div class="group-students">
+        <ion-item *ngFor="let student of group.students; let i = index">
+          <ion-label>
+            {{ i + 1 }}. {{ student.name }} {{ student.last_name }}
+            <p *ngIf="student.home_latitude">
+              Lat: {{ student.home_latitude | number:'1.4-4' }},
+              Lng: {{ student.home_longitude | number:'1.4-4' }}
+            </p>
+          </ion-label>
+        </ion-item>
+
+      </div>
+
+    </ion-list>
+  </ng-container>
+</ion-list>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button
+      class="login-button"
+      type="button"
+      (click)="onSubmit()"
+      expand="block"
+      [disabled]="ruteForm.invalid"
+    >
+      <span *ngIf="action !== 'edit'">Agregar</span>
+      <span *ngIf="action == 'edit'">Editar</span>
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

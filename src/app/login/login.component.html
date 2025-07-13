@@ -1,0 +1,55 @@
+
+<ion-content [fullscreen]="true" class="ion-padding login-content ">
+  <div class="content" >
+    <div class="login-box">
+      <img src="../../assets/images/logo.png" alt="Logo" class="logo" />
+
+      <h2>Bienvenido a tu app escolar</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <ion-item>
+          <ion-label position="floating">Correo electrónico</ion-label>
+          <ion-input type="text" formControlName="login"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input type="password" formControlName="password"></ion-input>
+        </ion-item>
+
+        <!-- <ion-button expand="block" type="submit" class="ion-margin-top" color="primary" size="large" expand="block">
+          Entrar
+        </ion-button> -->
+<ion-button expand="block" type="button" (click)="login()" class="ion-margin-top" color="primary" size="large">
+  Entrar
+  <ion-spinner *ngIf="mostrarAnimacion"></ion-spinner>
+          <!-- <ng-container *ngIf="!mostrarAnimacion; else loadingButtonContent">
+          </ng-container>
+          <ng-template #loadingButtonContent>
+            Entrar
+            <img src="assets/animation/electric-bus.gif" alt="Cargando..." class="button-loading-gif" />
+            </ng-template> -->
+        </ion-button>
+
+            <!-- <ion-button class="login-button" type="submit" size="large" expand="block">
+              <ion-spinner *ngIf="isIdentifying$ | async"></ion-spinner> Acceder
+            </ion-button> -->
+
+        <ion-button expand="block" fill="clear" class="ion-text-center" routerLink="/register">
+          ¿No tienes cuenta? Regístrate
+        </ion-button>
+      </form>
+    </div>
+      <!-- <div class="loading-message" *ngIf="mostrarAnimacion">
+      <p>Iniciando sesión...</p>
+    </div> -->
+
+       <!-- <ion-button expand="block" type="button" (click)="changeLanguage('es')" class="ion-margin-top" color="primary" size="large">
+WELCOME
+      </ion-button> -->
+    <div class="logo-back">
+      <ion-label>Copyright &copy; <b>Kabay Gruop </b> </ion-label>
+    </div>
+
+  </div>
+</ion-content>

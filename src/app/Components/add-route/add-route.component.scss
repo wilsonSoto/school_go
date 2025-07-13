@@ -1,0 +1,125 @@
+ion-item {
+  .toggle-edit {
+    display: flex
+;
+    flex-direction: column;
+    align-items: flex-end;
+}
+}
+
+.input-wrapper.sc-ion-input-md {
+  --background: #ffffff;
+
+  background: var(--background);
+}
+ion-input {
+  --background: #ffffff !important;
+
+  background: var(--background);
+}
+
+ion-content {
+  ion-item {
+    --border-color: #ffffff !important;
+    .image {
+      border-bottom: solid 1px #757a86;
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      padding: 4px 0;
+    }
+  }
+}
+.center {
+  justify-content: center;
+}
+.image-preview-container {
+  display: flex;
+  align-items: center;
+
+  // margin-top: 15px;
+  // text-align: center;
+
+  .image-preview {
+    max-width: 37%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+}
+
+.no-image-placeholder {
+  text-align: center;
+  margin-top: 20px;
+  color: #888;
+}
+
+.image-preview-container {
+  position: relative;
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; // Para que la imagen se ajuste bien sin distorsionarse
+    border-radius: 8px; // O el borde que tengas
+  }
+
+  .delete-icon {
+    position: absolute;
+    top: -4px;
+    right: 82px;
+    font-size: 24px; // Tamaño del ícono
+    color: var(--ion-color-danger, #eb445a); // Color rojo de Ionic o un color a tu elección
+    background-color: rgba(255, 255, 255, 0.7); // Fondo semi-transparente para visibilidad
+    border-radius: 50%; // Hace que el fondo sea circular
+    padding: 2px; // Pequeño padding alrededor del ícono
+    cursor: pointer; // Indica que es clickeable
+    z-index: 10; // Asegura que esté por encima de la imagen
+    transition: transform 0.2s ease-in-out; // Animación suave al hacer hover
+  }
+
+  .delete-icon:hover {
+    transform: scale(1.2); // Agranda un poco el ícono al pasar el ratón
+  }
+
+  &.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+ion-card {
+  position: relative;
+  margin: 10px 0;
+
+  div {
+    position: absolute;
+    top: 64px;
+    right: 23px;
+
+    ion-icon {
+      font-size: 22px;
+      margin: 0 -6px;
+    }
+  }
+
+
+}
+
+.ion-list-button {
+    margin-top: 10px;
+    display: flex
+;
+    justify-content: center;
+}
+.group-students {
+    margin-left: 11px;
+}
+
+.group {
+    border-bottom: 1px solid #e1dada;
+    /* margin-left: 8px; */
+    /* margin-right: 5px; */
+    padding-bottom: 5px;
+}

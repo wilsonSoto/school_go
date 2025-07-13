@@ -1,0 +1,74 @@
+<ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+         <ion-col>
+          <ion-title size="large" >
+            Chofer y Vehiculo
+          </ion-title>
+        </ion-col>
+        <ion-col size="auto">
+          <div>
+            <ion-avatar>
+              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+            </ion-avatar>
+
+          </div>
+        </ion-col>
+      </ion-row>
+
+
+    </div>
+
+    <div class="segment">
+
+      <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
+        <ion-segment-button value="first" content-id="first">
+          <ion-label>Chofer </ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="second" content-id="second">
+          <ion-label>Vehiculo</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+          <!-- <ion-searchbar size="mediun" mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar> -->
+        </div>
+      </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="">
+
+<!-- <ion-segment-view>
+  <ion-segment-content id="first">
+    <app-drivers
+    *ngFor="let driver of drivers"
+    [driver]="driver"
+    (handleActionDriver)="handleOpenDriverModal($event)"
+    ></app-drivers>
+
+  </ion-segment-content>
+  <ion-segment-content id="second">
+       <app-vehicles
+    *ngFor="let vehicle of vehicles"
+    [vehicle]="vehicle"
+    ></app-vehicles>
+
+  </ion-segment-content>
+  <ion-segment-content id="third">Third</ion-segment-content>
+</ion-segment-view> -->
+
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="handleOpenDriverModal('add')">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab>
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button >
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+
+  </ion-fab>
+
+</ion-content>

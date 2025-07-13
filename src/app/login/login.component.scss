@@ -1,0 +1,155 @@
+.login-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+
+  > div {
+     display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    padding: auto;
+    height: 95vh;
+  }
+
+
+  .login-box {
+    width: 100%;
+    max-width: 374px;
+    text-align: center;
+    background: var(--ion-color-light, #ffffff);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    position: relative;
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: var(--ion-color-primary);
+    }
+
+    ion-item {
+      margin-bottom: 12px;
+    }
+
+    ion-button {
+      margin-top: 10px;
+       // Estilos para el botón cuando el GIF esté dentro
+    display: flex; // Para centrar el GIF/spinner y texto si hubiera
+    justify-content: center; // Centrar horizontalmente
+    align-items: center; // Centrar verticalmente
+    min-height: 48px; // Asegura una altura mínima para el botón si solo hay un GIF pequeño
+
+    }
+  }
+ // Estilos para el GIF dentro del botón
+  .button-loading-gif {
+    height: 35px; // Ajusta el tamaño para que se vea bien dentro del botón
+    width: auto;
+    animation: pulse 1.5s infinite ease-in-out; // Opcional: una pequeña animación
+  }
+  .logo-back {
+    height: 40%; // Altura por defecto para móvil
+    width: 100%; // Ancho por defecto para móvil
+    display: flex;
+    align-items: flex-end;
+    justify-content: center; // Centra el copyright horizontalmente
+
+    background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(232 255 0 / 10%)), url('../../assets/images/logo-back.png');
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 20px;
+
+    ion-label {
+      color: var(--ion-color-medium);
+      font-size: 0.8em;
+      margin-bottom: 10px;
+    }
+  }
+
+  // --- MEDIA QUERY para pantallas GRANDES (mayor a 1023px) ---
+  @media (min-width: 1024px) {
+    > div {
+      flex-direction: row;
+      justify-content: center;
+      align-items: stretch;
+      width: 90%;
+      max-width: 1200px;
+      background: var(--ion-color-light, #ffffff);
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      height: 70vh;
+      overflow: hidden;
+    }
+
+    .login-box {
+      width: 45%;
+      max-width: none;
+      margin: 0;
+      padding: 40px;
+      border-radius: 0;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      .logo {
+        width: 180px;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        font-size: 2.5em;
+        margin-bottom: 40px;
+      }
+
+      ion-item {
+        margin-bottom: 15px;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      ion-button {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    .logo-back {
+      width: 55%;
+      height: 100%;
+      margin: 0;
+      position: relative;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 20px;
+
+      ion-label {
+        font-size: 1em;
+      }
+    }
+  }
+}
+
+// Opcional: una pequeña animación para el GIF en el botón
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
