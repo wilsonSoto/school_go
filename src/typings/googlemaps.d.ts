@@ -22,3 +22,6 @@
 //   // You can fill in the specific types as needed based on the Google API you are using.
 //   // For a basic declaration to avoid the initial error, just having `declare namespace google {}` is enough.
 // }
+declare namespace google {
+    export = google;
+}

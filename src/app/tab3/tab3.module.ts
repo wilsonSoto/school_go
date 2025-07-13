@@ -7,9 +7,10 @@ import { Tab3Page } from './tab3.page';
 
 import { Tab3PageRoutingModule } from './tab3-routing.module';
 import { RoutesVehiclesComponent } from '../Components/routes-vehicles/routes-vehicles.component';
-import { AllRouteComponent } from '../Components/all-rute/all-rute.component';
+import { AllRouteComponent } from '../Components/all-route/all-rute.component';
 import { CapitalCasePipe } from "../pipes/capital-case.pipe";
 import { RouteService } from '../services/route.service';
+import { SharedModule } from '../shared/module/shared.module';
 
 @NgModule({
   imports: [
@@ -19,12 +20,13 @@ import { RouteService } from '../services/route.service';
     // ExploreContainerComponentModule,
     Tab3PageRoutingModule,
     ReactiveFormsModule,
-    CapitalCasePipe
+    CapitalCasePipe,
+    SharedModule
 ],
   declarations: [
     Tab3Page,
     RoutesVehiclesComponent,
-    AllRouteComponent
+    // AllRouteComponent
   ],
    providers: [
       RouteService

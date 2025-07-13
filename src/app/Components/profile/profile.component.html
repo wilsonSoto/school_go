@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/edit-profile']">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Foto y Nombre -->
+  <div class="profile-header ion-text-center">
+    <ion-avatar class="profile-avatar">
+      <img [src]="user.image || 'assets/img/profile-placeholder.png'" alt="Foto" />
+    </ion-avatar>
+    <h2>{{ user.name }}</h2>
+    <p>{{ user.role }}</p>
+  </div>
+
+  <!-- Información Personal -->
+  <ion-list>
+    <ion-item>
+      <ion-icon name="mail-outline" slot="start"></ion-icon>
+      <ion-label>{{ user.email }}</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon name="call-outline" slot="start"></ion-icon>
+      <ion-label>{{ user.phone }}</ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="user.address">
+      <ion-icon name="location-outline" slot="start"></ion-icon>
+      <ion-label>{{ user.address }}</ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="user.accountStatus">
+      <ion-icon name="wallet-outline" slot="start"></ion-icon>
+      <ion-label>Estado de cuenta: {{ user.accountStatus }}</ion-label>
+    </ion-item>
+  </ion-list>
+
+
+  <!-- Acciones -->
+   <div class="btn">
+     <ion-button expand="block" color="primary" (click)="goToSettings()">
+       Configuración
+     </ion-button>
+
+     <ion-button class="logout" expand="block" fill="clear" color="medium" (click)="logout()">
+       Cerrar sesión
+     </ion-button>
+
+   </div>
+
+  <!-- Secciones según el tipo de usuario -->
+  <ion-list *ngIf="user.role === 'Padre'">
+    <ion-list-header>Padre de familia</ion-list-header>
+    <ion-item (click)="viewChildren()">Ver hijos</ion-item>
+    <ion-item (click)="viewPaymentHistory()">Historial de pagos</ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="user.role === 'Chofer'">
+    <ion-list-header>Chofer</ion-list-header>
+    <ion-item (click)="viewRoutes()">Mis rutas</ion-item>
+    <ion-item (click)="viewVehicle()">Información del vehículo</ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="user.role === 'Administrador'">
+    <ion-list-header>Administrativo</ion-list-header>
+    <ion-item (click)="manageUsers()">Administrar usuarios</ion-item>
+    <ion-item (click)="viewReports()">Ver reportes</ion-item>
+  </ion-list>
+</ion-content>

@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
-import { AddClientComponent } from './Components/add-client/add-client.component';
+import { AddParentComponent } from './Components/add-parent/add-parent.component';
 import { AddRouteComponent } from './Components/add-route/add-route.component';
-import { MapsComponent } from './Components/actions-services/maps-route/maps-route.component';
+import { MapsComponent } from './Components/actions-services/maps/maps.component';
 import { AddDriversComponent } from './Components/add-drivers/add-drivers.component';
 import { AddVehiclesComponent } from './Components/add-vehicles/add-vehicles.component';
+import { EditProfileComponent } from './Components/edit-profile/edit-profile.component';
+import { PlannedRouteComponent } from './Components/planned-route/planned-route.component';
 
 const routes: Routes = [
   {
@@ -24,7 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'add-client',
-    component: AddClientComponent,
+    component: AddParentComponent,
   },
    {
     path: 'add-driver',
@@ -34,10 +36,23 @@ const routes: Routes = [
     path: 'add-bus',
     component: AddVehiclesComponent,
   },
+   {
+    path: 'add-route',
+    component: AddRouteComponent,
+  },
   {
     path: 'route/:routeId',
     component: AddRouteComponent,
   },
+  {
+    path: 'edit-profile',
+    component: EditProfileComponent,
+  },
+  {
+    path: 'planned-route/:routeId',
+    component: PlannedRouteComponent,
+  },
+
   {
     path: 'maps',
     component: MapsComponent,

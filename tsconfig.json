@@ -17,7 +17,7 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2022",
-    "module": "es2020",
+    "module": "es2022",
     "resolveJsonModule": true,
      "esModuleInterop": true,                // Esto también es importante y a menudo va de la mano
     "allowSyntheticDefaultImports": true,   // ¡Añade o asegura que esto sea true!
@@ -27,8 +27,10 @@
       "dom"
     ],
     "useDefineForClassFields": false,
+    "skipLibCheck": true,
 
-    // "types": ["node", "google.maps"]
+    "types": ["google.maps"],
+    "typeRoots": ["node_modules/@types", "src/typings"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

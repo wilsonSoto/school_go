@@ -1,4 +1,4 @@
-import { MapsComponent } from './../maps-route/maps-route.component';
+// import { MapsRouteComponent } from './../maps-route/maps-route.component';
 
 import {
   Component,
@@ -9,7 +9,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   OnDestroy,
   Injectable,
-  AfterViewInit
+  AfterViewInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -17,7 +17,7 @@ import {
   ActionSheetController,
   AlertController,
   ToastController, // Import ToastController for actual toasts
-  ActionSheetButton
+  ActionSheetButton,
 } from '@ionic/angular';
 import { IonicModule } from '@ionic/angular';
 
@@ -31,7 +31,11 @@ import { Subject, Subscription } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ToastService } from 'src/app/services/toast.service';
-// import { MapsComponent } from '../maps/maps.component';
+// import { MapsRouteComponent } from '../maps/maps.component';
+import { GoogleMap } from '@capacitor/google-maps';
+import { MapsComponent } from '../maps/maps.component';
+import { getCentroid } from 'src/app/shared/utils/geo-utils';
+// import { MapsComponent } from '../../../../assets';
 
 // --- MOCK/CONCEPTUAL GoogleMapsService ---
 interface MapMarker {
@@ -48,78 +52,50 @@ interface MarkerDragEvent {
   newPosition: { lat: number; lng: number };
 }
 
-// @Injectable({ providedIn: 'root' })
-// class GoogleMapsService {
-//   private map: any;
-//   private markers: Map<string, any> = new Map();
-
-//   markerDragged = new Subject<MarkerDragEvent>();
-
-//   initMap(mapElement: HTMLElement, center: { lat: number; lng: number }, zoom: number = 14): void {
-//     console.log('Mock: Initializing map on element:', mapElement);
-//   }
-
-//   addMarker(markerData: MapMarker): void {
-//     console.log(`Mock: Adding marker for ${markerData.title} at (${markerData.position.lat}, ${markerData.position.lng})`);
-//   }
-
-//   removeMarker(id: string): void {
-//     console.log(`Mock: Removing marker for ID: ${id}`);
-//   }
-
-//   clearMarkers(): void {
-//     console.log('Mock: Clearing all markers');
-//   }
-
-//   updateMarkerPosition(id: string, newPosition: { lat: number; lng: number }): void {
-//     console.log(`Mock: Updating marker ${id} position to (${newPosition.lat}, ${newPosition.lng})`);
-//   }
-
-//   updateMarkerLabel(id: string, label: string): void {
-//     console.log(`Mock: Updating marker ${id} label to ${label}`);
-//   }
-
-//   centerMap(position: { lat: number; lng: number }, zoom?: number): void {
-//     console.log(`Mock: Centering map on (${position.lat}, ${position.lng})`);
-//   }
-// }
-// --- END MOCK/CONCEPTUAL GoogleMapsService ---
-
-
 @Component({
   standalone: true,
   selector: 'app-reorder-students-map-modal',
   templateUrl: './reorder-students-map-modal.component.html',
   styleUrls: ['./reorder-students-map-modal.component.scss'],
-  imports: [
-    CommonModule,
-    IonicModule,
-    MapsComponent
-],
+  imports: [CommonModule, IonicModule, MapsComponent],
   providers: [
     // GoogleMapsService,
-    StudentsService
+    StudentsService,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ReorderStudentsMapModalComponent implements OnInit, OnDestroy, AfterViewInit {
-
+export class ReorderStudentsMapModalComponent
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @Input() modal!: Components.IonModal;
+  // @Input() activeMap: boolean = false;
   @Input() studentsForRoute: Student[] = [];
-  @Input() studentIdsPickupOrderFormArray: any[] = [];
+  @Input() studentIdsPickupOrderFormArray: any = [];
 
   @ViewChild('mapContainer', { static: true }) mapElementRef!: ElementRef;
 
   reorderableStudentGroups: StudentGroup[] = [];
   isReorderEnabled: boolean = true;
+  activeMap: boolean = false;
   isLoadingMap: boolean = true;
   showMapComponent: boolean = true;
   errorMessage: string | null = null;
-myParentCondition = true;
+  myParentCondition = true;
   private markerDragSubscription: Subscription | undefined;
   private studentsSubscription: Subscription | undefined;
 
-  private groupColors: string[] = ['#F44336', '#2196F3', '#4CAF50', '#9C27B0', '#FF9800', '#795548', '#E91E63', '#00BCD4'];
+  private groupColors: string[] = [
+    '#F44336',
+    '#2196F3',
+    '#4CAF50',
+    '#9C27B0',
+    '#FF9800',
+    '#795548',
+    '#E91E63',
+    '#00BCD4',
+  ];
+
+  markers: any = [];
 
   constructor(
     private modalController: ModalController,
@@ -129,30 +105,36 @@ myParentCondition = true;
     // private mapService: GoogleMapsService,
     private studentsService: StudentsService,
     private toastService: ToastService
-
   ) {}
 
-  ngOnInit() {
-    console.log(this.studentIdsPickupOrderFormArray,'studentIdsPickupOrderFormArray');
-    console.log(this.studentsForRoute,'studentsForRoute');
-
-    if (this.studentIdsPickupOrderFormArray && this.studentIdsPickupOrderFormArray.length > 0) {
-       this.reorderableStudentGroups =  [...this.studentIdsPickupOrderFormArray]
+  async ngOnInit() {
+    if (
+      this.studentIdsPickupOrderFormArray &&
+      this.studentIdsPickupOrderFormArray.length > 0
+    ) {
+      this.setReorderStudents();
     } else if (this.studentsForRoute && this.studentsForRoute.length > 0) {
-      this.reorderableStudentGroups = [{
-        id: 'group-general',
-        name: 'General (Todos los estudiantes)',
-        students: [...this.studentsForRoute]
-      }];
+      this.reorderableStudentGroups = [
+        {
+          id: 'group-general',
+          name: 'General (Todos los estudiantes)',
+          students: [...this.studentsForRoute],
+          point_latitude: 0,
+          point_longitude: 0
+        },
+      ];
     }
-    // else {
-    //   this.loadStudents();
-    // }
+    console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+
+    this.markers = this.generateMarkersFromGroups(
+      this.reorderableStudentGroups
+    );
+    console.log(this.markers, 'this.markers');
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.showMapComponent = true
+      this.showMapComponent = true;
     }, 0);
   }
 
@@ -165,46 +147,160 @@ myParentCondition = true;
     }
   }
 
+  async onMarkerMoved(event: { id: string; lat: number; lng: number }) {
+  console.log('🟢 Marcador movido:', event);
+  const index = Number(event.id);
+
+  if (index >= 0 && index < this.markers.length) {
+    // Actualiza el marcador
+    this.markers[index].lat = event.lat;
+    this.markers[index].lng = event.lng;
+
+    // Espera confirmación
+    const alert = await this.alertController.create({
+      header: '¿Actualizar ubicación?',
+      message: `¿Deseas aplicar esta nueva ubicación también en ${this.markers[index].name}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Actualizar',
+          handler: () => {
+            const movedMarker = this.markers[index];
+            this.updateGroupOrStudentCoordinates(movedMarker);
+    console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  } else {
+    console.warn('Índice fuera de rango');
+  }
+}
+
+
+updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
+  for (const group of this.reorderableStudentGroups) {
+    // 1. Verifica si es un grupo (coincide con group.id)
+    if (group.id === marker.id) {
+      group.point_latitude = marker.lat;
+      group.point_longitude = marker.lng;
+      console.log(`📍 Coordenadas actualizadas para el grupo: ${group.name}`);
+      return;
+    }
+
+    // 2. Verifica si es un estudiante (coincide con student.id)
+    if (Array.isArray(group.students)) {
+      for (const student of group.students) {
+        if (student.id === marker.id) {
+          student.home_latitude = marker.lat;
+          student.home_longitude = marker.lng;
+          console.log(`📍 Coordenadas actualizadas para el estudiante: ${student.name}`);
+          return;
+        }
+      }
+    }
+  }
+
+  console.warn('❌ No se encontró el grupo o estudiante para actualizar');
+}
+
+
+  generateMarkersFromGroups(
+    groups: any[]
+  ): { lat: number; lng: number; name: string }[] {
+    const markers: { lat: number; lng: number; name: string; id: any }[] = [];
+
+    for (const group of groups) {
+      const hasGroupCoords = group.point_latitude && group.point_longitude;
+
+      if (hasGroupCoords) {
+        markers.push({
+          lat: group.point_latitude,
+          lng: group.point_longitude,
+          name: group.name,
+          id: group.id,
+        });
+      } else if (Array.isArray(group.students)) {
+        for (const student of group.students) {
+          const hasStudentCoords =
+            student.home_latitude && student.home_longitude;
+          if (hasStudentCoords) {
+            markers.push({
+              lat: student.home_latitude,
+              lng: student.home_longitude,
+              name: student.name,
+              id: student.id,
+            });
+          }
+        }
+      }
+    }
+
+    return markers;
+  }
+
+  setReorderStudents() {
+    const selectedStudentIds = this.studentIdsPickupOrderFormArray
+      .flatMap((control: any) => {
+        const route = control;
+        if (Array.isArray(route.students)) {
+          return route.students.map((student: any) => student.id);
+        }
+        return [route.students?.id];
+      })
+      .filter((id: any) => !!id);
+
+    const filteredStudents = this.studentsForRoute.filter(
+      (student) => !selectedStudentIds.includes(student.id)
+    );
+
+    console.log(filteredStudents, 'filteredStudents filteredStudents');
+    console.log(selectedStudentIds, 'selectedStudentIds selectedStudentIds');
+
+    if (
+      !this.studentIdsPickupOrderFormArray.some(
+        (data: any) => data.id == 'group-general'
+      ) ||
+      filteredStudents.length > 0
+    ) {
+      this.reorderableStudentGroups = [
+        ...this.studentIdsPickupOrderFormArray,
+        {
+          id: 'group-general',
+          name: 'General (Todos los estudiantes)',
+          students: filteredStudents,
+        },
+      ];
+    } else if (
+      this.studentIdsPickupOrderFormArray.some(
+        (data: any) => data.id == 'group-general'
+      ) ||
+      filteredStudents.length > 0
+    ) {
+      this.reorderableStudentGroups = [
+        ...this.studentIdsPickupOrderFormArray,
+        // {
+        //   id: 'group-general',
+        //   name: 'General (Todos los estudiantes)',
+        //   students: filteredStudents,
+        // },
+      ];
+    }
+  }
+
   getTotalStudents(): number {
-    return this.reorderableStudentGroups.reduce((count, group) => count + group.students.length, 0);
+    return this.reorderableStudentGroups.reduce(
+      (count, group) => count + group.students.length,
+      0
+    );
   }
 
-  // loadStudents(): void {
-  //   this.isLoadingMap = true;
-  //   this.errorMessage = null;
-
-  //   this.studentsSubscription = this.studentsService.getAllStudents().pipe(
-  //     tap((res: any) => {
-  //       if (res && res.data && res.data.students) {
-  //         this.reorderableStudentGroups = [{
-  //           id: 'group-general',
-  //           name: 'General (Todos los estudiantes)',
-  //           students: [...res.data.students]
-  //         }];
-  //       } else {
-  //         this.errorMessage = 'No se encontraron datos de estudiantes.';
-  //         this.reorderableStudentGroups = [];
-  //       }
-  //     }),
-  //     catchError(err => {
-  //       console.error('Error fetching students:', err);
-  //       this.errorMessage = 'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-  //       this.reorderableStudentGroups = [];
-  //       return of([]);
-  //     }),
-  //     finalize(() => {
-  //       setTimeout(() => {
-  //       }, 0);
-  //     })
-  //   ).subscribe();
-  // }
-
-  private getGroupColor(groupId: string): string {
-    const hash = groupId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return this.groupColors[hash % this.groupColors.length];
-  }
-
-  // --- Group Management ---
   async addGroup(): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Nombre del nuevo grupo',
@@ -212,15 +308,16 @@ myParentCondition = true;
         {
           name: 'groupName',
           type: 'text',
-          placeholder: 'Ej: Ruta Norte'
-        }
+          placeholder: 'Ej: Ruta Norte',
+        },
       ],
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
           cssClass: 'secondary',
-        }, {
+        },
+        {
           text: 'Crear',
           handler: (data) => {
             const groupName = data.groupName.trim();
@@ -229,38 +326,62 @@ myParentCondition = true;
               this.reorderableStudentGroups.push({
                 id: newGroupId,
                 name: groupName,
-                students: []
+                students: [],
+                point_latitude: 0,
+                point_longitude: 0
               });
+
               // this.updateMapVisualization();
-              this.toastService.presentToast('Nuevo grupo creado: ' + groupName, 'success');
+              this.toastService.presentToast(
+                'Nuevo grupo creado: ' + groupName,
+                'success'
+              );
             } else {
-              this.toastService.presentToast('El nombre del grupo no puede estar vacío.', 'danger');
+              this.toastService.presentToast(
+                'El nombre del grupo no puede estar vacío.',
+                'danger'
+              );
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
   removeGroup(groupId: string): void {
-    const groupIndex = this.reorderableStudentGroups.findIndex(g => g.id === groupId);
+    const groupIndex = this.reorderableStudentGroups.findIndex(
+      (g) => g.id === groupId
+    );
     if (groupIndex > -1) {
       const groupToRemove = this.reorderableStudentGroups[groupIndex];
 
       if (groupToRemove.id === 'group-general') {
-        this.toastService.presentToast('No se puede eliminar el grupo general.', 'warning');
+        this.toastService.presentToast(
+          'No se puede eliminar el grupo general.',
+          'warning'
+        );
         return;
       }
 
       if (groupToRemove.students.length > 0) {
-        const generalGroup = this.reorderableStudentGroups.find(g => g.id === 'group-general');
+        const generalGroup = this.reorderableStudentGroups.find(
+          (g) => g.id === 'group-general'
+        );
         if (generalGroup) {
           generalGroup.students.push(...groupToRemove.students);
-          console.log(`Moved ${groupToRemove.students.length} students from "${groupToRemove.name}" to "General" group.`);
-          this.toastService.presentToast(`Estudiantes de "${groupToRemove.name}" movidos al grupo "General".`, 'success');
+          console.log(
+            `Moved ${groupToRemove.students.length} students from "${groupToRemove.name}" to "General" group.`
+          );
+          this.toastService.presentToast(
+            `Estudiantes de "${groupToRemove.name}" movidos al grupo "General".`,
+            'success'
+          );
         } else {
-          this.toastService.presentToast('No se encontró el grupo "General" para transferir estudiantes.', 'danger');
+          this.toastService.presentToast(
+            'No se encontró el grupo "General" para transferir estudiantes.',
+            'danger'
+          );
           console.warn('Could not find General group to transfer students!');
         }
       }
@@ -269,58 +390,156 @@ myParentCondition = true;
   }
 
   handleGroupReorder(event: CustomEvent<ItemReorderEventDetail>): void {
-    const movedGroup = this.reorderableStudentGroups.splice(event.detail.from, 1)[0];
+    const movedGroup = this.reorderableStudentGroups.splice(
+      event.detail.from,
+      1
+    )[0];
     this.reorderableStudentGroups.splice(event.detail.to, 0, movedGroup);
     event.detail.complete();
   }
 
-  handleStudentReorder(event: CustomEvent<ItemReorderEventDetail>, groupIndex: number): void {
-    const studentsInSourceGroup = this.reorderableStudentGroups[groupIndex].students;
+  handleStudentReorder(
+    event: CustomEvent<ItemReorderEventDetail>,
+    groupIndex: number
+  ): void {
+    const studentsInSourceGroup =
+      this.reorderableStudentGroups[groupIndex].students;
     const movedStudent = studentsInSourceGroup.splice(event.detail.from, 1)[0];
     studentsInSourceGroup.splice(event.detail.to, 0, movedStudent);
     event.detail.complete();
   }
 
-  async presentMoveStudentOptions(studentToMove: Student, currentGroupId: string): Promise<void> {
-    const otherGroups = this.reorderableStudentGroups.filter(group => group.id !== currentGroupId);
+  async presentMoveStudentOptions(
+    studentToMove: Student,
+    currentGroupId: string
+  ): Promise<void> {
+    const otherGroups = this.reorderableStudentGroups.filter(
+      (group) => group.id !== currentGroupId
+    );
 
     if (otherGroups.length === 0) {
-      this.toastService.presentToast('No hay otros grupos disponibles para mover este estudiante.', 'warning');
+      this.toastService.presentToast(
+        'No hay otros grupos disponibles para mover este estudiante.',
+        'warning'
+      );
       return;
     }
 
     const actionSheet = await this.actionSheetController.create({
       header: `Mover a ${studentToMove.name} ${studentToMove.last_name} a:`,
-      buttons: otherGroups.map(group => ({
-        text: group.name,
-        handler: () => {
-          this.moveStudentToGroup(studentToMove, currentGroupId, group.id);
-        }
-      } as ActionSheetButton)).concat([
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        } as ActionSheetButton
-      ])
+      buttons: otherGroups
+        .map(
+          (group) =>
+            ({
+              text: group.name,
+              handler: () => {
+                this.moveStudentToGroup(
+                  studentToMove,
+                  currentGroupId,
+                  group.id
+                );
+              },
+            } as ActionSheetButton)
+        )
+        .concat([
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+          } as ActionSheetButton,
+        ]),
     });
     await actionSheet.present();
   }
 
-  moveStudentToGroup(student: Student, fromGroupId: string, toGroupId: string): void {
-    const fromGroup = this.reorderableStudentGroups.find(g => g.id === fromGroupId);
-    const toGroup = this.reorderableStudentGroups.find(g => g.id === toGroupId);
+  moveStudentToGroup11111(
+    student: Student,
+    fromGroupId: string,
+    toGroupId: string
+  ): void {
+    const fromGroup = this.reorderableStudentGroups.find(
+      (g) => g.id === fromGroupId
+    );
+    const toGroup = this.reorderableStudentGroups.find(
+      (g) => g.id === toGroupId
+    );
+console.log(fromGroupId,'fromGroupId fromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupId');
+console.log(toGroup,'toGroup toGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGroup');
 
     if (fromGroup && toGroup) {
-      const studentIndex = fromGroup.students.findIndex(s => s.id === student.id);
+      const studentIndex = fromGroup.students.findIndex(
+        (s) => s.id === student.id
+      );
       if (studentIndex > -1) {
         const [movedStudent] = fromGroup.students.splice(studentIndex, 1);
         toGroup.students.push(movedStudent);
-        this.toastService.presentToast(`"${movedStudent.name}" movido a "${toGroup.name}"`, 'success');
+        this.toastService.presentToast(
+          `"${movedStudent.name}" movido a "${toGroup.name}"`,
+          'success'
+        );
       }
     } else {
-      this.toastService.presentToast('Error al mover estudiante: grupos no encontrados.', 'danger');
+      this.toastService.presentToast(
+        'Error al mover estudiante: grupos no encontrados.',
+        'danger'
+      );
     }
   }
+
+  moveStudentToGroup(
+  student: Student,
+  fromGroupId: string,
+  toGroupId: string
+): void {
+  const fromGroup = this.reorderableStudentGroups.find(g => g.id === fromGroupId);
+  const toGroup = this.reorderableStudentGroups.find(g => g.id === toGroupId);
+
+  if (!fromGroup || !toGroup) {
+    this.toastService.presentToast('Error al mover estudiante: grupos no encontrados.', 'danger');
+    return;
+  }
+
+  const studentIndex = fromGroup.students.findIndex(s => s.id === student.id);
+  if (studentIndex === -1) return;
+
+  const [movedStudent] = fromGroup.students.splice(studentIndex, 1);
+  toGroup.students.push(movedStudent);
+
+  // 🧠 Actualizar puntos geográficos si aplica
+  if (toGroupId !== 'group-general') {
+    // Recalcular centroide
+    const wktPoints = toGroup.students
+      .filter(s => s.home_latitude && s.home_longitude)
+      .map(s => `POINT (${s.home_longitude} ${s.home_latitude})`);
+
+    const centroid = getCentroid(wktPoints);
+    if (centroid) {
+      toGroup.point_latitude = centroid.lat;
+      toGroup.point_longitude = centroid.lon;
+    }
+  }
+
+  if (fromGroupId !== 'group-general' && fromGroup.students.length > 0) {
+    // Recalcular centroide del grupo origen si aún tiene estudiantes
+    const wktPoints = fromGroup.students
+      .filter(s => s.home_latitude && s.home_longitude)
+      .map(s => `POINT (${s.home_longitude} ${s.home_latitude})`);
+
+    const centroid = getCentroid(wktPoints);
+    if (centroid) {
+      fromGroup.point_latitude = centroid.lat;
+      fromGroup.point_longitude = centroid.lon;
+    }
+  } else if (fromGroupId !== 'group-general' && fromGroup.students.length === 0) {
+    // Si quedó vacío, borra punto
+    fromGroup.point_latitude = 0;
+    fromGroup.point_longitude = 0;
+  }
+
+  this.toastService.presentToast(
+    `"${movedStudent.name}" movido a "${toGroup.name}"`,
+    'success'
+  );
+}
 
   dismissModal(action: 'cancel' | 'save' = 'cancel'): void {
     if (action === 'cancel') {
@@ -342,7 +561,7 @@ myParentCondition = true;
 
       this.modal.dismiss({
         action: 'save',
-        reorderedStudentsWithCoords:  this.reorderableStudentGroups,
+        reorderedStudentsWithCoords: this.reorderableStudentGroups,
       });
     }
   }
@@ -354,5 +573,4 @@ myParentCondition = true;
   toggleReorder(): void {
     this.isReorderEnabled = !this.isReorderEnabled;
   }
-
 }
