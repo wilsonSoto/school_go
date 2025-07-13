@@ -1,12 +1,29 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+  FormArray,
+  FormControl,
+} from '@angular/forms';
 
 @Component({
   standalone: false,
   selector: 'app-all-route',
   templateUrl: 'all-route.component.html',
-  styleUrls: ['all-route.component.scss']
+  styleUrls: ['all-route.component.scss'],
+  // schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  //  imports: [
+  //   CommonModule,
+  //   IonicModule,
+  //   FormsModule,
+  //   ReactiveFormsModule,
+  // ],
 })
 export class AllRouteComponent {
 

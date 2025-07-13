@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'www',
   plugins: {
     GoogleMap: {
-      apiKey: 'n/a', // <--- ¡COLOCA TU CLAVE API REAL AQUÍ!
+      apiKey: 'AIzaSyBsnbQOBYbbUuDL2Dzpd_7D-wlXz-1B5bg', // <--- ¡COLOCA TU CLAVE API REAL AQUÍ!
     },
   },
 };

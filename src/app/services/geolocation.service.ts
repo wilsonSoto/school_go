@@ -153,7 +153,7 @@ export class LocationService {
   }
 
   // Método para observar cambios de ubicación (si necesitas seguimiento en tiempo real)
- async startTrackingLocation(watchId: any) {
+ async startTrackingLocation111(watchId: any) {
     const hasPermission = await this.requestGeolocationPermissions();
     if (!hasPermission) {
       return;
@@ -185,6 +185,41 @@ export class LocationService {
       return false
     });
   }
+
+  async startTrackingLocation(watchId: any): Promise<string | undefined> {
+  const hasPermission = await this.requestGeolocationPermissions();
+  if (!hasPermission) {
+    return;
+  }
+
+  if (watchId) {
+    await this.stopTrackingLocation(watchId);
+  }
+
+  this.toastService.presentToast('Iniciando seguimiento de ubicación...', 'primary');
+
+  const newWatchId = Geolocation.watchPosition(
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    },
+    (position, err) => {
+      if (err) {
+        console.error('Error en el seguimiento de ubicación:', err);
+        this.toastService.presentToast('Error en el seguimiento de ubicación.', 'danger');
+        return;
+      }
+
+      if (position) {
+        console.log('Nueva ubicación:', position.coords.latitude, position.coords.longitude);
+        // Aquí puedes actualizar alguna propiedad o emitir un evento
+      }
+    }
+  );
+
+  return newWatchId;
+}
 
   // Método para detener el observador de ubicación
  async stopTrackingLocation(watchId: any) {

@@ -60,17 +60,24 @@
   }
   .logo-back {
     height: 40%; // Altura por defecto para móvil
-    width: 100%; // Ancho por defecto para móvil
+    width: 400px; // Ancho por defecto para móvil
     display: flex;
     align-items: flex-end;
     justify-content: center; // Centra el copyright horizontalmente
 
-    background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(232 255 0 / 10%)), url('../../assets/images/logo-back.png');
-    background-blend-mode: multiply;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-top: 20px;
+    div{
+      background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgb(232 255 0 / 10%)), url('../../assets/images/logo-back.png');
+      background-blend-mode: multiply;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin-top: 20px;
+
+    height: 100%; // Altura por defecto para móvil
+    width: 100%; // Ancho por defecto para móvil
+
+    }
+
 
     ion-label {
       color: var(--ion-color-medium);

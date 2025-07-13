@@ -34,7 +34,7 @@
 
 
 <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button  [routerLink]="['/add-client']">
+    <ion-fab-button  [routerLink]="['/add-route']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
 
@@ -50,15 +50,6 @@
         <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
         <ion-item [button]="true" [detail]="false" routerLink="/sign-in">Cerrar Sesión</ion-item>
 
-        <!-- <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
-          <ng-template>
-            <ion-content>
-              <ion-list>
-                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover> -->
       </ion-list>
     </ion-content>
   </ng-template>

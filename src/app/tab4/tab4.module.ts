@@ -6,6 +6,7 @@ import { Tab4Page } from './tab4.page';
 // import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab4PageRoutingModule } from './tab4-routing.module';
+import { ProfileComponent } from '../Components/profile/profile.component';
 // import { DaterangepickerComponent, DaterangepickerDirective, NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 @NgModule({
@@ -21,7 +22,10 @@ import { Tab4PageRoutingModule } from './tab4-routing.module';
     //   displayFormat: 'MM/DD/YYYY', // default is format value
     // }),
   ],
-  declarations: [Tab4Page],
+  declarations: [Tab4Page,
+    ProfileComponent,
+
+  ],
   providers: [ ],
 
 })

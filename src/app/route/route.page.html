@@ -29,10 +29,10 @@
 
       <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
         <ion-segment-button value="first" content-id="first">
-          <ion-label>Choferes </ion-label>
+          <ion-label>Regogida </ion-label>
         </ion-segment-button>
         <ion-segment-button value="second" content-id="second">
-          <ion-label>Vehiculos</ion-label>
+          <ion-label>Entrega</ion-label>
         </ion-segment-button>
       </ion-segment>
     </div>
@@ -42,22 +42,22 @@
 <ion-content [fullscreen]="true" class="">
   <ion-segment-view>
     <ion-segment-content id="first">
-      <app-drivers
-        *ngFor="let driver of currentDrivers"
-        [currentDriver]="driver"
-        (handleActionDriver)="handleOpenDriverModal($event, driver)"
-      ></app-drivers>
+      <app-all-route
+        *ngFor="let route of school_routes_pickup"
+        [route]="route"
+        (click)="handleOpenRouteModal('edit',route)"
+        ></app-all-route>
     </ion-segment-content>
     <ion-segment-content id="second">
-      <app-vehicles
-        *ngFor="let bus of currentVehicles"
-        [currentVehicle]="bus"
-        (handleActionDriver)="handleOpenBusModal($event, bus)"
-      ></app-vehicles>
+       <app-all-route
+        *ngFor="let route of school_routes_delivery"
+        [route]="route"
+        (click)="handleOpenRouteModal('edit',route)"
+        ></app-all-route>
     </ion-segment-content>
     <!-- <ion-segment-content id="third">Third</ion-segment-content> -->
   </ion-segment-view>
-
+<!--
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [routerLink]="['/add-bus']">
       <ion-icon name="add"></ion-icon>
@@ -68,7 +68,7 @@
     <ion-fab-button [routerLink]="['/add-bus']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 </ion-content>
 
 <ion-popover trigger="driver-bus-button" [dismissOnSelect]="true">

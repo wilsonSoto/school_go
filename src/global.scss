@@ -36,7 +36,28 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
+:root {
+  --ion-color-rose: #f6df9652;
+  // --ion-color-rose-rgb: 254, 205, 211;
+  --ion-color-rose-rgb: 252 245 221;
+  --ion-color-rose-contrast: #000000;
+  --ion-color-rose-contrast-rgb: 0, 0, 0;
+  --ion-color-rose-shade: #f6df9652;
+  --ion-color-rose-tint: #f6df9652;
+}
 
+.ion-color-rose {
+  --ion-color-base: var(--ion-color-rose);
+  --ion-color-base-rgb: var(--ion-color-rose-rgb);
+  --ion-color-contrast: var(--ion-color-rose-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-rose-contrast-rgb);
+  --ion-color-shade: var(--ion-color-rose-shade);
+  --ion-color-tint: var(--ion-color-rose-tint);
+}
+
+div[slot='content'] {
+  background: rgb(252 245 221 / 31%);;
+}
 
 body {
   font-size: 14px;
@@ -199,6 +220,10 @@ ion-modal {
   --height: 80%;
   --border-radius: 10px 10px 0px 0px;
   --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+ion-searchbar {
+  padding-bottom: 5px !important;
 }
 
 ion-modal::part(backdrop) {
