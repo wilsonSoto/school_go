@@ -28,7 +28,7 @@ import { AddVehiclesComponent } from './Components/add-vehicles/add-vehicles.com
 
 import { HttpInterceptorService } from './interceptor/http-interceptor';
 import { AuthInterceptorService } from './interceptor/auth-interceptor';
-import { AddClientComponent } from './Components/add-client/add-client.component';
+import { AddParentComponent } from './Components/add-parent/add-parent.component';
 import { AddStudentsComponent } from './Components/add-students/add-students.component';
 import { StudentsComponent } from './Components/students/students.component';
 // import { ClientsComponent } from './Components/clients/clients.component';
@@ -42,6 +42,7 @@ import { ParentService } from './services/parents.service';
 import { StudentsService } from './services/students.service';
 import { AddRouteComponent } from './Components/add-route/add-route.component';
 import { RouteService } from './services/route.service';
+import { EditProfileComponent } from './Components/edit-profile/edit-profile.component';
 // import { SelectWeekDayComponent } from './Components/actions-services/select-week-day/select-week-day.component';
 // import { AllRouteComponent } from './Components/all-rute/all-rute.component';
 
@@ -58,9 +59,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginComponent,
     AddDriversComponent,
     AddVehiclesComponent,
-    AddClientComponent,
+    AddParentComponent,
     AddStudentsComponent,
     StudentsComponent,
+    EditProfileComponent,
+
     // SelectWeekDayComponent,
     // AddRouteComponent,
     // AllRouteComponent,

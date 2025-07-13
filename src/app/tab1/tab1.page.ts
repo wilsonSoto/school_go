@@ -13,7 +13,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { TranslateService } from '@ngx-translate/core'; // Importa TranslateService
 import { ToastService } from '../services/toast.service';
-import { AddClientComponent } from '../Components/add-client/add-client.component';
+import { AddParentComponent } from '../Components/add-parent/add-parent.component';
 import { ParentService } from '../services/parents.service';
 // register();
 
@@ -92,7 +92,7 @@ export class Tab1Page implements OnInit {
     async handleOpenClientModal(action: any, parent: any) {
       try {
         const modal = await this.modalController.create({
-          component: AddClientComponent,
+          component: AddParentComponent,
           componentProps: {
             action: action,
             // students: this.stupartner_iddents,

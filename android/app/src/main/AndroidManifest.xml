@@ -35,7 +35,7 @@
             <meta-data android:name="photopicker_activity:0:required" android:value="" />
             <!-- <meta-data android:name="com.google.android.geo.API_KEY" android:value="YOUR_API_KEY_HERE"/> -->
            <!-- delete -->
-            <meta-data android:name="com.google.android.geo.API_KEY" android:value="n/a"/>
+            <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBsnbQOBYbbUuDL2Dzpd_7D-wlXz-1B5bg"/>
         </service>
 
         <provider

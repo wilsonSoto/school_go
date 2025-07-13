@@ -15,7 +15,7 @@ import { StudentsService } from 'src/app/services/students.service';
 import { Subscription, fromEvent, merge, of } from 'rxjs';
 
 import { LocationService } from 'src/app/services/geolocation.service';
-import { convertDateToTimestamp } from 'src/app/utils/convertDateToTimestamp';
+import { convertDateToTimestamp } from 'src/app/shared/utils/convertDateToTimestamp';
 
 @Component({
   standalone: false,
