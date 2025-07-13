@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+   googleMapsApiKey: 'AIzaSyBsnbQOBYbbUuDL2Dzpd_7D', // temporal
+
 };
