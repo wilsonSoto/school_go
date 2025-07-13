@@ -1,0 +1,37 @@
+  <ion-card  (click)="showDetails()" class="ion-activatable ripple-parent" *ngIf="route">
+    <ion-ripple-effect></ion-ripple-effect>
+      <ion-card-header>
+        <ion-avatar>
+          <img alt="Silhouette of a person's head" [src]="route?.school_bus?.vehicule_image" />
+        </ion-avatar>
+        <span>
+          <ion-card-title>{{route?.name | capitalCase  }} </ion-card-title>
+          <ion-card-subtitle>{{route?.contact_address}} </ion-card-subtitle>
+        </span>
+    </ion-card-header>
+
+    <ion-card-content>
+      <!-- <ion-item> -->
+
+        <!-- <ion-avatar>
+           <img alt="Silhouette of a person's head" [src]="route?.school_driver?.profile" />
+         </ion-avatar> -->
+         <!-- <span> -->
+
+           <p><ion-label>chofer: <ion-note>{{ route?.school_driver?.name}}</ion-note> </ion-label></p>
+           <p><ion-label>Email: <ion-note>{{ route?.school_driver?.email}}</ion-note> </ion-label></p>
+           <p><ion-label>Licencia: <ion-note>{{ route?.school_driver?.driver_license}}</ion-note> </ion-label></p>
+           <p>
+             <ion-label># Estudiantes en Ruta: <ion-note>{{ route?.students?.length }}</ion-note> </ion-label>
+           </p>
+         <!-- </span> -->
+      <!-- </ion-item> -->
+
+      <!-- Here's a small text description for the card content. Nothing more, nothing less. -->
+    </ion-card-content>
+
+    <div>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+</ion-card>

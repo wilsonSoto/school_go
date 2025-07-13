@@ -1,0 +1,254 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+
+
+body {
+  font-size: 14px;
+
+  --ion-color-default: #515466; // background-color: #F5F5F5;
+  --ion-color-primary: #f3b802; // background-color: #DAECFF;
+  --ion-color-success: #027A48; // background-color: #ECFDF3;
+  --ion-color-danger: #B92A2A; // background-color: #FDECEC;
+  --ion-color-dark: #1074b9; // background-color: #FDECEC;
+}
+
+ion-content {
+  --background: #f4f4f4; // Esta es la variable correcta para el fondo de ion-content
+  // Si necesitas que sea más oscuro cuando arrastras:
+  // --background-rgb: 244, 244, 244; // RGB de #f4f4f4
+}
+ion-header {
+       -webkit-box-shadow: 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 0px 0px 0 rgba(0, 0, 0, 0.1), 0 0px 0px 0 rgba(0, 0, 0, 0.1);
+
+    box-shadow: 0 2px 0px -1px rgba(0, 0, 0, 0.2), 0 0px 0px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgb(154 147 147 / 12%) !important;
+}
+
+ion-card {
+
+    -webkit-box-shadow: 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 0px 0px 0 rgba(0, 0, 0, 0.1), 0 0px 0px 0 rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);*/
+}
+ion-label  {
+    color: #757575 !important;
+    font-weight: 600;
+}
+
+ion-note {
+    font-weight: 500;
+
+  color: #1d1d1d !important;
+}
+
+.custom-danger-toast {
+  &::part(container) {
+    background-color: rgb(245 117 126 / 84%);;
+    border: 1px solid #e20a0a;
+    border-radius: 6px;
+    color: #fffffff0;
+
+    .icon-inner {
+      color: #fffffff0;
+    }
+  }
+  &::part(button) {
+    color: #fffffff0;
+
+    ion-icon {
+      color: #000;
+    }
+  }
+}
+
+
+.custom-success-toast {
+  &::part(container) {
+    background-color: #ecfdf3;
+    border: 1px solid #bffcd9;
+    border-radius: 6px;
+    color: #0a9052;
+
+    .icon-inner {
+      color: #0a9052;
+    }
+  }
+  &::part(button) {
+    color: #0a9052;
+
+    ion-icon {
+      color: #000;
+    }
+  }
+}
+
+
+.i-header {
+  background-color: #FFF;
+}
+
+.md {
+  .i-header {
+    background-color: #FFF;
+  }
+
+  ion-title {
+    // height: auto;
+    padding: 20px 20px 10px;
+  }
+}
+
+
+
+.ios {
+  .header-background {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .i-header {
+    border-bottom: 1px solid #D8DAE5;
+    background-color: #FFF;
+  }
+
+  ion-title {
+    height: auto;
+    // padding: 22px 20px 0;
+    padding: 12px 20px 0;
+  }
+}
+
+.i-toolbar-inner {
+  width: 100%;
+}
+
+ion-row {
+ display: flex;
+align-items: center;
+
+}
+.i-toolbar {
+  ion-col {
+    padding: 0;
+  }
+
+  ion-avatar {
+    height: 32px;
+    margin: 30px 20px 10px;
+    width: 32px;
+  }
+}
+
+.i-tabbar {
+  padding: 0 20px;
+}
+
+ion-card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  ion-avatar {
+    margin-right: 5px;
+  }
+}
+
+ion-input {
+  --background: #f4f4f4; // Esta es la variable correcta para el fondo de ion-content
+  input-wrapper {
+  --background: #f4f4f4; // Esta es la variable correcta para el fondo de ion-content
+
+}
+}
+
+ion-modal {
+  --height: 80%;
+  --border-radius: 10px 10px 0px 0px;
+  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+ion-modal::part(backdrop) {
+  background: rgba(209, 213, 219);
+  opacity: 1;
+}
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+
+  height: 300px;
+  width: 300px;
+
+  margin: 0 auto;
+}
+
+b {
+  width: 100%;
+}
+
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+
+  border: 1px solid #ddd;
+}
+
+.rectangle {
+  width: 300px;
+  height: 150px;
+}
+
+.rounded-rectangle {
+  width: 185px;
+  height: 65px;
+  border-radius: 8px;
+}
+
+.circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+}
+/* global.scss or app.scss */
+.full-screen-modal {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+}

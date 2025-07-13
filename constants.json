@@ -1,0 +1,8 @@
+{
+  "host": {
+    "is_production": true,
+    "prod": "https://kabaygroup.com/api",
+    "develop": "https://83bf-2001-1308-1ccf-9301-00-1003.ngrok-free.app"
+
+  }
+}

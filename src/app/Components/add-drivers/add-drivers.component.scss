@@ -1,0 +1,88 @@
+ion-item {
+  .toggle-edit {
+    display: flex
+;
+    flex-direction: column;
+    align-items: flex-end;
+}
+}
+
+.input-wrapper.sc-ion-input-md {
+  --background: #ffffff;
+
+  background: var(--background);
+}
+ion-input {
+  --background: #ffffff !important;
+
+  background: var(--background);
+}
+
+ion-content {
+  ion-item {
+    --border-color: #ffffff !important;
+    .image {
+      border-bottom: solid 1px #757a86;
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      padding: 4px 0;
+    }
+  }
+}
+.center {
+  justify-content: center;
+}
+.image-preview-container {
+  display: flex;
+  align-items: center;
+
+  // margin-top: 15px;
+  // text-align: center;
+
+  .image-preview {
+    max-width: 37%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+}
+
+.no-image-placeholder {
+  text-align: center;
+  margin-top: 20px;
+  color: #888;
+}
+
+ion-radio {
+  --border-radius: 4px;
+  --inner-border-radius: 4px;
+
+  --color: #ddd;
+  --color-checked: #2dd55b;
+}
+
+ion-radio.ios::part(container) {
+  width: 20px;
+  height: 20px;
+
+  border: 2px solid #ddd;
+  border-radius: 4px;
+}
+
+.radio-checked.ios::part(container) {
+  border-color: #2dd55b;
+}
+.radio-generate  {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+ion-radio-group {
+  padding-left: 47px;
+  border-bottom: 1px solid #969292c2;
+  min-width: 100%;
+}

@@ -1,0 +1,304 @@
+<!-- <ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Ordenar y Ajustar Ruta</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal('cancel')">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="split-layout">
+    <div class="list-panel">
+      <ion-list class="ion-padding">
+        <ion-list-header>
+          <ion-label>Orden de Recogida</ion-label>
+        </ion-list-header>
+
+        <ion-item *ngIf="reorderableStudents.length === 0">
+          <ion-label color="medium">No hay estudiantes para ordenar.</ion-label>
+        </ion-item>
+
+        <ion-reorder-group [disabled]="!isReorderEnabled" (ionItemReorder)="handleReorder($any($event))">
+          <ion-item *ngFor="let student of reorderableStudents; let i = index">
+            <ion-reorder slot="start">
+              <ion-icon name="reorder-four-outline"></ion-icon>
+            </ion-reorder>
+            <ion-label>
+              <h2>{{ i + 1 }}. {{ student.name }} {{ student.last_name }}</h2>
+              <p *ngIf="student.address">{{ student.address }}</p>
+              <p *ngIf="student.home_latitude && student.home_longitude">
+                Lat: {{ student.home_latitude | number:'1.4-4' }}, Lng: {{ student.home_longitude | number:'1.4-4' }}
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-reorder-group>
+      </ion-list>
+    </div>
+
+    <div class="map-panel">
+      <div *ngIf="isLoadingMap" class="map-loading-state ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando mapa...</p>
+      </div>
+      <div #mapContainer class="map-canvas"></div>
+      <div *ngIf="!isLoadingMap && reorderableStudents.length === 0" class="no-students-map-overlay">
+        <p>Seleccione estudiantes para verlos en el mapa.</p>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSaveOrderAndLocations()" [disabled]="reorderableStudents.length === 0">
+        Guardar Orden y Ubicaciones
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer> -->
+
+<!-- 2222222222222222222222222222222222222222222222222222222222222222222222222222222
+<ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Ordenar y Ajustar Ruta</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal('cancel')">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="split-layout">
+    <div class="list-panel">
+      <ion-list class="ion-padding">
+        <ion-list-header>
+          <ion-label>Organizar Estudiantes en Grupos</ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="toggleReorder()">
+              <ion-icon [name]="isReorderEnabled ? 'close-circle-outline' : 'reorder-four-outline'"></ion-icon>
+            </ion-button>
+            <ion-button (click)="addGroup()">
+              <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-list-header>
+
+        <ion-item *ngIf="reorderableStudentGroups.length === 0">
+          <ion-label color="medium">Haga clic en "+" para agregar un grupo.</ion-label>
+        </ion-item>
+        <ion-item *ngIf="errorMessage">
+          <ion-label color="danger">{{ errorMessage }}</ion-label>
+        </ion-item>
+
+        <ion-reorder-group [disabled]="!isReorderEnabled" (ionItemReorder)="handleGroupReorder($any($event))">
+          <ng-container *ngFor="let group of reorderableStudentGroups; let groupIndex = index">
+            <ion-item-divider>
+              <ion-reorder slot="start">
+                <ion-icon name="swap-vertical-outline"></ion-icon> </ion-reorder>
+              <ion-label>
+                <h3>{{ group.name }} ({{ group.students.length }} estudiantes)</h3>
+              </ion-label>
+              <ion-buttons slot="end">
+                <ion-button (click)="removeGroup(group.id)" color="danger">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-item-divider>
+
+            <ion-reorder-group [disabled]="!isReorderEnabled" (ionItemReorder)="handleStudentReorder($any($event), groupIndex)" class="student-reorder-group">
+              <ion-item *ngIf="group.students.length === 0">
+                <ion-label color="medium" class="ion-padding-start">Utilice el botón "Mover" para agregar estudiantes aquí.</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let student of group.students; let studentIndex = index">
+                <ion-reorder slot="start">
+                  <ion-icon name="reorder-four-outline"></ion-icon>
+                </ion-reorder>
+                <ion-label>
+                  <h2>{{ groupIndex + 1 }}-{{ studentIndex + 1 }}. {{ student.name }} {{ student.last_name }}</h2>
+                  <p *ngIf="student.address">{{ student.address }}</p>
+                  <p *ngIf="student.home_latitude && student.home_longitude">
+                    Lat: {{ student.home_latitude | number:'1.4-4' }}, Lng: {{ student.home_longitude | number:'1.4-4' }}
+                  </p>
+                </ion-label>
+                <ion-buttons slot="end">
+                  <ion-button (click)="presentMoveStudentOptions(student, group.id)">
+                    <ion-icon slot="icon-only" name="arrow-redo-outline"></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-item>
+            </ion-reorder-group>
+          </ng-container>
+        </ion-reorder-group>
+      </ion-list>
+    </div>
+
+    <div class="map-panel">
+      <div *ngIf="isLoadingMap" class="map-loading-state ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando mapa...</p>
+      </div>
+      <div #mapContainer class="map-canvas" [class.hidden]="isLoadingMap"></div>
+      <div *ngIf="!isLoadingMap && getTotalStudents() === 0" class="no-students-map-overlay">
+        <p>No hay estudiantes para mostrar. Agregue grupos y mueva estudiantes.</p>
+      </div>
+       <div *ngIf="!isLoadingMap && getTotalStudents() === 0 && reorderableStudentGroups.length > 0" class="no-students-map-overlay">
+        <p>Mueva estudiantes a los grupos para verlos en el mapa.</p>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSaveOrderAndLocations()" [disabled]="getTotalStudents() === 0">
+        Guardar Orden y Ubicaciones
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer> -->
+
+
+<!-- 3333333333333333333333333333 -->
+ <ion-header class="i-header">
+  <ion-toolbar>
+    <div class="i-toolbar-inner">
+      <ion-row class="i-toolbar">
+        <ion-col>
+          <ion-title size="large">Ordenar y Ajustar Ruta</ion-title>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal('cancel')">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="split-layout">
+    <div class="list-panel">
+      <ion-list class="ion-padding">
+        <!-- <ion-list-header> -->
+          <ion-label>Organizar Estudiantes en Grupos</ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="toggleReorder()">
+              <ion-icon [name]="isReorderEnabled ? 'close-circle-outline' : 'reorder-four-outline'"></ion-icon>
+            </ion-button>
+            <ion-button (click)="addGroup()">
+              <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        <!-- </ion-list-header> -->
+
+        <ion-list-header>
+  <ion-label>Organizar Estudiantes en Grupos</ion-label>
+  <ion-buttons slot="end">
+    <ion-button (click)="toggleReorder()">
+      <ion-icon [name]="isReorderEnabled ? 'close-circle-outline' : 'reorder-four-outline'"></ion-icon>
+    </ion-button>
+    <ion-button (click)="addGroup()">
+      <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-list-header>
+
+        <ion-item *ngIf="reorderableStudentGroups.length === 0">
+          <ion-label color="medium">Haga clic en "+" para agregar un grupo.</ion-label>
+        </ion-item>
+        <ion-item *ngIf="errorMessage">
+          <ion-label color="danger">{{ errorMessage }}</ion-label>
+        </ion-item>
+
+        <ion-reorder-group [disabled]="!isReorderEnabled" (ionItemReorder)="handleGroupReorder($any($event))">
+          <ng-container *ngFor="let group of reorderableStudentGroups; let groupIndex = index">
+            <ion-item-divider>
+              <ion-reorder slot="start">
+                <ion-icon name="swap-vertical-outline"></ion-icon>
+              </ion-reorder>
+              <ion-label>
+                <h3>{{ group.name }} ({{ group.students.length }} estudiantes)</h3>
+              </ion-label>
+              <ion-buttons slot="end">
+                <ion-button (click)="removeGroup(group.id)" color="danger">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-item-divider>
+
+            <ion-reorder-group [disabled]="!isReorderEnabled" (ionItemReorder)="handleStudentReorder($any($event), groupIndex)" class="student-reorder-group">
+              <ion-item *ngIf="group.students.length === 0">
+                <ion-label color="medium" class="ion-padding-start">Utilice el botón "Mover" para agregar estudiantes aquí.</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let student of group.students; let studentIndex = index">
+                <ion-reorder slot="start">
+                  <ion-icon name="reorder-four-outline"></ion-icon>
+                </ion-reorder>
+                <ion-label>
+                  <h2>{{ groupIndex + 1 }}-{{ studentIndex + 1 }}. {{ student.name }} {{ student.last_name }}</h2>
+                  <p *ngIf="student.address">{{ student.address }}</p>
+                  <p *ngIf="student.home_latitude && student.home_longitude">
+                    Lat: {{ student.home_latitude | number:'1.4-4' }}, Lng: {{ student.home_longitude | number:'1.4-4' }}
+                  </p>
+                </ion-label>
+                <ion-buttons slot="end">
+                  <ion-button (click)="presentMoveStudentOptions(student, group.id)">
+                    <ion-icon slot="icon-only" name="arrow-redo-outline"></ion-icon>
+                  </ion-button>
+                </ion-buttons>
+              </ion-item>
+            </ion-reorder-group>
+          </ng-container>
+        </ion-reorder-group>
+      </ion-list>
+    </div>
+
+    <div class="map-panel">
+      <!-- <div *ngIf="isLoadingMap" class="map-loading-state ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando mapa...</p>
+      </div> -->
+      <!-- <div #mapContainer class="map-canvas" [class.hidden]="isLoadingMap"></div> -->
+      <!-- <app-maps></app-maps> -->
+<!-- <app-maps *ngIf="showMapComponent"></app-maps> -->
+<!-- <app-maps [showMap]="myParentCondition"></app-maps> -->
+ <app-maps
+  [markers]="[
+    { lat: 18.51036, lng: -69.86078, popupText: 'Punto A' },
+    { lat: 18.515, lng: -69.865, popupText: 'Punto B' }
+  ]"
+></app-maps>
+
+      <div *ngIf="!isLoadingMap && getTotalStudents() === 0" class="no-students-map-overlay">
+        <p>No hay estudiantes para mostrar. Agregue grupos y mueva estudiantes.</p>
+      </div>
+       <div *ngIf="!isLoadingMap && getTotalStudents() === 0 && reorderableStudentGroups.length > 0" class="no-students-map-overlay">
+        <p>Mueva estudiantes a los grupos para verlos en el mapa.</p>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSaveOrderAndLocations()" [disabled]="getTotalStudents() === 0">
+        Guardar Orden y Ubicaciones
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

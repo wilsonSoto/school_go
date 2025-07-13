@@ -6,7 +6,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+      // Este método se llama cuando la app se registra para notificaciones push con éxito
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Envía el token de dispositivo a Capacitor
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+    }
+    
+    // Este método se llama si la app no puede registrar las notificaciones push
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        // Envia el error a Capacitor
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Inicializa Firebase
+        FirebaseApp.configure()
+        
+        // Solicita permisos para las notificaciones
+        application.registerForRemoteNotifications()
+
         // Override point for customization after application launch.
         return true
     }
