@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">EscolarGo</string>
-    <string name="title_activity_main">EscolarGo</string>
-    <string name="package_name">io.kabaygroup.escolar.go</string>
-    <string name="custom_url_scheme">io.kabaygroup.escolar.go</string>
-</resources>
