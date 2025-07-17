@@ -24,6 +24,10 @@ ion-list {
 
 ion-content {
   ion-item {
+    ion-note {
+
+      border-bottom: 1px solid #e9e1e1;
+    }
     --border-color: #ffffff !important;
     .image {
       border-bottom: solid 1px #757a86;

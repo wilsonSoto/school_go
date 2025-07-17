@@ -188,13 +188,13 @@
                           Lng: {{ student?.home_longitude | number : "1.4-4" }}
                         </p>
                       </ion-label>
-                      <div *ngIf="!student?.isActive" class="action-button">
+                      <div *ngIf="showBtnPermission != 'partner'" class="action-button">
                         <span  *ngIf="group?.students?.length == 1">
                           <ion-button
                             color="dark"
                             class="login-button"
                             type="button"
-                            (click)="startTrackingLocation()"
+                            (click)="markARouteAsVisited(group, true)"
                             expand="block"
                           >
                             recoger estudiante
@@ -203,14 +203,14 @@
                             color="danger"
                             class="login-button"
                             type="button"
-                            (click)="startTrackingLocation()"
+                            (click)="markARouteAsVisited(group)"
                             expand="block"
                           >
                             estudiante ausente
                           </ion-button>
 
                         </span>
-                         <ion-button  *ngIf="group?.students?.length == 1"
+                         <ion-button  *ngIf="group?.students?.length > 1"
                           color="danger"
                           class="login-button"
                           type="button"
@@ -237,7 +237,7 @@
         <!-- <ion-note>{{ schedulesFormDays }}</ion-note> -->
         )
       </ion-list>
-      <app-maps  [markers]="markers" (markerMoved)="onMarkerMoved($event)">
+      <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
       </app-maps>
 
       <div
@@ -264,7 +264,7 @@
 
 <ion-footer>
   <ion-toolbar>
-    <ion-button
+    <ion-button *ngIf="showBtnPermission == 'partner'"
       class="login-button"
       type="button"
       (click)="getDriverCurrentLocation()"
@@ -273,21 +273,21 @@
       Ver Ubicacion del conductor
     </ion-button>
 
-    <ion-button
+    <ion-button *ngIf="showBtnPermission != 'partner'"
       class="login-button"
       type="button"
       (click)="startTrackingLocation()"
       expand="block"
     >
-      Iniciar Ruta Escolar 22
+      Iniciar Ruta Escolar
     </ion-button>
 
-    <ion-button
+    <ion-button *ngIf="showBtnPermission != 'partner'"
       class="login-button"
       type="button"
-      (click)="stopTrackingLocation()"
+      (click)="setEndTheRoute()"
       expand="block"
-    > stop traking
+    > Finalizar Ruta
     </ion-button>
   </ion-toolbar>
 </ion-footer>
@@ -314,6 +314,10 @@
         </ion-buttons>
       </ion-toolbar>
       <ion-list>
+        <ion-item>
+
+          <ion-note>Seleeccione los estudiantes que subieron al transporte</ion-note>
+        </ion-item>
            <ion-item *ngFor="let student of studentsInToSchoolGroup?.students">
         <ion-checkbox
           labelPlacement="end"
@@ -330,29 +334,6 @@
         </ion-card-title>
       </span>
         </ion-item>
-         <div class="action-button">
-                        <span >
-                          <ion-button
-                            color="dark"
-                            class="login-button"
-                            type="button"
-                            (click)="startTrackingLocation()"
-                            expand="block"
-                          >
-                            recoger estudiante
-                          </ion-button>
-                          <ion-button
-                            color="danger"
-                            class="login-button"
-                            type="button"
-                            (click)="startTrackingLocation()"
-                            expand="block"
-                          >
-                            estudiante ausente
-                          </ion-button>
-
-                        </span>
-                      </div>
         </ion-checkbox>
       </ion-item>
       </ion-list>
@@ -364,6 +345,7 @@
             type="button"
             expand="full"
             color="primary"
+            (click)="markARouteAsVisited('group')"
             >
             Guardar
           </ion-button>

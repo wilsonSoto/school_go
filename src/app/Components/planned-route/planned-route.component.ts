@@ -76,8 +76,9 @@ export class PlannedRouteComponent implements OnInit {
   @Input() partner_id: any = null;
 
   @ViewChild('timePopover') timePopover!: IonPopover;
-  markers: any = [];
+  markers: any[] = [];
 
+  maps = true;
   showCalendar = false;
   selectedDays: any[] = [];
   selectedDayForPopover: any = null;
@@ -109,10 +110,19 @@ export class PlannedRouteComponent implements OnInit {
   studentsInToSchool: any = [];
   studentsInToSchoolGroup: any = []
 
+  get showBtnPermission () {
+    const userData = JSON.parse(localStorage.getItem('userData') ?? "")
+
+    if (userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father")) {
+      return 'partner'
+    } else {
+      return 'driver'
+
+    }
+    return
+    }
   ngOnInit() {
-    // this.initForm();
     this.route_id = this.route.snapshot.paramMap.get('routeId');
-    // console.log(this.route_id, 'id -------------------------------');
 
     if (this.route_id) {
       this.getRute();
@@ -123,13 +133,18 @@ export class PlannedRouteComponent implements OnInit {
           return !this.planned_route.route_points.student_visiteds.some((visited: any) => visited.id === student.id);
         });
 
-            studentsNotVisited.forEach((student: any) => {
-              this.getDistanceAndCheckRadius(student, position)
-            })
+        studentsNotVisited.forEach((student: any) => {
+          this.getDistanceAndCheckRadius(student, position)
+        })
 
        }
      });
 
+     this.observerService.currentDriverLocation.subscribe(async(position) => {
+       if (position) {
+        this.setdriverLocation(position)
+       }
+     });
   }
 
   ngOnDestroy() {
@@ -139,26 +154,25 @@ export class PlannedRouteComponent implements OnInit {
   }
 
   sendInformation (group: any) {
+      group.students.forEach((st: any) => {
+      st.checked = false;
+    });
     this.studentsInToSchoolGroup = group;
-console.log(group,'/;/.................');
-
     this.isOpenApprovalStudents = true;
   }
 
     // Check if a student is currently selected
   isStudentSelected(studentId: string): boolean {
-    console.log(studentId,'isStudentSelected ------------------------------------');
-    console.log(this.studentsInToSchool,'this.studentsInToSchool ------------------------------------');
-
     return this.studentsInToSchool.some((control: any) => control.id === studentId);
   }
 
   // Handle checkbox change for a student
-  onStudentCheckboxChange(event: CustomEvent, student: Student): void {
+  onStudentCheckboxChange(event: CustomEvent, student: any): void {
     const isChecked = event.detail.checked;
     if (isChecked) {
       // Add student ID to FormArray if not already present
       if (!this.isStudentSelected(student.id)) {
+        student.checked = true
         this.studentsInToSchool.push(student.id);
       }
     } else {
@@ -166,9 +180,10 @@ console.log(group,'/;/.................');
       const index = this.studentsInToSchool.findIndex((control: any) => control.id === student.id);
       if (index > -1) {
         this.studentsInToSchool.removeAt(index);
+      } else {
+        this.studentsInToSchool[index].checked = true
       }
     }
-    console.log('Current selected student IDs:', this.studentsInToSchool);
   }
   async getDistanceAndCheckRadius(studentsLatLng: any, position: any) {
     const baseLat = studentsLatLng.home_latitude; //18.48123;
@@ -207,48 +222,6 @@ console.log(group,'/;/.................');
       // return false;
     }
   }
-
-  // createScheduleGroup(schedule: RouteSchedule): FormGroup {
-  //   return this.fb.group({
-  //     session_start_time: [schedule.session_start_time, Validators.required],
-  //     session_end_time: [schedule.session_end_time, Validators.required],
-  //     day: [schedule.day, Validators.required],
-  //     name: [schedule.name, Validators.required],
-  //     checked: [schedule.checked, Validators.required],
-  //   });
-  // }
-
-  // addSchedule(schedule?: any): void {
-  //   const newSchedule = schedule || {
-  //     session_start_time: '',
-  //     session_end_time: '',
-  //     day: '',
-  //     name: '',
-  //     checked: false,
-  //   };
-  //   this.schedulesFormArray.push(this.createScheduleGroup(newSchedule));
-  // }
-
-  // removeSchedule(index: number): void {
-  //   this.schedulesFormArray.removeAt(index);
-  // }
-
-  // setSchedules(schedules: RouteSchedule[]): void {
-  //   this.schedulesFormArray.clear();
-  //   const dataSchedule = schedules.map((sc: any) => {
-  //     return {
-  //       session_start_time: sc.session_start_time.label,
-  //       session_end_time: sc.session_end_time.label,
-  //       day: sc.day.value,
-  //       name: sc.day.label,
-  //       checked: true,
-  //     };
-  //   });
-
-  //   this.selectedDays = dataSchedule;
-
-  //   dataSchedule.forEach((schedule) => this.addSchedule(schedule));
-  // }
 
   async onMarkerMoved(event: { id: string; lat: number; lng: number }) {
     console.log('🟢 Marcador movido:', event);
@@ -378,71 +351,6 @@ console.log(group,'/;/.................');
       .subscribe();
   }
 
-  // async onSubmit() {
-  //   this.ruteForm.markAllAsTouched();
-
-  //   this.schedulesFormArray.controls.forEach((group: any, index) => {
-  //     // console.log(`Schedule Group ${index} Valid?`, group.valid);
-  //     Object.keys(group.controls).forEach((key) => {
-  //       const control = group.get(key);
-  //       if (control && control.invalid) {
-  //         // console.log(`  Control ${key} invalid. Errors:`, control.errors);
-  //       }
-  //     });
-  //   });
-
-  //   if (this.ruteForm.valid) {
-  //     const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
-
-  //     const data = {
-  //       name: this.ruteForm.value.name,
-  //       schedules: this.ruteForm.value.schedules,
-  //       partner_id: this.partner_id,
-  //       company_id: userData.company.id ?? null,
-  //       action: this.action,
-  //       driverId: this.ruteForm.value.driverId, // Include driverId
-  //       busId: this.ruteForm.value.busId, // Include busId
-  //       student_ids: this.ruteForm.value.student_ids, // Include selected student IDs
-  //       student_ids_pickup_order: this.ruteForm.value.student_ids_pickup_order, // Include pickup order
-  //     };
-
-  //     const observableResponse = await this.routeService.postParent(data);
-
-  //     observableResponse.subscribe({
-  //       next: (response: any) => {
-  //         const msm = this.action == 'edit' ? 'Ruta Editada' : 'Ruta Agregada';
-  //         this.toastService.presentToast(msm, 'custom-success-toast');
-  //         // Optionally, dismiss modal or navigate
-  //       },
-  //       error: (err: any) => {
-  //         const errorMessage =
-  //           err.error.error.message ||
-  //           err.error.error ||
-  //           err?.message ||
-  //           'Error desconocido al agregar/editar ruta';
-  //         this.toastService.presentToast(errorMessage);
-  //       },
-  //     });
-  //   } else {
-  //     // console.log('Formulario inválido. Errores por campo:');
-  //     Object.keys(this.ruteForm.controls).forEach((key) => {
-  //       const control = this.ruteForm.get(key);
-  //       if (control && control.invalid) {
-  //         // console.log(`Campo '${key}' es inválido. Errores:`, control.errors);
-  //       }
-  //     });
-  //   }
-  // }
-
-  // loadStudents(allFetchedStudents: Student[]): void {
-  //   this.isLoadingMap = true;
-  //   this.errorMessage = null;
-  //   this.allStudents = allFetchedStudents.map((student) => ({
-  //     ...student,
-  //     home_latitude: student.home_latitude ?? 0, // Default to 0 if null/undefined
-  //     home_longitude: student.home_longitude ?? 0, // Default to 0 if null/undefined
-  //   }));
-  // }
 
   async getLocation() {
     try {
@@ -462,29 +370,39 @@ console.log(group,'/;/.................');
     // const watchId = false;
     try {
       // this.routeSubscription = this.routeService
+      this.maps = false
       this.routeTrackingPlannedService
         .getDriverCurrentLocation(this.route_id)
         .pipe(
           tap((response: any) => {
+
             if (response.data) {
-              console.log(response);
               response.data.name = 'Ubicacion de chofer';
-              this.markers = [...response.data];
+              response.data.lat = response.data.latitude
+              response.data.lng = response.data.longitude
+              this.markers.push(response.data);
+              this.maps = true
+
             }
           }),
           catchError((err) => {
             // console.error('Error fetching students:', err);
+              this.maps = true
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
             return of([]);
           }),
           finalize(() => {
+              this.maps = true
             setTimeout(() => {}, 0);
           })
         )
         .subscribe();
-    } catch (error) {}
+    } catch (error) {
+              this.maps = true
+
+    }
   }
 
   getTheNextPoint() {
@@ -496,7 +414,6 @@ console.log(group,'/;/.................');
         .pipe(
           tap((response: any) => {
             if (response.data) {
-              console.log(response);
             }
           }),
           catchError((err) => {
@@ -515,7 +432,7 @@ console.log(group,'/;/.................');
   }
 
   stopTrackingLocation() {
-    const watchId = localStorage.getItem('watchId');
+    const watchId = JSON.parse(localStorage.getItem('watchId') ?? '');
     this.locationService.stopTrackingLocation(watchId);
   }
 
@@ -555,14 +472,14 @@ console.log(group,'/;/.................');
     } catch (error) {}
   }
 
-  async setdriverLocation() {
-    const watchId = false;
+  async setdriverLocation(position: any) {
+    // const watchId = false;
     try {
-      const location = await this.getLocation();
+      // const location = await this.getLocation();
       const data = {
         route_id: this.route_id,
-        lat: location.latitude,
-        lng: location.longitude,
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
       };
       // this.routeSubscription = this.routeService
       this.routeTrackingPlannedService
@@ -588,19 +505,47 @@ console.log(group,'/;/.................');
     } catch (error) {}
   }
 
-  async markARouteAsVisited() {
-    const watchId = false;
+  async markARouteAsVisited(group: any = null, checked: boolean = false, type: string = 'only', ) {
     try {
-      const location = await this.getLocation();
+      let studentsIds: any = []
+      let group_id: any = ''
+      if (type == 'group') {
+        this.isOpenApprovalStudents = false;
+        group_id = this.studentsInToSchoolGroup.id
+        console.log(this.studentsInToSchoolGroup?.students,'studentsInToSchoolGroup?.studentswilwiwliwlwi');
+        studentsIds = this.studentsInToSchoolGroup?.students.map((st: any) => {
+          return {
+            student_id: st.id,
+            is_present: st.checked
 
-      const data = {
-        route_id: this.route_id,
-        lat: location.latitude,
-        lng: location.longitude,
-      };
+          }
+        })
+      } else {
+        console.log(group?.students,'group?.studentswilwiwliwlwi');
+        group_id = group.id
+        studentsIds = group?.students.map((st: any) => {
+          return {
+            student_id: st.id,
+            is_present: checked
+
+          }
+        })
+        console.log(studentsIds,'studentsIds studentsIds');
+      }
+      const data =  {
+        "point_id":  group_id,
+        "students": studentsIds
+        // [
+        //     {
+        //         "student_id": 1,
+        //         "is_present": false
+        //     }
+        // ]
+    };
+      // const location = await this.getLocation();
       // this.routeSubscription = this.routeService
       this.routeTrackingPlannedService
-        .markARouteAsVisited(data)
+        .markARouteAsVisited(this.route_id,data)
         .pipe(
           tap((response: any) => {
             if (response.data) {
@@ -623,7 +568,7 @@ console.log(group,'/;/.................');
   }
 
   async setEndTheRoute() {
-    const watchId = false;
+    // const watchId = false;
     try {
       const location = await this.getLocation();
 
@@ -639,6 +584,7 @@ console.log(group,'/;/.................');
           tap((response: any) => {
             if (response.data) {
               console.log(response);
+              this.stopTrackingLocation()
             }
           }),
           catchError((err) => {
