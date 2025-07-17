@@ -10,6 +10,8 @@ import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
 
 import { Component, OnInit } from '@angular/core'; // <--- ASEGÚRATE DE QUE 'Component' ESTÉ IMPORTADO AQUÍ
+  import { ModalController } from '@ionic/angular';
+import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
 
 @Component({
   // <--- ESTE DECORADOR ES PROBABLEMENTE EL QUE FALTA O ESTÁ MAL ESCRITO
@@ -25,12 +27,40 @@ export class Tab3Page implements OnInit {
     private routeService: RouteService,
     private toastService: ToastService,
     private router: Router,
+    private modalController: ModalController,
   ) {}
 
   ngOnInit(): void {
-    this.getAllRoute();
+
+    // this.getAllRoute();
+  }
+
+
+  async openModalUbicacion() {
+      console.log('Ubicación recibida desde modal+++++++++++++++++++:');
+
+    const modal = await this.modalController.create({
+      component: UbicationModalComponent,
+      // component: UbicacionModalComponent,
+  cssClass: 'full-screen-modal',
+  breakpoints: [0, 1],
+  initialBreakpoint: 1,
+    backdropDismiss: false, // ❌ No se puede cerrar tocando afuera
+  canDismiss: false
+
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      console.log('Ubicación recibida desde modal:', data);
+      // Aquí puedes guardar la ubicación o usarla en el mapa
+    }
   }
   ionViewWillEnter() {
+        // this.openModalUbicacion()
+
     console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }

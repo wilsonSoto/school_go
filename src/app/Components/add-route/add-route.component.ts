@@ -28,15 +28,24 @@ import { SelectDriverBusComponent } from '../actions-services/select-driver-bus/
 import { SelectStudentsModalComponent } from '../actions-services/select-students-modal/select-students-modal.component';
 import { ReorderStudentsMapModalComponent } from '../actions-services/reorder-students-map-modal/reorder-students-map-modal.component';
 import { Student } from 'src/app/interfaces/student.interface';
-import { tap, catchError, finalize, map } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
 import { StudentsService } from 'src/app/services/students.service';
 import { Driver } from 'src/app/interfaces/driver.interface'; // Import Driver interface
 import { Bus } from 'src/app/interfaces/bus.interface';     // Import Bus interface
 import { RouteService } from 'src/app/services/route.service';
 
-import { Subject, Subscription } from 'rxjs';
-
+import { RouteTrackingService } from 'src/app/services/route-tracking.service';
+import {
+  catchError,
+  finalize,
+  of,
+  Subscription,
+  filter,
+  map,
+  Observable,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
 @Component({
   standalone: true,
   selector: 'app-add-route',
@@ -57,11 +66,13 @@ export class AddRouteComponent implements OnInit {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private studentsService: StudentsService,
+    private routeTrackingService: RouteTrackingService,
     private toastService: ToastService
   ) {}
 
-  @Input() action: string = '';
+  action: string = '';
   @Input() partner_id: any = null;
+  private componentDestroyed$ = new Subject<void>();
 
   @ViewChild('timePopover') timePopover!: IonPopover;
 
@@ -95,6 +106,15 @@ export class AddRouteComponent implements OnInit {
     this.initForm();
     this.route_id = this.route.snapshot.paramMap.get('routeId');
     // console.log(this.route_id, 'id -------------------------------');
+this.route.queryParams
+      .pipe(
+        takeUntil(this.componentDestroyed$),
+        filter((params: any) => params.action !== undefined),
+        map((params: any) => params.action)
+      )
+      .subscribe(action => {
+        this.action = action;
+      });
 
     if (this.route_id) {
       this.getRute();
@@ -113,6 +133,9 @@ export class AddRouteComponent implements OnInit {
 
 
   ngOnDestroy() {
+    this.componentDestroyed$.next();
+    this.componentDestroyed$.complete();
+
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
@@ -265,10 +288,10 @@ export class AddRouteComponent implements OnInit {
       newSelectedStudentIds.forEach(id => {
         this.studentIdsFormArray.push(this.fb.control(id));
       });
+      if (this.action == 'edit') {
+        this.setSelectStudents()
 
-      // console.log('Selected student IDs in AddRouteComponent:', this.ruteForm.get('student_ids')?.value);
-
-
+      }
     } else {
       // console.log('Student selection cancelled or no students selected.');
     }
@@ -508,10 +531,14 @@ export class AddRouteComponent implements OnInit {
       this.selectedBus = selectedBus;
 
       this.ruteForm.patchValue({
-        driverId: selectedDriver ? selectedDriver.id : null,
-        busId: selectedBus ? selectedBus.id : null,
+        driverId: selectedDriver ? selectedDriver : null,
+        busId: selectedBus ? selectedBus : null,
       });
 
+      if (this.action == 'edit') {
+        this.setSelectDriver()
+
+      }
       this.toastService.presentToast('Chofer y Autobús seleccionados', 'success');
 
     } else {
@@ -551,7 +578,7 @@ export class AddRouteComponent implements OnInit {
       },
       initialBreakpoint: 1,
       breakpoints: [0, 1],
-      cssClass: ['full-screen-modal']
+      // cssClass: ['full-screen-modal']
     });
     await modal.present();
 
@@ -591,6 +618,91 @@ reorderedStudentsWithCoords.forEach((group: any) => {
     } else {
       // console.log('Student reordering and map adjustment cancelled.');
     }
+  }
+
+
+  //request
+
+
+  async setSelectDriver() {
+    try {
+      console.log(this.ruteForm.value,'this.ruteForm.value this.ruteForm.value');
+
+      this.routeTrackingService
+        .updateRoute(this.route_id, this.ruteForm.value)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
+  }
+
+   async setSelectStudents() {
+    try {
+      console.log(this.ruteForm.value,'this.ruteForm.value this.ruteForm.value');
+      const student_ids = this.ruteForm.value.student_ids.map((student: any) => student.id ?? student)
+      this.routeTrackingService
+        .updateStudentsInRoute(this.route_id, student_ids)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
+  }
+
+   async setPointsInRoute() {
+    try {
+      console.log(this.ruteForm.value,'this.ruteForm.value this.ruteForm.value');
+
+      this.routeTrackingService
+        .updatePointsInRoute(this.route_id, this.ruteForm.value)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
   }
 
 }

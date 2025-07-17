@@ -43,12 +43,32 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
     await this.addMarkersFromInput();
   }
 
+  // async ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['markers'] && !changes['markers'].firstChange && this.map) {
+  //     await this.removeAllMarkers();
+  //     await this.addMarkersFromInput();
+  //   }
+  // }
+
   async ngOnChanges(changes: SimpleChanges) {
-    if (changes['markers'] && !changes['markers'].firstChange && this.map) {
+    console.log(changes,'[[[[[[[[[[[[[[[[[[[[[[[[[[[www');
+
+  if (changes['markers']) {
+    const current = changes['markers'].currentValue;
+    const previous = changes['markers'].previousValue;
+
+    // Evitar ejecución si markers no ha cambiado realmente
+    const hasChanges =
+      !previous ||
+      previous.length !== current.length ||
+      JSON.stringify(previous) !== JSON.stringify(current);
+
+    if (hasChanges && this.map) {
       await this.removeAllMarkers();
       await this.addMarkersFromInput();
     }
   }
+}
 
   private async createMap() {
     // Esperar hasta que el elemento exista físicamente en el DOM

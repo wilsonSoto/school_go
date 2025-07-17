@@ -13,114 +13,231 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="p-full-5" >
-
-
-   <div class="split-layout">
+<ion-content [fullscreen]="true" class="p-full-5">
+  <div class="split-layout">
     <div class="list-panel">
-
-
-
-<ion-accordion-group expand="inset" [value]="['third']">
-  <ion-accordion value="first">
-    <ion-item slot="header" color="rose">
-      <ion-label>Chofer</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
+      <ion-accordion-group expand="inset" [value]="['third']">
+        <ion-accordion value="first">
+          <ion-item slot="header" color="rose">
+            <ion-label>Chofer</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
             <ion-ripple-effect></ion-ripple-effect>
-    <ion-card-header>
-      <ion-avatar>
-        <img alt="Driver Profile" [src]="planned_route?.school_driver.profile || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-      </ion-avatar>
-      <span>
-        <ion-card-title>{{ planned_route?.school_driver.name }}</ion-card-title>
-        <ion-card-subtitle>{{ planned_route?.school_driver.email }}</ion-card-subtitle>
-      </span>
-    </ion-card-header>
+            <ion-card-header>
+              <ion-avatar>
+                <img
+                  alt="Driver Profile"
+                  [src]="
+                    planned_route?.school_driver.profile ||
+                    'https://ionicframework.com/docs/img/demos/avatar.svg'
+                  "
+                />
+              </ion-avatar>
+              <span>
+                <ion-card-title>
+                  {{
+                  planned_route?.school_driver.name
+                }}
+                </ion-card-title>
+                <ion-card-subtitle>
+                  {{
+                  planned_route?.school_driver.email
+                }}
+                </ion-card-subtitle>
+              </span>
+            </ion-card-header>
 
-    <ion-card-content>
-      <p><ion-label>Teléfono: <ion-note>{{ planned_route?.school_driver.phone || 'N/A'}}</ion-note></ion-label></p>
-      <p><ion-label>Móvil: <ion-note>{{ planned_route?.school_driver.mobile || 'N/A'}}</ion-note></ion-label></p>
-      <p><ion-label>Licencia: <ion-note>{{ planned_route?.school_driver.driver_license || 'N/A'}}</ion-note></ion-label></p>
-      <p><ion-label>Dirección: <ion-note>{{ planned_route?.school_driver.address || 'N/A'}}</ion-note></ion-label></p>
-    </ion-card-content>
-    </div>
-  </ion-accordion>
-  <ion-accordion value="second">
-    <ion-item slot="header" color="rose">
-      <ion-label>Vehicúlon</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-       <ion-ripple-effect></ion-ripple-effect>
-    <ion-card-header>
-      <ion-avatar>
-        <img alt="Bus Image" [src]="planned_route?.school_bus?.vehicule_image || 'https://ionicframework.com/docs/img/demos/bus.png'" />
-      </ion-avatar>
-      <span>
-        <ion-card-title>{{ planned_route?.school_bus?.name }}</ion-card-title>
-        <ion-card-subtitle>{{ planned_route?.school_bus?.brand || 'Marca no especificada'}} - {{ planned_route?.school_bus?.model || 'Modelo no especificado'}}</ion-card-subtitle>
-      </span>
-    </ion-card-header>
+            <ion-card-content>
+              <p>
+                <ion-label
+                  >Teléfono:
+                  <ion-note>{{
+                    planned_route?.school_driver.phone || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >Móvil:
+                  <ion-note>{{
+                    planned_route?.school_driver.mobile || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >Licencia:
+                  <ion-note>{{
+                    planned_route?.school_driver.driver_license || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >Dirección:
+                  <ion-note>{{
+                    planned_route?.school_driver.address || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+            </ion-card-content>
+          </div>
+        </ion-accordion>
+        <ion-accordion value="second">
+          <ion-item slot="header" color="rose">
+            <ion-label>Vehicúlo</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-header>
+              <ion-avatar>
+                <img
+                  alt="Bus Image"
+                  [src]="
+                    planned_route?.school_bus?.vehicule_image ||
+                    'https://ionicframework.com/docs/img/demos/bus.png'
+                  "
+                />
+              </ion-avatar>
+              <span>
+                <ion-card-title>{{
+                  planned_route?.school_bus?.name
+                }}</ion-card-title>
+                <ion-card-subtitle
+                  >{{
+                    planned_route?.school_bus?.brand || "Marca no especificada"
+                  }}
+                  -
+                  {{
+                    planned_route?.school_bus?.model || "Modelo no especificado"
+                  }}</ion-card-subtitle
+                >
+              </span>
+            </ion-card-header>
 
-    <ion-card-content>
-      <p><ion-label>Capacidad: <ion-note>{{ planned_route?.school_bus?.people_capacity || 'N/A'}} personas</ion-note></ion-label></p>
-      <p><ion-label>Color: <ion-note>{{ planned_route?.school_bus?.vehicle_color || 'N/A'}}</ion-note></ion-label></p>
-      <p><ion-label>Conductor Asignado: <ion-note>{{ planned_route?.school_bus?.name || 'N/A'}}</ion-note></ion-label></p>
-      <p><ion-label>ID de la Placa: <ion-note>{{ planned_route?.school_bus?.name }}</ion-note></ion-label></p>
-    </ion-card-content>
-    </div>
-  </ion-accordion>
-  <ion-accordion value="third">
-    <ion-item slot="header" color="rose">
-      <ion-label>Estudiantes en ruta</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-       <ion-list *ngIf="planned_route?.route_points.length > 0">
-  <!-- <ion-list-header>
+            <ion-card-content>
+              <p>
+                <ion-label
+                  >Capacidad:
+                  <ion-note
+                    >{{
+                      planned_route?.school_bus?.people_capacity || "N/A"
+                    }}
+                    personas</ion-note
+                  ></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >Color:
+                  <ion-note>{{
+                    planned_route?.school_bus?.vehicle_color || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >Conductor Asignado:
+                  <ion-note>{{
+                    planned_route?.school_bus?.name || "N/A"
+                  }}</ion-note></ion-label
+                >
+              </p>
+              <p>
+                <ion-label
+                  >ID de la Placa:
+                  <ion-note>{{
+                    planned_route?.school_bus?.name
+                  }}</ion-note></ion-label
+                >
+              </p>
+            </ion-card-content>
+          </div>
+        </ion-accordion>
+        <ion-accordion value="third">
+          <ion-item slot="header" color="rose">
+            <ion-label>Estudiantes en ruta</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-list *ngIf="planned_route?.route_points.length > 0">
+              <!-- <ion-list-header>
     <ion-label>Estudiantes Seleccionados en Orden de Recogida</ion-label>
   </ion-list-header> -->
-<ion-item lines="full" color="light">
-      <ion-label>
-        <strong>Grupos:</strong>
-      </ion-label>
-    </ion-item>
-  <ng-container *ngFor="let group of planned_route?.route_points">
-    <ion-list *ngIf=" group?.students?.length > 0">
-      <ion-item lines="full" >
-        <ion-label class="group">
-        <strong>{{ group?.name }}</strong>
-      </ion-label>
-      </ion-item>
+              <ion-item lines="full" color="light">
+                <ion-label>
+                  <strong>Grupos:</strong>
+                </ion-label>
+              </ion-item>
+              <ng-container *ngFor="let group of planned_route?.route_points">
+                <ion-list *ngIf="group?.students?.length > 0">
+                  <ion-item lines="full">
+                    <ion-label class="group">
+                      <strong>{{ group?.name }}</strong>
+                    </ion-label>
+                  </ion-item>
 
-      <div class="group-students">
-        <ion-item *ngFor="let student of group?.students; let i = index">
-          <ion-label>
-            {{ i + 1 }}. {{ student?.name }} {{ student?.last_name }}
-            <p *ngIf="student?.home_latitude">
-              Lat: {{ student?.home_latitude | number:'1.4-4' }},
-              Lng: {{ student?.home_longitude | number:'1.4-4' }}
-            </p>
-          </ion-label>
-        </ion-item>
+                  <div class="group-students">
+                    <ion-item
+                      *ngFor="let student of group?.students; let i = index"
+                    >
+                      <ion-label>
+                        {{ i + 1 }}. {{ student?.name }}
+                        {{ student?.last_name }}
+                        <p *ngIf="student?.home_latitude">
+                          Lat: {{ student?.home_latitude | number : "1.4-4" }},
+                          Lng: {{ student?.home_longitude | number : "1.4-4" }}
+                        </p>
+                      </ion-label>
+                      <div *ngIf="!student?.isActive" class="action-button">
+                        <span  *ngIf="group?.students?.length == 1">
+                          <ion-button
+                            color="dark"
+                            class="login-button"
+                            type="button"
+                            (click)="startTrackingLocation()"
+                            expand="block"
+                          >
+                            recoger estudiante
+                          </ion-button>
+                          <ion-button
+                            color="danger"
+                            class="login-button"
+                            type="button"
+                            (click)="startTrackingLocation()"
+                            expand="block"
+                          >
+                            estudiante ausente
+                          </ion-button>
 
-      </div>
-
-    </ion-list>
-  </ng-container>
-</ion-list>
-    </div>
-  </ion-accordion>
-</ion-accordion-group>
+                        </span>
+                         <ion-button  *ngIf="group?.students?.length == 1"
+                          color="danger"
+                          class="login-button"
+                          type="button"
+                          (click)="sendInformation(group)"
+                          expand="block"
+                        >
+                          Aprobar Grupo
+                        </ion-button>
+                      </div>
+                    </ion-item>
+                  </div>
+                </ion-list>
+              </ng-container>
+            </ion-list>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
     </div>
     <div class="map-panel">
       <ion-list class="ion-list-button">
-    <ion-label>{{ planned_route?.name }}</ion-label>
+        <ion-label>{{ planned_route?.name }}</ion-label>
         (
 
-          <ion-note>{{ schedulesFormDays }}</ion-note>
+        <!-- <ion-note>{{ schedulesFormDays }}</ion-note> -->
         )
-  </ion-list>
-      <app-maps [markers]="markers" (markerMoved)="onMarkerMoved($event)">
+      </ion-list>
+      <app-maps  [markers]="markers" (markerMoved)="onMarkerMoved($event)">
       </app-maps>
 
       <div
@@ -143,11 +260,6 @@
       </div>
     </div>
   </div>
-
-
-
-
-
 </ion-content>
 
 <ion-footer>
@@ -155,32 +267,108 @@
     <ion-button
       class="login-button"
       type="button"
-      (click)="onSubmit()"
+      (click)="getDriverCurrentLocation()"
       expand="block"
-      [disabled]="ruteForm.invalid"
     >
-    Ver Ubicacion del conductor
+      Ver Ubicacion del conductor
     </ion-button>
 
-     <ion-button
+    <ion-button
       class="login-button"
       type="button"
       (click)="startTrackingLocation()"
       expand="block"
-      [disabled]="ruteForm.invalid"
     >
-      Iniciar Ruta Escolar
+      Iniciar Ruta Escolar 22
     </ion-button>
 
-     <!-- <ion-button
+    <ion-button
       class="login-button"
       type="button"
-      (click)="onSubmit()"
+      (click)="stopTrackingLocation()"
       expand="block"
-      [disabled]="ruteForm.invalid"
-    >
-      <span *ngIf="action !== 'edit'">Agregar</span>
-      <span *ngIf="action == 'edit'">Editar</span>
-    </ion-button> -->
+    > stop traking
+    </ion-button>
   </ion-toolbar>
 </ion-footer>
+
+
+
+
+<ion-modal
+  #modal
+  isOpen="{{ isOpenApprovalStudents }}"
+  [initialBreakpoint]="1.0"
+  [breakpoints]="[1.0]"
+  handleBehavior="cycle">
+  <ng-template>
+    <ion-content>
+      <ion-toolbar>
+        <ion-title>Grupo de Estudiantes</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            color="light"
+            (click)="modal.dismiss(); isOpenApprovalStudents = false"
+            >Close</ion-button
+          >
+        </ion-buttons>
+      </ion-toolbar>
+      <ion-list>
+           <ion-item *ngFor="let student of studentsInToSchoolGroup?.students">
+        <ion-checkbox
+          labelPlacement="end"
+          [checked]="isStudentSelected(student.id)"
+          (ionChange)="onStudentCheckboxChange($event, student)"
+        >
+        <ion-item>
+        <ion-avatar>
+        <img alt="Bus Image" [src]="student.image || 'https://ionicframework.com/docs/img/demos/bus.png'" />
+      </ion-avatar>
+      <span>
+        <ion-card-title>
+                     {{ student.name }}
+        </ion-card-title>
+      </span>
+        </ion-item>
+         <div class="action-button">
+                        <span >
+                          <ion-button
+                            color="dark"
+                            class="login-button"
+                            type="button"
+                            (click)="startTrackingLocation()"
+                            expand="block"
+                          >
+                            recoger estudiante
+                          </ion-button>
+                          <ion-button
+                            color="danger"
+                            class="login-button"
+                            type="button"
+                            (click)="startTrackingLocation()"
+                            expand="block"
+                          >
+                            estudiante ausente
+                          </ion-button>
+
+                        </span>
+                      </div>
+        </ion-checkbox>
+      </ion-item>
+      </ion-list>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <div>
+          <ion-button
+            type="button"
+            expand="full"
+            color="primary"
+            >
+            Guardar
+          </ion-button>
+        </div>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
