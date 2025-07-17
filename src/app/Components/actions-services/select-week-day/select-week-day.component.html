@@ -14,6 +14,11 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-list>
+<ion-item>
+  <ion-toggle [(ngModel)]="allDate" (ionChange)="isActiveAllDay()">Aplicar fechas a todos</ion-toggle>
+</ion-item>
+</ion-list>
   <form [formGroup]="weekDaysForm">
     <ion-item *ngFor="let weekDay of weeks; let i = index">
       <ion-checkbox

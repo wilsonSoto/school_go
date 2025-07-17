@@ -8,3 +8,8 @@ ion-tab-button {
     font-size: 10px;
     margin-left: -11px;
 }
+
+::ng-deep .location-modal {
+  --height: auto;
+  --border-radius: 20px;
+}

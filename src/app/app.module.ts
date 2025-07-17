@@ -43,6 +43,10 @@ import { StudentsService } from './services/students.service';
 import { AddRouteComponent } from './Components/add-route/add-route.component';
 import { RouteService } from './services/route.service';
 import { EditProfileComponent } from './Components/edit-profile/edit-profile.component';
+import { RouteTrackingPlannedService } from './services/route-tracking-planned.service';
+import { ObserverBetweenComponentsService } from './services/observer-between-components.services';
+import { RouteTrackingService } from './services/route-tracking.service';
+import { UbicationModalComponent } from './Components/actions-services/ubication-modal/ubication-modal.component';
 // import { SelectWeekDayComponent } from './Components/actions-services/select-week-day/select-week-day.component';
 // import { AllRouteComponent } from './Components/all-rute/all-rute.component';
 
@@ -63,7 +67,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AddStudentsComponent,
     StudentsComponent,
     EditProfileComponent,
-
+    UbicationModalComponent,
     // SelectWeekDayComponent,
     // AddRouteComponent,
     // AllRouteComponent,
@@ -94,9 +98,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     ParentService,
     StudentsService,
     RouteService,
-
-
-
+    RouteTrackingPlannedService,
+    ObserverBetweenComponentsService,
+    RouteTrackingService,
     {
     provide: RouteReuseStrategy,
     useClass: IonicRouteStrategy,
