@@ -39,6 +39,9 @@ import { Subject, Subscription } from 'rxjs';
 import { StudentGroup } from 'src/app/interfaces/student-group.interface';
 import { MapsComponent } from '../actions-services/maps/maps.component';
 import { LocationService } from 'src/app/services/geolocation.service';
+import { RouteTrackingPlannedService } from 'src/app/services/route-tracking-planned.service';
+import { getDistanceAndCheckRadius } from 'src/app/shared/utils/getDistanceAndCheckRadius';
+import { ObserverBetweenComponentsService } from 'src/app/services/observer-between-components.services';
 
 @Component({
   standalone: true,
@@ -58,12 +61,14 @@ export class PlannedRouteComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private routeService: RouteService,
+    private routeTrackingPlannedService: RouteTrackingPlannedService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private studentsService: StudentsService,
     private locationService: LocationService,
     private alertController: AlertController,
 
+    private observerService: ObserverBetweenComponentsService,
     private toastService: ToastService
   ) {}
 
@@ -81,6 +86,7 @@ export class PlannedRouteComponent implements OnInit {
   selectedStudentsForRoute: Student[] = [];
   allStudents: any[] = [];
 
+  isOpenApprovalStudents: boolean = false;
   isLoadingMap: boolean = true;
   errorMessage: string | null = null;
 
@@ -100,25 +106,30 @@ export class PlannedRouteComponent implements OnInit {
 
   ruteForm!: FormGroup;
   reorderableStudentGroups: StudentGroup[] = [];
+  studentsInToSchool: any = [];
+  studentsInToSchoolGroup: any = []
 
   ngOnInit() {
-    this.initForm();
+    // this.initForm();
     this.route_id = this.route.snapshot.paramMap.get('routeId');
     // console.log(this.route_id, 'id -------------------------------');
 
     if (this.route_id) {
       this.getRute();
     }
-  }
+    this.observerService.currentMessage.subscribe(async(position) => {
+       if (position) {
+        const studentsNotVisited =  this.planned_route.route_points.students.filter((student: any) => {
+          return !this.planned_route.route_points.student_visiteds.some((visited: any) => visited.id === student.id);
+        });
 
-  get schedulesFormArray(): FormArray {
-    return this.ruteForm.get('schedules') as FormArray;
-  }
+            studentsNotVisited.forEach((student: any) => {
+              this.getDistanceAndCheckRadius(student, position)
+            })
 
-  get schedulesFormDays(): any {
-    const route = this.selectedDays;
-    const routeName = route.map((route: any) => route.name);
-    return routeName.toString();
+       }
+     });
+
   }
 
   ngOnDestroy() {
@@ -126,77 +137,118 @@ export class PlannedRouteComponent implements OnInit {
       this.routeSubscription.unsubscribe();
     }
   }
-  initForm(): void {
-    this.ruteForm = this.fb.group({
-      name: ['', Validators.required],
-      schedules: this.fb.array([], Validators.required),
-      driverId: [null, Validators.required],
-      busId: [null, Validators.required],
-      student_ids: this.fb.array([]),
-      student_ids_pickup_order: this.fb.array([]),
-    });
 
-    const initialSchedules: RouteSchedule[] = [
-      {
-        session_start_time: '',
-        session_end_time: '',
-        day: '',
-        name: '',
-        checked: false,
-      },
-    ];
-    initialSchedules.forEach((schedule) => this.addSchedule(schedule));
+  sendInformation (group: any) {
+    this.studentsInToSchoolGroup = group;
+console.log(group,'/;/.................');
+
+    this.isOpenApprovalStudents = true;
   }
 
-  get studentIdsFormArray(): FormArray {
-    return this.ruteForm.get('student_ids') as FormArray;
+    // Check if a student is currently selected
+  isStudentSelected(studentId: string): boolean {
+    console.log(studentId,'isStudentSelected ------------------------------------');
+    console.log(this.studentsInToSchool,'this.studentsInToSchool ------------------------------------');
+
+    return this.studentsInToSchool.some((control: any) => control.id === studentId);
   }
 
-  get studentIdsPickupOrderFormArray(): FormArray {
-    return this.ruteForm.get('student_ids_pickup_order') as FormArray;
+  // Handle checkbox change for a student
+  onStudentCheckboxChange(event: CustomEvent, student: Student): void {
+    const isChecked = event.detail.checked;
+    if (isChecked) {
+      // Add student ID to FormArray if not already present
+      if (!this.isStudentSelected(student.id)) {
+        this.studentsInToSchool.push(student.id);
+      }
+    } else {
+      // Remove student ID from FormArray
+      const index = this.studentsInToSchool.findIndex((control: any) => control.id === student.id);
+      if (index > -1) {
+        this.studentsInToSchool.removeAt(index);
+      }
+    }
+    console.log('Current selected student IDs:', this.studentsInToSchool);
+  }
+  async getDistanceAndCheckRadius(studentsLatLng: any, position: any) {
+    const baseLat = studentsLatLng.home_latitude; //18.48123;
+    const baseLng = studentsLatLng.home_longitude; //-69.9333;
+    const currentLat = position.coords.latitude; //18.48123;
+    const currentLng = position.coords.longitude; //-69.9332;
+    try {
+      const result = getDistanceAndCheckRadius(
+        baseLat,
+        baseLng,
+        currentLat,
+        currentLng
+      );
+
+      if (result.isInside) {
+        this.toastService.presentToast(
+          `📍 Dentro del área. Distancia: ${result.distance.toFixed(2)} m`
+        );
+
+        console.log(
+          `📍 Dentro del área. Distancia: ${result.distance.toFixed(2)} m`
+        );
+        // return true;
+      }
+      // } else {
+      //   this.toastService.presentToast(
+      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
+      //   );
+
+      //   console.log(
+      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
+      //   );
+      //   return false;
+      // }
+    } catch (error) {
+      // return false;
+    }
   }
 
-  createScheduleGroup(schedule: RouteSchedule): FormGroup {
-    return this.fb.group({
-      session_start_time: [schedule.session_start_time, Validators.required],
-      session_end_time: [schedule.session_end_time, Validators.required],
-      day: [schedule.day, Validators.required],
-      name: [schedule.name, Validators.required],
-      checked: [schedule.checked, Validators.required],
-    });
-  }
+  // createScheduleGroup(schedule: RouteSchedule): FormGroup {
+  //   return this.fb.group({
+  //     session_start_time: [schedule.session_start_time, Validators.required],
+  //     session_end_time: [schedule.session_end_time, Validators.required],
+  //     day: [schedule.day, Validators.required],
+  //     name: [schedule.name, Validators.required],
+  //     checked: [schedule.checked, Validators.required],
+  //   });
+  // }
 
-  addSchedule(schedule?: any): void {
-    const newSchedule = schedule || {
-      session_start_time: '',
-      session_end_time: '',
-      day: '',
-      name: '',
-      checked: false,
-    };
-    this.schedulesFormArray.push(this.createScheduleGroup(newSchedule));
-  }
+  // addSchedule(schedule?: any): void {
+  //   const newSchedule = schedule || {
+  //     session_start_time: '',
+  //     session_end_time: '',
+  //     day: '',
+  //     name: '',
+  //     checked: false,
+  //   };
+  //   this.schedulesFormArray.push(this.createScheduleGroup(newSchedule));
+  // }
 
-  removeSchedule(index: number): void {
-    this.schedulesFormArray.removeAt(index);
-  }
+  // removeSchedule(index: number): void {
+  //   this.schedulesFormArray.removeAt(index);
+  // }
 
-  setSchedules(schedules: RouteSchedule[]): void {
-    this.schedulesFormArray.clear();
-    const dataSchedule = schedules.map((sc: any) => {
-      return {
-        session_start_time: sc.session_start_time.label,
-        session_end_time: sc.session_end_time.label,
-        day: sc.day.value,
-        name: sc.day.label,
-        checked: true,
-      };
-    });
+  // setSchedules(schedules: RouteSchedule[]): void {
+  //   this.schedulesFormArray.clear();
+  //   const dataSchedule = schedules.map((sc: any) => {
+  //     return {
+  //       session_start_time: sc.session_start_time.label,
+  //       session_end_time: sc.session_end_time.label,
+  //       day: sc.day.value,
+  //       name: sc.day.label,
+  //       checked: true,
+  //     };
+  //   });
 
-    this.selectedDays = dataSchedule;
+  //   this.selectedDays = dataSchedule;
 
-    dataSchedule.forEach((schedule) => this.addSchedule(schedule));
-  }
+  //   dataSchedule.forEach((schedule) => this.addSchedule(schedule));
+  // }
 
   async onMarkerMoved(event: { id: string; lat: number; lng: number }) {
     console.log('🟢 Marcador movido:', event);
@@ -274,91 +326,6 @@ export class PlannedRouteComponent implements OnInit {
       0
     );
   }
-
-  async handleOpenSelectWeekDayToTimmeModal() {
-    try {
-      const modal = await this.modalController.create({
-        component: SelectWeekDayComponent,
-        componentProps: {
-          currentSchedules: this.selectedDays,
-        },
-        initialBreakpoint: 1,
-        breakpoints: [0, 1],
-        cssClass: ['loading-truck-options-sheet-modal'],
-      });
-      await modal.present();
-
-      const { data } = await modal.onWillDismiss();
-
-      if (!data) {
-        // console.log('Modal dismissed without data.');
-        return;
-      }
-
-      if (
-        data.selectedWeekDays.days?.length > 0 &&
-        Array.isArray(data.selectedWeekDays?.days)
-      ) {
-        this.ruteForm.patchValue({
-          schedules: [],
-        });
-        this.selectedDays = data.selectedWeekDays.days;
-        this.ruteForm.patchValue({
-          schedules: data.selectedWeekDays.days,
-        });
-        // console.log(data.selectedWeekDays.days,'data.selectedWeekDays.days data.selectedWeekDays.days');
-
-        this.toastService.presentToast(
-          'Horarios de ruta actualizados!',
-          'custom-success-toast'
-        );
-      } else {
-        // console.warn('Modal dismissed without valid schedule data.');
-      }
-    } catch (error: any) {
-      // console.error('Error opening or dismissing modal:', error);
-      this.toastService.presentToast(
-        'Error al abrir el selector de días.',
-        'custom-error-toast'
-      );
-    }
-  }
-
-  // This method will now be for opening the student selection modal
-  async openStudentsSelectionModal() {
-    const modal = await this.modalController.create({
-      component: SelectStudentsModalComponent,
-      componentProps: {
-        // Pass currently selected student IDs to the modal for pre-selection
-        currentStudentIds: this.allStudents,
-      },
-      initialBreakpoint: 1,
-      breakpoints: [0, 1],
-    });
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-
-    if (data && data.action === 'select' && data.selectedStudentIds) {
-      const newSelectedStudentIds: string[] = data.selectedStudentIds;
-
-      // Clear existing student IDs in the form array
-      while (this.studentIdsFormArray.length !== 0) {
-        this.studentIdsFormArray.removeAt(0);
-      }
-
-      // Add the newly selected student IDs
-      newSelectedStudentIds.forEach((id) => {
-        this.studentIdsFormArray.push(this.fb.control(id));
-      });
-
-      // console.log('Selected student IDs in AddRouteComponent:', this.ruteForm.get('student_ids')?.value);
-    } else {
-      // console.log('Student selection cancelled or no students selected.');
-    }
-  }
-
-  // <--- FIX: This function was previously outside the class. Moved it inside.
   getStudentName(id: string): string {
     const student = this.allStudents.find((s) => s.id === id);
 
@@ -378,9 +345,7 @@ export class PlannedRouteComponent implements OnInit {
       home_longitude: student?.home_longitude,
     };
   }
-  // You need to fetch the driver and bus details if the route is being edited.
-  // Assuming your getRute() returns the full route object including driver and bus IDs
-  // and you have services to get the full objects by ID.
+
   getRute() {
     this.routeSubscription = this.routeService
       .getRoute(this.route_id)
@@ -388,73 +353,19 @@ export class PlannedRouteComponent implements OnInit {
         tap((response: any) => {
           if (response.data) {
             const routeData = response.data.school_route;
-            if (routeData?.schedules) {
-              this.setSchedules(routeData.schedules);
-            }
-            this.planned_route = routeData;
-
-            this.ruteForm.patchValue({
-              name: routeData.name,
-              driverId: routeData?.school_driver?.id, // Assuming your backend provides these
-              busId: routeData?.school_bus?.id, // Assuming your backend provides these
+            const students = routeData.route_points.map((route: any) => {
+              if (!Array.isArray(route.students)) {
+                route.students = [route.students];
+              }
+              return route;
             });
 
-            // Fetch full driver and bus objects if only IDs are returned
-            if (routeData.school_driver?.id) {
-              this.selectedDriver = routeData.school_driver;
-            }
-            if (routeData.school_bus?.id) {
-              this.selectedBus = routeData.school_bus;
-            }
-
-            // Handle student_ids and student_ids_pickup_order if they exist in the route data
-            if (routeData.students && Array.isArray(routeData.students)) {
-              this.studentIdsFormArray.clear();
-              const students = routeData.students.map((st: any) => {
-                st.checked = true;
-                this.studentIdsFormArray.push(this.fb.control(st));
-                return {
-                  ...st,
-                };
-              });
-              // const allStudents = [ ...students]
-              const allStudents = [...routeData.pending_students, ...students];
-
-              // You might need to fetch full student objects based on these IDs if you plan to display them
-              this.loadStudents(allStudents);
-            }
-
-            if (
-              routeData.route_points &&
-              Array.isArray(routeData.route_points)
-            ) {
-              this.studentIdsPickupOrderFormArray.clear();
-              routeData.route_points.forEach((route: any) => {
-                // console.log(route,'/////////////////////852');
-                // console.log(route.students,'////students/////////////////852');
-
-                // Asegurarte de que route.students sea siempre un array
-                if (!Array.isArray(route.students)) {
-                  route.students = [route.students];
-                }
-
-                // Luego verifica si hay estudiantes
-                if (route.students.length > 0) {
-                  // console.log('//entreeeeeeeeeeeeeeeee///////////////////852');
-                  this.studentIdsPickupOrderFormArray.push(
-                    this.fb.control(route)
-                  );
-                  this.selectedStudentsForRoute.push(route);
-                }
-              });
-            }
-            // console.log(this.studentIdsPickupOrderFormArray,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
-            // console.log(this.selectedStudentsForRoute,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
-            this.setReorderStudents();
+            routeData.route_points.students = [students];
+            this.planned_route = routeData;
           }
         }),
         catchError((err) => {
-          // console.error('Error fetching students:', err);
+          console.error('Error fetching students:', err);
           this.errorMessage =
             'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
           // this.reorderableStudentGroups = [];
@@ -467,233 +378,282 @@ export class PlannedRouteComponent implements OnInit {
       .subscribe();
   }
 
-  setReorderStudents() {
-    const selectedStudentIds = this.studentIdsPickupOrderFormArray.value
-      .flatMap((control: any) => {
-        const route = control;
-        if (Array.isArray(route.students)) {
-          return route.students.map((student: any) => student.id);
-        }
-        return [route.students?.id];
-      })
-      .filter((id: any) => !!id);
+  // async onSubmit() {
+  //   this.ruteForm.markAllAsTouched();
 
-    const filteredStudents = this.allStudents.filter(
-      (student) => !selectedStudentIds.includes(student.id)
-    );
+  //   this.schedulesFormArray.controls.forEach((group: any, index) => {
+  //     // console.log(`Schedule Group ${index} Valid?`, group.valid);
+  //     Object.keys(group.controls).forEach((key) => {
+  //       const control = group.get(key);
+  //       if (control && control.invalid) {
+  //         // console.log(`  Control ${key} invalid. Errors:`, control.errors);
+  //       }
+  //     });
+  //   });
 
-    this.studentIdsPickupOrderFormArray.push(
-      this.fb.control({
-        id: 'group-general',
-        name: 'General (Todos los estudiantes)',
-        students: filteredStudents,
-      })
-    );
+  //   if (this.ruteForm.valid) {
+  //     const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+
+  //     const data = {
+  //       name: this.ruteForm.value.name,
+  //       schedules: this.ruteForm.value.schedules,
+  //       partner_id: this.partner_id,
+  //       company_id: userData.company.id ?? null,
+  //       action: this.action,
+  //       driverId: this.ruteForm.value.driverId, // Include driverId
+  //       busId: this.ruteForm.value.busId, // Include busId
+  //       student_ids: this.ruteForm.value.student_ids, // Include selected student IDs
+  //       student_ids_pickup_order: this.ruteForm.value.student_ids_pickup_order, // Include pickup order
+  //     };
+
+  //     const observableResponse = await this.routeService.postParent(data);
+
+  //     observableResponse.subscribe({
+  //       next: (response: any) => {
+  //         const msm = this.action == 'edit' ? 'Ruta Editada' : 'Ruta Agregada';
+  //         this.toastService.presentToast(msm, 'custom-success-toast');
+  //         // Optionally, dismiss modal or navigate
+  //       },
+  //       error: (err: any) => {
+  //         const errorMessage =
+  //           err.error.error.message ||
+  //           err.error.error ||
+  //           err?.message ||
+  //           'Error desconocido al agregar/editar ruta';
+  //         this.toastService.presentToast(errorMessage);
+  //       },
+  //     });
+  //   } else {
+  //     // console.log('Formulario inválido. Errores por campo:');
+  //     Object.keys(this.ruteForm.controls).forEach((key) => {
+  //       const control = this.ruteForm.get(key);
+  //       if (control && control.invalid) {
+  //         // console.log(`Campo '${key}' es inválido. Errores:`, control.errors);
+  //       }
+  //     });
+  //   }
+  // }
+
+  // loadStudents(allFetchedStudents: Student[]): void {
+  //   this.isLoadingMap = true;
+  //   this.errorMessage = null;
+  //   this.allStudents = allFetchedStudents.map((student) => ({
+  //     ...student,
+  //     home_latitude: student.home_latitude ?? 0, // Default to 0 if null/undefined
+  //     home_longitude: student.home_longitude ?? 0, // Default to 0 if null/undefined
+  //   }));
+  // }
+
+  async getLocation() {
+    try {
+      let local = await this.locationService.getCurrentLocation();
+      if (!local) {
+        local = { latitude: 0, longitude: 0 };
+      }
+      return local;
+    } catch (error) {
+      console.log(error);
+
+      return error;
+    }
+  }
+  // request
+  getDriverCurrentLocation() {
+    // const watchId = false;
+    try {
+      // this.routeSubscription = this.routeService
+      this.routeTrackingPlannedService
+        .getDriverCurrentLocation(this.route_id)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+              response.data.name = 'Ubicacion de chofer';
+              this.markers = [...response.data];
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
   }
 
-  // Helper to fetch full student objects based on IDs (if your API gives only IDs initially)
-  private fetchSelectedStudentsDetails(studentIds: string[]): void {
-    // Assuming your StudentsService has a method like `getStudentsByIds`
-    // If your `getStudents()` already returns all students, filter them:
-    this.studentsService
-      .getStudents()
-      .pipe(
-        map((res: any) => {
-          const allFetchedStudents: Student[] = res.data.student;
-          return allFetchedStudents.filter((s) => studentIds.includes(s.id));
-        }),
-        tap((filteredStudents) => {
-          this.selectedStudentsForRoute = filteredStudents;
-          this.allStudents = filteredStudents; // Ensure allStudents also has the full objects
-        }),
-        catchError((err) => {
-          // console.error('Error fetching selected student details:', err);
-          return of([]);
-        })
-      )
-      .subscribe();
+  getTheNextPoint() {
+    const watchId = false;
+    try {
+      // this.routeSubscription = this.routeService
+      this.routeTrackingPlannedService
+        .getTheNextPoint(this.route_id)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
   }
 
-  async onSubmit() {
-    this.ruteForm.markAllAsTouched();
+  stopTrackingLocation() {
+    const watchId = localStorage.getItem('watchId');
+    this.locationService.stopTrackingLocation(watchId);
+  }
 
-    this.schedulesFormArray.controls.forEach((group: any, index) => {
-      // console.log(`Schedule Group ${index} Valid?`, group.valid);
-      Object.keys(group.controls).forEach((key) => {
-        const control = group.get(key);
-        if (control && control.invalid) {
-          // console.log(`  Control ${key} invalid. Errors:`, control.errors);
-        }
-      });
-    });
-
-    if (this.ruteForm.valid) {
-      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
-
+  async startTrackingLocation() {
+    // const watchId = false;
+    try {
+      const location = await this.getLocation();
       const data = {
-        name: this.ruteForm.value.name,
-        schedules: this.ruteForm.value.schedules,
-        partner_id: this.partner_id,
-        company_id: userData.company.id ?? null,
-        action: this.action,
-        driverId: this.ruteForm.value.driverId, // Include driverId
-        busId: this.ruteForm.value.busId, // Include busId
-        student_ids: this.ruteForm.value.student_ids, // Include selected student IDs
-        student_ids_pickup_order: this.ruteForm.value.student_ids_pickup_order, // Include pickup order
+        route_id: this.route_id,
+        lat: location.latitude,
+        lng: location.longitude,
       };
 
-      const observableResponse = await this.routeService.postParent(data);
-
-      observableResponse.subscribe({
-        next: (response: any) => {
-          const msm = this.action == 'edit' ? 'Ruta Editada' : 'Ruta Agregada';
-          this.toastService.presentToast(msm, 'custom-success-toast');
-          // Optionally, dismiss modal or navigate
-        },
-        error: (err: any) => {
-          const errorMessage =
-            err.error.error.message ||
-            err.error.error ||
-            err?.message ||
-            'Error desconocido al agregar/editar ruta';
-          this.toastService.presentToast(errorMessage);
-        },
-      });
-    } else {
-      // console.log('Formulario inválido. Errores por campo:');
-      Object.keys(this.ruteForm.controls).forEach((key) => {
-        const control = this.ruteForm.get(key);
-        if (control && control.invalid) {
-          // console.log(`Campo '${key}' es inválido. Errores:`, control.errors);
-        }
-      });
-    }
-  }
-
-  // ... (handleOpenSelectWeekDayToTimmeModal, getStudentName, getStudentCoordinates are fine)
-
-  async openDriverBusSelectionModal() {
-    const modal = await this.modalController.create({
-      component: SelectDriverBusComponent,
-      componentProps: {
-        initialDriverId: this.ruteForm.get('driverId')?.value,
-        initialBusId: this.ruteForm.get('busId')?.value,
-        initialSelectedDriver: this.selectedDriver,
-        initialSelectedBus: this.selectedBus,
-      },
-      initialBreakpoint: 1,
-      breakpoints: [0, 1],
-      cssClass: ['select-driver-bus-modal'],
-    });
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-
-    if (data && data.action === 'select') {
-      const selectedDriver: Driver | null = data.selectedDriver; // Expecting full object
-      const selectedBus: Bus | null = data.selectedBus; // Expecting full object
-
-      this.selectedDriver = selectedDriver;
-      this.selectedBus = selectedBus;
-
-      this.ruteForm.patchValue({
-        driverId: selectedDriver ? selectedDriver.id : null,
-        busId: selectedBus ? selectedBus.id : null,
-      });
-
-      this.toastService.presentToast(
-        'Chofer y Autobús seleccionados',
-        'success'
-      );
-    } else {
-      // console.log('Driver/Bus selection cancelled.');
-    }
-  }
-
-  // ... (openStudentsSelectionModal is fine)
-
-  loadStudents(allFetchedStudents: Student[]): void {
-    this.isLoadingMap = true;
-    this.errorMessage = null;
-    this.allStudents = allFetchedStudents.map((student) => ({
-      ...student,
-      home_latitude: student.home_latitude ?? 0, // Default to 0 if null/undefined
-      home_longitude: student.home_longitude ?? 0, // Default to 0 if null/undefined
-    }));
-  }
-
-  async openReorderStudentsMapModal() {
-    if (this.allStudents.length === 0) {
-      // Check this.allStudents (filtered and prepared)
-      // console.warn('No students prepared for reordering.');
-      this.toastService.presentToast(
-        'No hay estudiantes para reordenar en el mapa. Seleccione estudiantes y asegúrese de que tengan coordenadas.',
-        'warning'
-      );
-      return;
-    }
-
-    const modal = await this.modalController.create({
-      component: ReorderStudentsMapModalComponent,
-      componentProps: {
-        studentsForRoute: [...this.allStudents], // Pass the prepared student objects
-        studentIdsPickupOrderFormArray: [
-          ...this.studentIdsPickupOrderFormArray.value,
-        ], // Pass the prepared student objects
-      },
-      initialBreakpoint: 1,
-      breakpoints: [0, 1],
-      cssClass: ['full-screen-modal'],
-    });
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-
-    if (data && data.action === 'save' && data.reorderedStudentsWithCoords) {
-      const reorderedStudentsWithCoords: Student[] =
-        data.reorderedStudentsWithCoords;
-      this.studentIdsPickupOrderFormArray.clear();
-
-      reorderedStudentsWithCoords.forEach((group: any) => {
-        const studentObjects = group.students.map((student: any) => ({
-          id: student.id,
-          name: student.name,
-          last_name: student.last_name,
-          home_latitude: student.home_latitude,
-          home_longitude: student.home_longitude,
-        }));
-
-        this.studentIdsPickupOrderFormArray.push(
-          this.fb.control({
-            name: group.name,
-            id: group.id,
-            students: studentObjects,
+      this.routeSubscription = this.routeTrackingPlannedService
+        .startTheRoute(data)
+        .pipe(
+          tap((response: any) => {
+            if (response) {
+              console.log(response);
+              const watchId: any =
+                this.locationService.startTrackingLocation();
+              if (watchId) {
+                localStorage.setItem('watchId', watchId);
+              }
+            }
+          }),
+          catchError((err) => {
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
           })
-        );
-
-        this.selectedStudentsForRoute = studentObjects; // Update the list of full student objects with the new order AND updated coordinates
-      });
-
-      // console.log(reorderedStudentsWithCoords,'reorderedStudentsWithCoords');
-
-      // this.selectedStudentsForRoute = reorderedStudentsWithCoords; // Update the list of full student objects with the new order AND updated coordinates
-
-      // console.log('Reordered student IDs in AddRouteComponent  studentIdsPickupOrderFormArray:', this.studentIdsPickupOrderFormArray.value);
-      // console.log('Updated student coordinates:', this.selectedStudentsForRoute.map((s: any) => ({id: s.id, lat: s.home_latitude, lng: s.home_longitude})));
-    } else {
-      // console.log('Student reordering and map adjustment cancelled.');
-    }
+        )
+        .subscribe();
+    } catch (error) {}
   }
 
-  startTrackingLocation () {
-    const watchId = false
+  async setdriverLocation() {
+    const watchId = false;
     try {
-      const wach =this.locationService.startTrackingLocation(watchId)
-      console.log(wach,'wachhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+      const location = await this.getLocation();
+      const data = {
+        route_id: this.route_id,
+        lat: location.latitude,
+        lng: location.longitude,
+      };
+      // this.routeSubscription = this.routeService
+      this.routeTrackingPlannedService
+        .setdriverLocation(data)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
+  }
 
-    } catch (error) {
+  async markARouteAsVisited() {
+    const watchId = false;
+    try {
+      const location = await this.getLocation();
 
-    }
+      const data = {
+        route_id: this.route_id,
+        lat: location.latitude,
+        lng: location.longitude,
+      };
+      // this.routeSubscription = this.routeService
+      this.routeTrackingPlannedService
+        .markARouteAsVisited(data)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
+  }
+
+  async setEndTheRoute() {
+    const watchId = false;
+    try {
+      const location = await this.getLocation();
+
+      const data = {
+        route_id: this.route_id,
+        lat: location.latitude,
+        lng: location.longitude,
+      };
+      // this.routeSubscription = this.routeService
+      this.routeTrackingPlannedService
+        .setEndTheRoute(data)
+        .pipe(
+          tap((response: any) => {
+            if (response.data) {
+              console.log(response);
+            }
+          }),
+          catchError((err) => {
+            // console.error('Error fetching students:', err);
+            this.errorMessage =
+              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+            // this.reorderableStudentGroups = [];
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } catch (error) {}
   }
 }
 

@@ -43,6 +43,7 @@ export class SelectWeekDayComponent implements OnInit {
 
   @Input() currentSchedules: any = null;
   @Output() weekDaySelected = new EventEmitter<string>();
+  allDate: boolean = false;
 
   get defaultHref(): string {
     let href = '/tabs';
@@ -141,16 +142,8 @@ export class SelectWeekDayComponent implements OnInit {
     this.weekDaysForm = this.fb.group({
       days: this.fb.array([]), // This FormArray will hold selected days' time info
     });
-    console.log(this.currentSchedules, 'currentSchedules currentSchedules');
-    // this.studentForm.patchValue({
-    //     birth_date: date,
-    //     profile: this.student?.image,
-    //   });
     this.currentSchedules.forEach((day: any) => {
-      // If a day is initially checked, add its form control
       if (day.checked) {
-        console.log(day, '/////////////////day day//day');
-
         this.addDayToForm(day);
       }
     });
@@ -159,6 +152,33 @@ export class SelectWeekDayComponent implements OnInit {
   get daysFormArray(): FormArray {
     return this.weekDaysForm.get('days') as FormArray;
   }
+
+  isActiveAllDay() {
+    // console.log(event,'......................');
+
+    // console.log(this.currentSchedules,'this.currentSchedules');
+    console.log(this.daysFormArray,'this.currentSthis.daysFormArraychedules');
+    let data: any = {};
+    if (this.allDate) {
+       this.weeks.forEach((d: any) => {
+       data = {
+          day: d.day,
+          name: d.name,
+          session_start_time: this.daysFormArray?.value[0]?.session_start_time,
+          session_end_time: this.daysFormArray?.value[0]?.session_end_time,
+          checked: true,
+        }
+
+        this.addDayToForm(data);
+
+      });
+      return
+    }
+    this.weekDaysForm = this.fb.group({
+      days: this.fb.array([]), // This FormArray will hold selected days' time info
+    });
+  }
+
 
   // In your SelectWeekDayComponent class:
   getStartTimeControl(dayId: number): FormControl | any {
