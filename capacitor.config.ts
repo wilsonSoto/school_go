@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.school.go.starter',
-  appName: 'schoolGo',
+  appId: 'io.kabaygroup.escolar.go',
+  appName: 'EscolarGo',
   webDir: 'www',
   plugins: {
     GoogleMap: {

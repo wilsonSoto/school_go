@@ -1,4 +1,4 @@
-package io.school.go.starter;
+package io.kabaygroup.escolar.go;
 
 import com.getcapacitor.BridgeActivity;
 
