@@ -69,13 +69,11 @@ export class RouteTrackingPlannedService {
   }
 
 
-  markARouteAsVisited(data: any) {
+  markARouteAsVisited(route_id: any, data: any) {
     // {{host_local}}/api/school/route/14/point/mark_visited
-    let url = `${this.appURl}/school/route/${data.route_id}/point/mark_visited`;
+    let url = `${this.appURl}/school/route/${route_id}/point/mark_visited`;
     const dataRoute = {
-      params: {
-        point_id: data.point_id, //'18.5200830',
-      },
+      params: data
     };
     return this.httpClient.post(url, dataRoute).pipe(
       map((res: any) => {
