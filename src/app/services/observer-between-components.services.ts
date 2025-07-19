@@ -12,10 +12,10 @@ export class ObserverBetweenComponentsService {
     this.sourceMessage.next(message);
   }
 
-  private isFetchingOdoo = new BehaviorSubject<boolean>(false);
-  currentFetching = this.isFetchingOdoo.asObservable();
+  private sendDriverLocation = new BehaviorSubject<any>(null);
+  currentDriverLocation = this.sendDriverLocation.asObservable();
 
-  changeFetching(message: boolean) {
-    this.isFetchingOdoo.next(message);
+  changeDriverLocation(message: any) {
+    this.sendDriverLocation.next(message);
   }
 }

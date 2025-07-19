@@ -13,7 +13,7 @@ import { IonTabs } from '@ionic/angular'; // Si quieres tipar el evento
   standalone: false,
 })
 export class TabsPage   {
-
+userData: any = null;
 
   constructor(private router: Router,
 
@@ -24,7 +24,20 @@ export class TabsPage   {
 
 
   ngOnInit() {
-    this.router.navigateByUrl('/tabs/tab3', { replaceUrl: true });
+    this.userData = localStorage.getItem('userData')
+    this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
+  }
+
+  get showTabsPermission () {
+    this.userData = JSON.parse(localStorage.getItem('userData') ?? "")
+
+    if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father")) {
+      return [false, false, true, false, true ]
+    } else {
+      return [true, true, true, true, true ]
+
+    }
+    // return
   }
 
     tabDidChange(event?: any) { // El evento contiene información sobre la pestaña cambiada

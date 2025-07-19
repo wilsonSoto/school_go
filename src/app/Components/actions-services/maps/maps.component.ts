@@ -37,22 +37,13 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
   private markerIds: string[] = [];
 
   async ngAfterViewInit() {
-    console.log(environment.googleMapsApiKey, 'environment.googleMapsApiKey');
 
     await this.createMap();
     await this.addMarkersFromInput();
   }
 
-  // async ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['markers'] && !changes['markers'].firstChange && this.map) {
-  //     await this.removeAllMarkers();
-  //     await this.addMarkersFromInput();
-  //   }
-  // }
 
   async ngOnChanges(changes: SimpleChanges) {
-    console.log(changes,'[[[[[[[[[[[[[[[[[[[[[[[[[[[www');
-
   if (changes['markers']) {
     const current = changes['markers'].currentValue;
     const previous = changes['markers'].previousValue;
