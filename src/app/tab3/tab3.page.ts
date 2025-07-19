@@ -12,6 +12,8 @@ import { ToastService } from '../services/toast.service';
 import { Component, OnInit } from '@angular/core'; // <--- ASEGÚRATE DE QUE 'Component' ESTÉ IMPORTADO AQUÍ
   import { ModalController } from '@ionic/angular';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
+import { StorageService } from '../services/storage.service';
+import { hostUrlEnum } from 'src/types';
 
 @Component({
   // <--- ESTE DECORADOR ES PROBABLEMENTE EL QUE FALTA O ESTÁ MAL ESCRITO
@@ -22,17 +24,22 @@ import { UbicationModalComponent } from '../Components/actions-services/ubicatio
 })
 export class Tab3Page implements OnInit {
   school_routes: any = [];
-
+  token = ""
   constructor(
     private routeService: RouteService,
     private toastService: ToastService,
     private router: Router,
     private modalController: ModalController,
+    private storage: StorageService
   ) {}
 
   ngOnInit(): void {
-
+  const self = this
     // this.getAllRoute();
+      this.storage.get(hostUrlEnum.FCM_TOKEN).then((resp) => {
+        self.token = JSON.stringify(resp)
+      })
+    
   }
 
 

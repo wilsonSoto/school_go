@@ -302,6 +302,34 @@ export class SelectWeekDayComponent implements OnInit {
       action: 'proceed',
     });
   }
+
+  applySameTimeToAllDays() {
+    const [firstDay] = this.daysFormArray.value;
+  
+    if (this.allDate && firstDay) {
+      this.daysFormArray.clear();
+  
+      this.weeks.forEach((day) => {
+        const newDay = {
+          day: day.day,
+          name: day.name,
+          session_start_time: firstDay.session_start_time,
+          session_end_time: firstDay.session_end_time,
+          checked: true,
+        };
+  
+        // Marcar como checked en el modelo base también
+        const week = this.weeks.find(w => w.day === day.day);
+        if (week) week.checked = true;
+  
+        this.addDayToForm(newDay);
+      });
+    } else {
+      this.daysFormArray.clear();
+      this.weeks.forEach((w) => (w.checked = false));
+    }
+  }
+  
 }
 
 interface WeekDay {

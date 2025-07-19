@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { FcmService } from './services/fcm.service';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +12,22 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AppComponent {
 
-  constructor(private translate: TranslateService, private router: Router) {
+  constructor(private translate: TranslateService, 
+    private router: Router, 
+    private platform: Platform, private fcm: FcmService) {
     // this.translate.setDefaultLang('es'); // idioma por defecto
      this.initializeApp();
     //  this.translate.use('es');  
     // this.router.navigate(['tabs'])          // idioma en uso
+    this.platform.ready().then(() => {
+      this.fcm.initPush().then();
+    }).catch((e: any) => {
+      console.log(e);
+      alert(e)
+    })
+
   }
+
 
     initializeApp() {
     // Establece el idioma por defecto a 'es' (español)

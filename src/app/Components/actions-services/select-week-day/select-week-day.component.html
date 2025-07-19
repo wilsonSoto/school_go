@@ -16,7 +16,8 @@
 <ion-content class="ion-padding">
   <ion-list>
 <ion-item>
-  <ion-toggle [(ngModel)]="allDate" (ionChange)="isActiveAllDay()">Aplicar fechas a todos</ion-toggle>
+  <ion-label>Usar misma hora para todos</ion-label>
+  <ion-toggle [(ngModel)]="allDate" (ionChange)="applySameTimeToAllDays()"></ion-toggle>
 </ion-item>
 </ion-list>
   <form [formGroup]="weekDaysForm">
