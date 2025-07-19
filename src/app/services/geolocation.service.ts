@@ -260,12 +260,12 @@ export class LocationService {
         if (distance > DISTANCE_THRESHOLD_METERS) {
           console.log(`🚶‍♂️ Movimiento detectado: ${distance.toFixed(2)}m`);
           lastMovementTime = currentTime;
+          this.observerService.changeDriverLocation(position); // ejemplo: empieza una carga
         } else if (timeStopped > TIME_THRESHOLD_MS) {
           console.warn('🛑 Usuario lleva más de 5 minutos sin moverse.');
         }
 
          this.observerService.changeMessage(position);
-    this.observerService.changeFetching(true); // ejemplo: empieza una carga
       } else {
         lastMovementTime = currentTime;
         console.log('📍 Primer dato de ubicación recibido.');

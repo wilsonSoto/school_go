@@ -50,19 +50,19 @@ const routes: Routes = [
       // },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/route',
         pathMatch: 'full'
       }
     ]
   },
    {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/route',
         pathMatch: 'full'
       },
   {
-    path: 'tabs/tab1',
-    redirectTo: '/tabs/tab1',
+    path: 'tabs/route',
+    redirectTo: '/tabs/route',
     pathMatch: 'full'
   }
 ];
