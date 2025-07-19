@@ -188,7 +188,7 @@
                           Lng: {{ student?.home_longitude | number : "1.4-4" }}
                         </p>
                       </ion-label>
-                      <div *ngIf="showBtnPermission != 'partner'" class="action-button">
+                      <div *ngIf="showBtnPermission == 'driver'" class="action-button">
                         <span  *ngIf="group?.students?.length == 1">
                           <ion-button
                             color="dark"

@@ -115,11 +115,11 @@ export class PlannedRouteComponent implements OnInit {
 
     if (userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father")) {
       return 'partner'
-    } else {
+    } else  if (userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_driver")){
       return 'driver'
 
     }
-    return
+    return 'admin'
     }
   ngOnInit() {
     this.route_id = this.route.snapshot.paramMap.get('routeId');
