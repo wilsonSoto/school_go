@@ -237,9 +237,14 @@
         <!-- <ion-note>{{ schedulesFormDays }}</ion-note> -->
         )
       </ion-list>
-      <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
-      </app-maps>
-
+      <!-- <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
+      </app-maps> -->
+      <app-maps
+      [markers]="markers"
+      [routePoints]="rutaDelBus"
+      (markerMoved)="onMarkerMoved($event)"
+    ></app-maps>
+    
       <div
         *ngIf="!isLoadingMap && getTotalStudents() === 0"
         class="no-students-map-overlay"

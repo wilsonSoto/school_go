@@ -18,6 +18,8 @@ export class LocationService {
     latitude: number | '';
     longitude: number | '';
   }> {
+    // alert('1==')
+
     const isConnected = await checkNetworkStatus();
     if (!isConnected) {
       this.toastService.presentToast(
@@ -29,10 +31,17 @@ export class LocationService {
         longitude: '',
       };
     }
+    // alert('22==')
 
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by this browser.'));
+    // alert('33==')
+        const text = 'Geolocation is not supported by this browser.'
+        reject(new Error(text));
+        this.toastService.presentToast(
+          'Revise si tiene la ubicacion encendida o '+ text,
+          'warning'
+        );
         return; // Asegúrate de salir después de rechazar
       }
       navigator.geolocation.getCurrentPosition(
@@ -52,6 +61,10 @@ export class LocationService {
           } else if (error.code === error.TIMEOUT) {
             errorMessage = 'Tiempo de espera agotado al obtener la ubicación.';
           }
+          this.toastService.presentToast(
+            'Revise si tiene la ubicacion encendida o '+ error,
+            'warning'
+          );
           return false;
           reject(new Error(errorMessage));
         },
@@ -77,7 +90,7 @@ export class LocationService {
       }
       return permissionStatus.location === 'granted';
     } catch (error: any) {
-      // alert(JSON.stringify(error));
+      alert(JSON.stringify(error));
       console.error('Error al solicitar permisos de geolocalización:', error);
       console.log('Error al solicitar permisos de geolocalización:', error);
       this.toastService.presentToast(

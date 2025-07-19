@@ -40,6 +40,10 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     await this.createMap();
     await this.addMarkersFromInput();
+    if (this.routePoints) {
+      await this.drawPolyline(this.markers);
+      
+    }
   }
 
 
@@ -59,6 +63,13 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
       await this.addMarkersFromInput();
     }
   }
+  // cambios de markers...
+  // if (changes['routePoints']) {
+  //   const points = changes['routePoints'].currentValue;
+  //   if (Array.isArray(points) && this.map) {
+  //     await this.drawPolyline(points);
+  //   }
+  // }
 }
 
   private async createMap() {
@@ -131,4 +142,95 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
   ngOnDestroy() {
     this.map?.destroy();
   }
+
+  @Input() routePoints:boolean = false;
+private polylineId?: string;
+
+
+
+// private async drawPolyline22(points: { lat: number; lng: number }[]) {
+//   if (!this.map || points.length < 2) return;
+
+//   // Elimina la línea anterior si existe
+//   if (this.polylineId) {
+//     await this.map.removePolylines([this.polylineId]);
+//     this.polylineId = undefined;
+//   }
+
+//   const result = await this.map.addPolylines([
+//     {
+//       id: 'main-route', // puedes generar un ID único si deseas
+//       path: points,
+//       color: '#4285F4',
+//       width: 4,
+//     },
+//   ]);
+
+//   this.polylineId = result.ids?.[0]; // guardar el ID de la línea
+
+//   // Centrar la cámara en el primer punto
+//   await this.map.setCamera({
+//     coordinate: points[0],
+//     zoom: 14,
+//   });
+// }
+
+// private polylineId?: string;
+
+private async drawPolyline(points: { lat: number; lng: number }[]) {
+  if (!this.map || points.length < 2) return;
+
+  // Elimina la línea anterior si existe
+  if (this.polylineId) {
+    await this.map.removePolylines([this.polylineId]);
+    this.polylineId = undefined;
+  }
+  const ids = await this.map.addPolylines([
+    {
+      path: points,
+      color: '#4285F4',
+      width: 4,
+    } as any, // ⚠️ esto evita el error TS, aunque no es lo ideal
+  ]);
+  
+  // Agregar nueva línea
+  // const ids = await this.map.addPolylines([
+  //   {
+  //     path: points,
+  //     // color: '#4285F4',
+  //     // width: 4,
+  //   },
+  // ]);
+
+  this.polylineId = ids[0]; // Guardar ID retornado
+
+  // Centrar cámara en el primer punto
+  await this.map.setCamera({
+    coordinate: points[0],
+    zoom: 14,
+  });
+}
+
+// private async drawPolyline1(points: { lat: number; lng: number }[]) {
+//   if (!this.map || points.length < 2) return;
+
+//   if (this.polylineId) {
+//     await this.map.removePolylines([this.polylineId]);
+//     this.polylineId = undefined;
+//   }
+
+//   const result = await this.map.addPolyline({
+//     path: points,
+//     color: '#4285F4',
+//     width: 4,
+//   });
+
+//   this.polylineId = result.id;
+
+//   await this.map.setCamera({
+//     coordinate: points[0],
+//     zoom: 14,
+//   });
+// }
+
 }
