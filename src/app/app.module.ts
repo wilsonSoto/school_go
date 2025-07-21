@@ -47,6 +47,9 @@ import { RouteTrackingPlannedService } from './services/route-tracking-planned.s
 import { ObserverBetweenComponentsService } from './services/observer-between-components.services';
 import { RouteTrackingService } from './services/route-tracking.service';
 import { UbicationModalComponent } from './Components/actions-services/ubication-modal/ubication-modal.component';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { GoogleDirectionsService } from './services/google-directions.service';
+import { VersionUpdateComponent } from './Components/actions-services/version-update/version-update.component';
 // import { SelectWeekDayComponent } from './Components/actions-services/select-week-day/select-week-day.component';
 // import { AllRouteComponent } from './Components/all-rute/all-rute.component';
 
@@ -68,6 +71,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     StudentsComponent,
     EditProfileComponent,
     UbicationModalComponent,
+    VersionUpdateComponent,
     // SelectWeekDayComponent,
     // AddRouteComponent,
     // AllRouteComponent,
@@ -79,6 +83,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   imports: [
     BrowserModule,
+    IonicStorageModule.forRoot(),
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
@@ -101,6 +106,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     RouteTrackingPlannedService,
     ObserverBetweenComponentsService,
     RouteTrackingService,
+    GoogleDirectionsService,
     {
     provide: RouteReuseStrategy,
     useClass: IonicRouteStrategy,

@@ -5,11 +5,14 @@
          <ion-col>
           <ion-title size="large" >
             Rutas programadas
+
+            {{token}}
           </ion-title>
         </ion-col>
         <ion-col size="auto">
           <div>
 <!-- <ion-button id="popover-button">Open Menu</ion-button> -->
+<ion-input type="text"  [(ngModel)]="token"></ion-input>
 
             <ion-avatar id="popover-button">
               <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />

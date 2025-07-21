@@ -69,6 +69,7 @@ export class ReorderStudentsMapModalComponent
 {
   @Input() modal!: Components.IonModal;
   // @Input() activeMap: boolean = false;
+  @Input() isActiveAllStudents: boolean= true;
   @Input() studentsForRoute: Student[] = [];
   @Input() studentIdsPickupOrderFormArray: any = [];
 
@@ -112,7 +113,13 @@ export class ReorderStudentsMapModalComponent
       this.studentIdsPickupOrderFormArray &&
       this.studentIdsPickupOrderFormArray.length > 0
     ) {
-      this.setReorderStudents();
+      if (this.isActiveAllStudents) {
+        this.setReorderStudents();
+      } else {
+        // console.log(this.studentIdsPickupOrderFormArray,'this.studentIdsPickupOrderFormArray');
+        
+        this.reorderableStudentGroups = this.studentIdsPickupOrderFormArray;
+      }
     } else if (this.studentsForRoute && this.studentsForRoute.length > 0) {
       this.reorderableStudentGroups = [
         {
@@ -124,12 +131,12 @@ export class ReorderStudentsMapModalComponent
         },
       ];
     }
-    console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+    // console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
 
     this.markers = this.generateMarkersFromGroups(
       this.reorderableStudentGroups
     );
-    console.log(this.markers, 'this.markers');
+    // console.log(this.markers, 'this.markers');
   }
 
   ngAfterViewInit() {
@@ -148,7 +155,7 @@ export class ReorderStudentsMapModalComponent
   }
 
   async onMarkerMoved(event: { id: string; lat: number; lng: number }) {
-  console.log('🟢 Marcador movido:', event);
+  // console.log('🟢 Marcador movido:', event);
   const index = Number(event.id);
 
   if (index >= 0 && index < this.markers.length) {
@@ -170,7 +177,7 @@ export class ReorderStudentsMapModalComponent
           handler: () => {
             const movedMarker = this.markers[index];
             this.updateGroupOrStudentCoordinates(movedMarker);
-    console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+    // console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
 
           },
         },
@@ -190,7 +197,7 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
     if (group.id === marker.id) {
       group.point_latitude = marker.lat;
       group.point_longitude = marker.lng;
-      console.log(`📍 Coordenadas actualizadas para el grupo: ${group.name}`);
+      // console.log(`📍 Coordenadas actualizadas para el grupo: ${group.name}`);
       return;
     }
 
@@ -200,7 +207,7 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
         if (student.id === marker.id) {
           student.home_latitude = marker.lat;
           student.home_longitude = marker.lng;
-          console.log(`📍 Coordenadas actualizadas para el estudiante: ${student.name}`);
+          // console.log(`📍 Coordenadas actualizadas para el estudiante: ${student.name}`);
           return;
         }
       }
@@ -260,8 +267,8 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
       (student) => !selectedStudentIds.includes(student.id)
     );
 
-    console.log(filteredStudents, 'filteredStudents filteredStudents');
-    console.log(selectedStudentIds, 'selectedStudentIds selectedStudentIds');
+    // console.log(filteredStudents, 'filteredStudents filteredStudents');
+    // console.log(selectedStudentIds, 'selectedStudentIds selectedStudentIds');
 
     if (
       !this.studentIdsPickupOrderFormArray.some(
@@ -462,8 +469,8 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
     const toGroup = this.reorderableStudentGroups.find(
       (g) => g.id === toGroupId
     );
-console.log(fromGroupId,'fromGroupId fromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupId');
-console.log(toGroup,'toGroup toGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGroup');
+// console.log(fromGroupId,'fromGroupId fromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupId');
+// console.log(toGroup,'toGroup toGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGroup');
 
     if (fromGroup && toGroup) {
       const studentIndex = fromGroup.students.findIndex(

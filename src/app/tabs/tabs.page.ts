@@ -1,8 +1,5 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ParentService
- } from '../services/parents.service';
-import { ToastService } from '../services/toast.service';
 import { IonTabs } from '@ionic/angular'; // Si quieres tipar el evento
 
 @Component({
@@ -15,23 +12,22 @@ import { IonTabs } from '@ionic/angular'; // Si quieres tipar el evento
 export class TabsPage   {
 userData: any = null;
 
+  students: any = [];
   constructor(private router: Router,
-
   ) {} // Inyecta el Router
 
   @ViewChild('myTabs')
   tabs!: IonTabs; // Declara la propiedad para la referencia a IonTabs
 
 
-  ngOnInit() {
-    this.userData = localStorage.getItem('userData')
+ ngOnInit() {
+      this.userData = JSON.parse(localStorage.getItem('userData') ?? "")
+
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
   }
 
   get showTabsPermission () {
-    this.userData = JSON.parse(localStorage.getItem('userData') ?? "")
-
-    if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father")) {
+    if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father" || rol.external_id == "pool.group_school_driver")) {
       return [false, false, true, false, true ]
     } else {
       return [true, true, true, true, true ]

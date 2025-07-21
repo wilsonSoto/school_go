@@ -54,7 +54,7 @@ export class SelectStudentsModalComponent implements OnInit {
     });
     this.availableStudents = this.currentStudentIds
 
-    console.log(this.availableStudents,';lpopopo');
+    // console.log(this.availableStudents,';lpopopo');
         this.populateFormWithCurrentSelections();
 
   }
@@ -85,15 +85,15 @@ export class SelectStudentsModalComponent implements OnInit {
 
   // Populate the form array with students that are already selected
   populateFormWithCurrentSelections(): void {
-    console.log(this.currentStudentIds,'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    // console.log(this.currentStudentIds,'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
     if (this.currentStudentIds && this.currentStudentIds.length > 0) {
       this.currentStudentIds.forEach((selectStudent : any) => {
-    console.log(selectStudent,'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    // console.log(selectStudent,'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
         // Ensure the ID corresponds to an available student before adding to form
         if (selectStudent.checked) {
-    console.log(selectStudent.checked,'>>>>>>>>>>>>checked>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    // console.log(selectStudent.checked,'>>>>>>>>>>>>checked>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
           this.selectedStudentsFormArray.push(this.fb.control(selectStudent));
         }
@@ -103,8 +103,8 @@ export class SelectStudentsModalComponent implements OnInit {
 
   // Check if a student is currently selected
   isStudentSelected(studentId: string): boolean {
-    console.log(studentId,'isStudentSelected ------------------------------------');
-    console.log(this.selectedStudentsFormArray,'this.selectedStudentsFormArray ------------------------------------');
+    // console.log(studentId,'isStudentSelected ------------------------------------');
+    // console.log(this.selectedStudentsFormArray,'this.selectedStudentsFormArray ------------------------------------');
 
     return this.selectedStudentsFormArray.controls.some(control => control.value.id === studentId);
   }
@@ -124,7 +124,7 @@ export class SelectStudentsModalComponent implements OnInit {
         this.selectedStudentsFormArray.removeAt(index);
       }
     }
-    console.log('Current selected student IDs:', this.selectedStudentsFormArray.value);
+    // console.log('Current selected student IDs:', this.selectedStudentsFormArray.value);
   }
 
   // Dismiss the modal without saving (cancel action)
