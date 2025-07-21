@@ -28,6 +28,7 @@ userData: any = null;
 
   get showTabsPermission () {
     if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father" || rol.external_id == "pool.group_school_driver")) {
+      return [true, true, true, true, true ]
       return [false, false, true, false, true ]
     } else {
       return [true, true, true, true, true ]

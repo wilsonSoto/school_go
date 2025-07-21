@@ -37,8 +37,9 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
 
   constructor(private googleDirectionsService: GoogleDirectionsService){}
-  
+
   @Input() routePoints:boolean = false;
+  @Input() showBtnPermission: string = '';
   private polylineId?: string;
   private map!: GoogleMap;
   private markerIds: string[] = [];
@@ -47,12 +48,10 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     await this.createMap();
     await this.addMarkersFromInput();
-    if (this.routePoints) {
-      console.log(this.markers,'///////////markers////////////////');
-      
+    if (this.routePoints && this.showBtnPermission != 'driver') {
       await this.drawRouteUsingGoogleAPI();
 
-      
+
     }
   }
 
@@ -73,13 +72,13 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
       await this.addMarkersFromInput();
       if (this.routePoints) {
         console.log(this.markers,'///////////markers///////22/////////');
-        
+
         await this.drawRouteUsingGoogleAPI();
-        
+
       }
     }
   }
-  
+
 }
 
   private async createMap() {
@@ -165,10 +164,10 @@ private async drawPolyline000(points: { lat: number; lng: number }[]) {
       path: points,
       color: '#4285F4',
       width: 4,
-    } as any, 
+    } as any,
   ]);
-  
-  this.polylineId = ids[0]; 
+
+  this.polylineId = ids[0];
   await this.map.setCamera({
     coordinate: points[0],
     zoom: 14,
@@ -223,7 +222,7 @@ async drawRouteUsingGoogleAPI() {
 
 
 private async getDrawPolyline(points: { lat: number; lng: number }[]) {
-  
+
   if (!this.map || points.length < 2) return;
 
   // Usa los primeros y últimos puntos como origen y destino

@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@an
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
-import { Components } from '@ionic/core'; // For ModalController type
+import { Components, RefresherCustomEvent } from '@ionic/core'; // For ModalController type
 import { Observable, forkJoin, of, throwError } from 'rxjs'; // Import throwError
 import { tap, catchError, finalize, map } from 'rxjs/operators';
 
@@ -69,6 +69,12 @@ export class SelectDriverBusComponent implements OnInit {
     }
   }
 
+   handleRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
+  }
 
   loadDriversAndBuses(): void {
     this.isLoading = true;

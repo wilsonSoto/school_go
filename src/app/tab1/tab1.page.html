@@ -24,11 +24,27 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
- <app-parents
-  *ngFor="let parent of parents"
-  [parent]="parent"
-    (click)="handleOpenClientModal('edit', parent)"
- ></app-parents>
+     <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Rutas...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="getAllParents()">Reintentar</ion-button>
+  </div>
+  <span *ngIf="!isLoading">
+    <app-parents
+     *ngFor="let parent of parents"
+     [parent]="parent"
+       (click)="handleOpenClientModal('edit', parent)"
+    ></app-parents>
+
+  </span>
 
 
 <ion-fab slot="fixed" vertical="bottom" horizontal="end">
