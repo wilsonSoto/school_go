@@ -78,6 +78,7 @@ export class PlannedRouteComponent implements OnInit {
   @ViewChild('timePopover') timePopover!: IonPopover;
   markers: any[] = [];
 
+  rutaDelBus = false;
   maps = true;
   showCalendar = false;
   selectedDays: any[] = [];
@@ -123,6 +124,7 @@ export class PlannedRouteComponent implements OnInit {
         (rol: any) => rol.external_id == 'pool.group_school_driver'
       )
     ) {
+      this.rutaDelBus = true;
       return 'driver';
     }
     return 'admin';
@@ -331,11 +333,47 @@ export class PlannedRouteComponent implements OnInit {
     };
   }
 
+  generateMarkersFromGroups(
+    groups: any[]
+  ): { lat: number; lng: number; name: string }[] {
+    const markers: { lat: number; lng: number; name: string; id: any }[] = [];
+
+    for (const group of groups) {
+      const hasGroupCoords = group.point_latitude && group.point_longitude;
+
+      if (hasGroupCoords) {
+        markers.push({
+          lat: group.point_latitude,
+          lng: group.point_longitude,
+          name: group.name,
+          id: group.id,
+        });
+      } else if (Array.isArray(group.students)) {
+        for (const student of group.students) {
+          const hasStudentCoords =
+            student.home_latitude && student.home_longitude;
+          if (hasStudentCoords) {
+            markers.push({
+              lat: student.home_latitude,
+              lng: student.home_longitude,
+              name: student.name,
+              id: student.id,
+            });
+          }
+        }
+      }
+    }
+
+    return markers;
+  }
+
   getRute() {
+    this.maps = false;
+
     this.routeSubscription = this.routeService
       .getRoute(this.route_id)
       .pipe(
-        tap((response: any) => {
+        tap(async(response: any) => {
           if (response.data) {
             const routeData = response.data.school_route;
             const students = routeData.route_points.map((route: any) => {
@@ -345,8 +383,18 @@ export class PlannedRouteComponent implements OnInit {
               return route;
             });
 
-            routeData.route_points.students = [students];
+            const location = await this.getLocation();
+            let driver: any = {}
+            driver.name = 'Ubicacion de chofer';
+            driver.point_latitude = location.latitude;
+            driver.point_longitude = location.longitude;
+            routeData.route_points.students = [...students];
+            routeData.route_points.push(driver)
             this.planned_route = routeData;
+            this.markers = this.generateMarkersFromGroups(
+              routeData.route_points
+            );
+            this.maps = true;
           }
         }),
         catchError((err) => {
@@ -365,6 +413,8 @@ export class PlannedRouteComponent implements OnInit {
 
   async getLocation() {
     try {
+      // console.log('33333333333');
+
       let local = await this.locationService.getCurrentLocation();
       if (!local) {
         local = { latitude: 0, longitude: 0 };
@@ -451,22 +501,25 @@ export class PlannedRouteComponent implements OnInit {
   async startTrackingLocation() {
     // const watchId = false;
     try {
+      // console.log('1111');
+
       const location = await this.getLocation();
       const data = {
         route_id: this.route_id,
         lat: location.latitude,
         lng: location.longitude,
       };
+      // console.log('222222');
 
       this.routeSubscription = this.routeTrackingPlannedService
         .startTheRoute(data)
         .pipe(
           tap((response: any) => {
             if (response) {
-              console.log(response);
+              // console.log(response);
               const watchId: any = this.locationService.startTrackingLocation();
               if (watchId) {
-                localStorage.setItem('watchId', watchId);
+                localStorage.setItem('watchId', JSON.stringify(watchId));
               }
             }
           }),
@@ -527,10 +580,7 @@ export class PlannedRouteComponent implements OnInit {
       if (type == 'group') {
         this.isOpenApprovalStudents = false;
         group_id = this.studentsInToSchoolGroup.id;
-        console.log(
-          this.studentsInToSchoolGroup?.students,
-          'studentsInToSchoolGroup?.studentswilwiwliwlwi'
-        );
+        // console.log(this.studentsInToSchoolGroup?.students,'studentsInToSchoolGroup?.studentswilwiwliwlwi');
         studentsIds = this.studentsInToSchoolGroup?.students.map((st: any) => {
           return {
             student_id: st.id,
@@ -538,7 +588,7 @@ export class PlannedRouteComponent implements OnInit {
           };
         });
       } else {
-        console.log(group?.students, 'group?.studentswilwiwliwlwi');
+        // console.log(group?.students,'group?.studentswilwiwliwlwi');
         group_id = group.id;
         studentsIds = group?.students.map((st: any) => {
           return {
@@ -546,7 +596,7 @@ export class PlannedRouteComponent implements OnInit {
             is_present: checked,
           };
         });
-        console.log(studentsIds, 'studentsIds studentsIds');
+        // console.log(studentsIds,'studentsIds studentsIds');
       }
       const data = {
         point_id: group_id,

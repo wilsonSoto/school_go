@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { FcmService } from './services/fcm.service';
 import { ParentService } from './services/parents.service';
 import { ToastService } from './services/toast.service';
 
@@ -13,14 +15,24 @@ import { ToastService } from './services/toast.service';
 export class AppComponent implements OnInit {
   userData: any = '';
 
-  constructor(
-    private translate: TranslateService,
-    private router: Router,
+  constructor(private translate: TranslateService, 
+    private router: Router, 
+    private platform: Platform, private fcm: FcmService,
+  
     private parentService: ParentService,
     private toastService: ToastService
   ) {
-    this.initializeApp();
+     this.initializeApp();
+    this.platform.ready().then(() => {
+      this.fcm.initPush().then();
+    }).catch((e: any) => {
+      console.log(e);
+      alert(e)
+    })
+
   }
+
+
 
   async ngOnInit() {
     localStorage.removeItem('studentsWithoutLocation')

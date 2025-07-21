@@ -1,0 +1,20 @@
+1. Rename App Name
+  1. rm android folder
+  2. rm www folder
+  3. Edit capacitor.config.ts
+    4. Change appId
+    5. Change appName
+  4. run "ionic capacitor build android --no-open"
+  5. run "ionic capacitor sync"
+  5. run "npx cap open android"
+  6. "open folder android in Android Studio 2024.1.1 o superior
+  
+  documentacion para crear notificaciones
+  7. Apply push notification : https://ionicframework.com/docs/native/push-notifications  y https://www.youtube.com/watch?v=pVsOIXjKbas
+    7.1 In variables.gradle set firebaseMessagingVersion = '23.3.1'
+    7.2 In AndroidManifest set
+      <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_launcher" />
+      after provider
+      duplicate app/src/main/res/mipmap-hdpi to app/src/main/res/mipmap
+    7.3 Genera el google-service.json en https://console.firebase.google.com/ en la cuenta de rdbazar
+    7.3 copiar archivo google-services.json a \android\app\google-services.json
