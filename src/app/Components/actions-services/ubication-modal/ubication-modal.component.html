@@ -1,15 +1,51 @@
 <ion-content class="ion-padding">
+  <ion-grid class="responsive-layout">
+    <ion-row>
+      <!-- Columna Izquierda: Imagen -->
+      <ion-col size="12" sizeLg="6" class="left-column">
+        <img
+          src="../../../../assets/images/here.jpg"
+          alt="Ubicación de recogida"
+          class="banner-image"
+        />
+      </ion-col>
+
+      <!-- Columna Derecha: Estudiantes y acciones -->
+      <ion-col size="12" sizeLg="6" class="right-column">
   <ion-card>
-    <img src="../../../../assets/images/here.jpg" alt="Ubicación de recogida" />
-
     <ion-card-content>
-      <p class="ion-text-center">
-        Presiona este botón cuando estés en el lugar donde quieres que recojan a tu hijo.
-      </p>
+      <ion-grid>
+        <ion-row
+          *ngFor="let student of studentsWithoutLocation"
+          class="student-card"
+        >
+          <ion-col size="12">
+            <ion-card class="student-info-card">
+              <ion-item lines="none" class="student-item">
+                <ion-avatar slot="start">
+                  <img [src]="student.image" alt="Estudiante" />
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{ student.name }}</h2>
+                  <p>No tiene ubicación asignada</p>
+                </ion-label>
+              </ion-item>
 
-      <ion-button expand="block" (click)="sendLocation()">
-        Estoy aquí, recoger aquí al niño
-      </ion-button>
+              <ion-button
+                expand="block"
+                (click)="assignLocation(student)"
+                color="primary"
+              >
+                Asignar ubicación actual
+              </ion-button>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-card-content>
   </ion-card>
+</ion-col>
+
+    </ion-row>
+  </ion-grid>
 </ion-content>

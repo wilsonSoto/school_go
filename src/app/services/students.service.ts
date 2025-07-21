@@ -10,7 +10,7 @@ import { ToastService } from './toast.service';
 
 @Injectable()
 export class StudentsService {
-  appURl = hostUrlEnum.is_production ? hostUrlEnum.prod : hostUrlEnum.develop
+  appURl = hostUrlEnum.is_production ? hostUrlEnum.prod : hostUrlEnum.develop;
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -23,8 +23,6 @@ export class StudentsService {
   ) {}
 
   getStudents() {
-    console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;');
-
     const url = this.appURl + '/school/student/1536/info';
     return this.httpClient.get(url).pipe(
       map((res: any) => {
@@ -35,9 +33,7 @@ export class StudentsService {
 
   getAllStudents() {
 
-console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;')
-
-    const url =  this.appURl +'/school/students/';
+    const url = this.appURl + '/school/students/';
     return this.httpClient.get(url).pipe(
       map((res: any) => {
         return res;
@@ -67,15 +63,32 @@ console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;')
     const name = `Foto.jpg`;
     formData.append('profile', blob, name);
 
-
     let url = null;
-   if (studen_id || action == 'edit') {
+    if (studen_id || action == 'edit') {
       url = `${this.appURl}/school/parent/${partner_id}/student/${studen_id}`;
     } else {
       url = `${this.appURl}/school/parent/${partner_id}/student/`;
     }
 
     return this.httpClient.post(url, formData).pipe(
+      map((res: any) => {
+        return res;
+      })
+    );
+  }
+
+  updateStudentLocation(students: any) {
+    const url = this.appURl + '/school/students/';
+    const data = {
+      params: [
+        {
+          id: students.id,
+          home_latitude: students.home_latitude,
+          home_longitude: students.home_longitude,
+        },
+      ],
+    };
+    return this.httpClient.post(url, data).pipe(
       map((res: any) => {
         return res;
       })

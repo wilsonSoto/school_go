@@ -1,91 +1,106 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AlertController, ModalController } from '@ionic/angular';
 import { LocationService } from 'src/app/services/geolocation.service';
-// import {} from '../../../../assets/images/here.jpg'
+import { StudentsService } from 'src/app/services/students.service';
+import { ToastService } from 'src/app/services/toast.service';
+import { Router } from '@angular/router';
+
 @Component({
   standalone: false,
   selector: 'app-ubication-modal',
   templateUrl: './ubication-modal.component.html',
   styleUrls: ['./ubication-modal.component.scss'],
 })
-export class UbicationModalComponent implements OnInit{
-  constructor(private modalCtrl: ModalController,
-        private locationService: LocationService,
-    private alertController: AlertController,
+export class UbicationModalComponent implements OnInit {
+  @Input() students: any[] = [];
 
+  studentsWithoutLocation: any[] = [];
+isSaving: boolean = false;
+
+  constructor(
+    private modalCtrl: ModalController,
+    private locationService: LocationService,
+    private toastService: ToastService,
+    private studentsService: StudentsService,
+    private router: Router,
+    private alertController: AlertController
   ) {}
- ngOnInit(): void {
-   console.log('llegueeeeeeeeeeeeeeeeeeeeeeeeeeeeee00');
-
- }
 
 
-  async getLocation() {
+get allStudentsLoactionActive () {
+    const data= this.studentsWithoutLocation.every(
+      (student: any) =>
+       ( student.home_latitude &&
+        student.home_longitude) ||
+        ( student.home_latitude !== 0 &&
+        student.home_longitude !== 0)
+    );
+    return !data;
+}
+
+  ngOnInit(): void {
+       this.studentsWithoutLocation =  JSON.parse(localStorage.getItem('studentsWithoutLocation') ?? '[]')
+  }
+
+  async assignLocation(student: any) {
     try {
-      let local = await this.locationService.getCurrentLocation();
-      if (!local) {
-        local = { latitude: 0, longitude: 0 };
+      const location = await this.locationService.getCurrentLocation();
+
+      if (!location || !location.latitude || !location.longitude) {
+        throw new Error('No se pudo obtener la ubicación');
       }
-      return local;
+
+      student.home_latitude = location.latitude;
+      student.home_longitude = location.longitude;
+
+      // Eliminar de la lista temporal
+      this.studentsWithoutLocation = this.studentsWithoutLocation.filter(
+        (s) => s.id !== student.id
+      );
+
     } catch (error) {
-      console.log(error);
-
-      return error;
+      console.error('Error al obtener ubicación:', error);
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo obtener la ubicación. Intenta nuevamente.',
+        buttons: ['OK'],
+      });
+      await alert.present();
     }
   }
 
-  // async sendLocation() {
-  //   try {
-  //    const location = await this.getLocation()
-  //     console.log('Ubicación enviada:', location);
+  closeModal() {
+    this.modalCtrl.dismiss(this.students);
+  }
 
-  //     this.modalCtrl.dismiss(location); // ✅ Solo este botón cierra el modal
+   async updateStudentLocation() {
 
-  //   } catch (error) {
-  //     console.log(error);
+  this.isSaving = true;
+    this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
 
-  //   }
-  // }
-  async sendLocation2() {
-  try {
-    const location = await this.getLocation();
-    console.log('Ubicación enviada:', location);
+      return
+      this.studentsService.updateStudentLocation(this.studentsWithoutLocation).subscribe({
+        next: (response: any) => {
 
-    // Solo se cierra el modal si la ubicación fue obtenida
-    this.modalCtrl.dismiss(location);
-  } catch (error) {
-    console.error('Error obteniendo ubicación:', error);
-    // Muestra un mensaje de error si deseas
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: 'No se pudo obtener la ubicación. Intenta nuevamente.',
-      buttons: ['OK'],
+          this.isSaving = false;
+          this.toastService.presentToast('Ubicaciones guardadas correctamente.', 'success');
+    this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
+
+        console.log(response, 'respo ,,,,,,,,,,,,,getParentgetParent,,,,,,,,,');
+      },
+      error: (err: any) => {
+
+      this.isSaving = false;
+        // this.mostrarAnimacion = false;
+        const errorMessage =
+          err.error.error.message ||
+          err.error.error ||
+          err?.message ||
+          'Error desconocido';
+
+        this.toastService.presentToast(errorMessage);
+      },
     });
-    await alert.present();
   }
-}
-
-sendLocation() {
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const location = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      };
-
-      console.log('Ubicación enviada:', location);
-
-      this.modalCtrl.dismiss(location); // ✅ Solo este botón cierra el modal
-    },
-    (error) => {
-      console.error('Error al obtener la ubicación', error);
-      // Opcional: puedes mostrar un toast o mensaje de error
-    },
-    {
-      enableHighAccuracy: true,
-    }
-  );
-}
-
 
 }
