@@ -96,7 +96,6 @@ export class PlannedRouteComponent implements OnInit {
   date = new Date();
   route_id: any = null;
   planned_route: any = null;
-  // currentDriver: any = null // <<< Remove this or make it Driver | null
   selectedDriver: Driver | null = null; // New property to store the full driver object
   selectedBus: Bus | null = null; // New property to store the full bus object
 
@@ -428,10 +427,15 @@ export class PlannedRouteComponent implements OnInit {
     }
   }
   // request
-  getDriverCurrentLocation() {
-    // const watchId = false;
+  async getDriverCurrentLocation() {
     try {
-      // this.routeSubscription = this.routeService
+      const position = await this.getLocation();
+      const { latitude, longitude } = position.coords ?? position;
+      const data = {
+        name: 'Mi ubicación',
+        lat: latitude,
+        lng: longitude,
+      };
       this.maps = false;
       this.routeTrackingPlannedService
         .getDriverCurrentLocation(this.route_id)
@@ -442,15 +446,14 @@ export class PlannedRouteComponent implements OnInit {
               response.data.lat = response.data.latitude;
               response.data.lng = response.data.longitude;
               this.markers.push(response.data);
+              this.markers.push(data);
               this.maps = true;
             }
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
             this.maps = true;
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-            // this.reorderableStudentGroups = [];
             return of([]);
           }),
           finalize(() => {
@@ -516,7 +519,7 @@ export class PlannedRouteComponent implements OnInit {
               // console.log(response);
               const watchId: any = this.locationService.startTrackingLocation();
               if (watchId) {
-                localStorage.setItem('watchId', watchId);
+                localStorage.setItem('watchId', JSON.stringify(watchId));
               }
             }
           }),
