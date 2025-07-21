@@ -5,6 +5,7 @@ import {
   AlertController,
   CheckboxCustomEvent,
   ModalController,
+  RefresherCustomEvent,
 } from '@ionic/angular';
 import { NavigationEnd, Router } from '@angular/router';
 // import { ProductsServices } from '../services/products.services';
@@ -33,15 +34,15 @@ export class Tab2Page {
     private modalController: ModalController,
     private busService: VehiclesService,
 
-          private toastService: ToastService,
-          private driversService: DriversService,
+    private toastService: ToastService,
+    private driversService: DriversService
   ) {}
-typeSelect: any = 'first'
+  typeSelect: any = 'first';
   // drivers: any = [1, 1, 1, 1];
   // vehicles: any = [1, 1, 1, 1];
-   currentDrivers: any = []
-   currentVehicles: any = []
- isLoading: boolean = true;
+  currentDrivers: any = [];
+  currentVehicles: any = [];
+  isLoading: boolean = true;
   errorMessage: string | null = null;
 
   ionViewWillEnter() {
@@ -57,9 +58,16 @@ typeSelect: any = 'first'
     this.translate.use(lang);
   }
 
+  handleRefresh(event: RefresherCustomEvent) {
+    this.loadDriversAndBuses(); // Llama a tu función para cargar las rutas aquí
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
+  }
+
   async handleOpenDriverModal(action: any, driver: any) {
     try {
-
       const modal = await this.modalController.create({
         component: AddDriversComponent,
         componentProps: {
@@ -83,7 +91,6 @@ typeSelect: any = 'first'
 
   async handleOpenBusModal(action: any, bus: any) {
     try {
-
       const modal = await this.modalController.create({
         component: AddVehiclesComponent,
         componentProps: {
@@ -106,43 +113,50 @@ typeSelect: any = 'first'
   }
 
   loadDriversAndBuses(): void {
-      this.isLoading = true;
-      this.errorMessage = null;
+    this.isLoading = true;
+    this.errorMessage = null;
 
-      forkJoin({
-        drivers: this.driversService.getAllDrivers().pipe(
-            map((res: any) => res?.data?.school_drivers || []), // Adjust path if needed
-            catchError(err => {
-                console.error('Error fetching drivers:', err);
-                // Wrap error in throwError to propagate it for the outer catchError
-                return throwError(() => new Error(err.message || 'Failed to load drivers'));
-            })
-        ),
-        buses: this.busService.getAllBuses().pipe(
-            map((res: any) => res?.data?.school_buses || []), // Adjust path if needed
-            catchError(err => {
-                console.error('Error fetching buses:', err);
-                // Wrap error in throwError to propagate it for the outer catchError
-                return throwError(() => new Error(err.message || 'Failed to load buses'));
-            })
-        )
-      }).pipe(
-        tap((data: { drivers: Driver[], buses: Bus[] }) => {
+    forkJoin({
+      drivers: this.driversService.getAllDrivers().pipe(
+        map((res: any) => res?.data?.school_drivers || []), // Adjust path if needed
+        catchError((err) => {
+          console.error('Error fetching drivers:', err);
+          // Wrap error in throwError to propagate it for the outer catchError
+          return throwError(
+            () => new Error(err.message || 'Failed to load drivers')
+          );
+        })
+      ),
+      buses: this.busService.getAllBuses().pipe(
+        map((res: any) => res?.data?.school_buses || []), // Adjust path if needed
+        catchError((err) => {
+          console.error('Error fetching buses:', err);
+          // Wrap error in throwError to propagate it for the outer catchError
+          return throwError(
+            () => new Error(err.message || 'Failed to load buses')
+          );
+        })
+      ),
+    })
+      .pipe(
+        tap((data: { drivers: Driver[]; buses: Bus[] }) => {
           this.currentDrivers = data.drivers;
           this.currentVehicles = data.buses;
-        // console.log(this.availableBuses,'//////////////////////');
-        // console.log(this.availableDrivers,'//////////////////////');
-
+          // console.log(this.availableBuses,'//////////////////////');
+          // console.log(this.availableDrivers,'//////////////////////');
         }),
-        catchError(err => {
+        catchError((err) => {
           // This catchError handles errors from any of the forkJoined observables
           console.error('Failed to load drivers or buses:', err);
-          this.errorMessage = 'Error al cargar los conductores o autobuses: ' + (err.message || 'Error desconocido');
+          this.errorMessage =
+            'Error al cargar los conductores o autobuses: ' +
+            (err.message || 'Error desconocido');
           return of(null); // Return observable of null to complete the stream gracefully
         }),
         finalize(() => {
           this.isLoading = false;
         })
-      ).subscribe();
-    }
+      )
+      .subscribe();
+  }
 }

@@ -49,3 +49,36 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="auto">
+            <ion-button (click)="closeModal()" expand="full" color="medium">
+              <span>Cancelar</span>
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button
+              [disabled]="allStudentsLoactionActive || isSaving"
+              type="button"
+              expand="full"
+              color="primary"
+              (click)="updateStudentLocation()"
+            >
+              <ion-spinner
+                *ngIf="isSaving"
+                name="dots"
+                slot="start"
+              ></ion-spinner>
+              <span *ngIf="!isSaving">Guardar</span>
+              <span *ngIf="isSaving">Guardando...</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </ion-toolbar>
+</ion-footer>

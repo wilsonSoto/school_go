@@ -40,7 +40,20 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
-  <ion-segment-view>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Rutas...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="loadDriversAndBuses()">Reintentar</ion-button>
+  </div>
+  <ion-segment-view *ngIf="!isLoading">
     <ion-segment-content id="first">
       <app-drivers
         *ngFor="let driver of currentDrivers"
@@ -58,13 +71,13 @@
     <!-- <ion-segment-content id="third">Third</ion-segment-content> -->
   </ion-segment-view>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab *ngIf="!isLoading" slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [routerLink]="['/add-bus']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab *ngIf="!isLoading" slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [routerLink]="['/add-bus']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
