@@ -10,7 +10,7 @@ import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
 
 import { Component, OnInit } from '@angular/core'; // <--- ASEGÚRATE DE QUE 'Component' ESTÉ IMPORTADO AQUÍ
-  import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
 import { StorageService } from '../services/storage.service';
 import { hostUrlEnum } from 'src/types';
@@ -22,7 +22,7 @@ import { hostUrlEnum } from 'src/types';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
 })
-export class Tab3Page implements OnInit {
+export class Tab3Page {
   school_routes: any = [];
   token = ""
   constructor(
@@ -43,30 +43,8 @@ export class Tab3Page implements OnInit {
   }
 
 
-  async openModalUbicacion() {
-      console.log('Ubicación recibida desde modal+++++++++++++++++++:');
-
-    const modal = await this.modalController.create({
-      component: UbicationModalComponent,
-      // component: UbicacionModalComponent,
-  cssClass: 'full-screen-modal',
-  breakpoints: [0, 1],
-  initialBreakpoint: 1,
-    backdropDismiss: false, // ❌ No se puede cerrar tocando afuera
-  canDismiss: false
-
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-    if (data) {
-      console.log('Ubicación recibida desde modal:', data);
-      // Aquí puedes guardar la ubicación o usarla en el mapa
-    }
-  }
   ionViewWillEnter() {
-        // this.openModalUbicacion()
+    // this.openModalUbicacion()
 
     console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
@@ -95,13 +73,8 @@ export class Tab3Page implements OnInit {
   // --- FIN MÉTODOS DE CICLO DE VIDA DE IONIC ---
 
   getAllRoute() {
-    console.log(
-      '....................................................................1111'
-    );
-
     this.routeService.getAllroute().subscribe({
       next: (response: any) => {
-        console.log(response, 'respo ,,,,,,,,,,,,,,,,,,,,,,');
         this.school_routes = response.data.school_routes;
       },
       error: (err: any) => {
@@ -117,20 +90,16 @@ export class Tab3Page implements OnInit {
     });
   }
 
-   handleOpenRouteModal(action: any, route: any) {
+  handleOpenRouteModal(action: any, route: any) {
     if (!route.id) {
       console.log('error id route');
-
     }
 
     const url = `/route/${route.id}`;
-    this.router.navigate(
-      [url],
-      {
-        queryParams: {
-          action
-        }
-      }
-    );
+    this.router.navigate([url], {
+      queryParams: {
+        action,
+      },
+    });
   }
 }

@@ -1,0 +1,126 @@
+// Imagen con estilo para pantallas grandes
+.banner-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Tarjeta de estudiante
+.student-info-card {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+ion-avatar img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+// Diseño responsivo
+@media (min-width: 1024px) {
+  .responsive-layout {
+    height: 100%;
+  }
+
+  .left-column,
+  .right-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .left-column img {
+    max-width: 90%;
+    max-height: 500px;
+  }
+
+  .right-column ion-card {
+    width: 90%;
+  }
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+
+  // Para pantallas pequeñas: reorganizar en columna
+  @media (max-width: 1023px) {
+    flex-direction: column;
+    text-align: center;
+
+    ion-avatar {
+      margin-bottom: 1rem;
+    }
+
+    ion-label {
+      h2, p {
+        margin: 0;
+      }
+    }
+  }
+
+  // Pantallas grandes: diseño horizontal
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    text-align: left;
+
+    ion-avatar {
+      margin-right: 1rem;
+    }
+  }
+}
+
+@media (max-width: 1023px) {
+  .right-column {
+    padding: 0 8px; // Reduce el espacio lateral
+    margin-top: 1rem; // Opcional, para separar de la imagen
+  }
+
+  .right-column ion-card {
+    padding: 8px !important;
+    margin: 0 !important;
+  }
+
+  .right-column ion-card-content {
+    padding: 8px !important;
+  }
+
+  .student-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .student-info-card {
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  .student-item {
+    flex-direction: column !important;
+    text-align: center;
+
+    ion-avatar {
+      margin: 0 auto 1rem auto;
+    }
+
+    ion-label {
+      h2, p {
+        margin: 0;
+      }
+    }
+  }
+
+  ion-col {
+    padding: 0 !important;
+  }
+  ion-button {
+    margin-top: 1rem;
+    width: 100%;
+  }
+}
