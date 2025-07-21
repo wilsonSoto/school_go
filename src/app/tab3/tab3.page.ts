@@ -10,7 +10,7 @@ import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
 
 import { Component, OnInit } from '@angular/core'; // <--- ASEGÚRATE DE QUE 'Component' ESTÉ IMPORTADO AQUÍ
-import { ModalController } from '@ionic/angular';
+import { ModalController, RefresherCustomEvent } from '@ionic/angular';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
 import { StorageService } from '../services/storage.service';
 import { hostUrlEnum } from 'src/types';
@@ -24,7 +24,7 @@ import { hostUrlEnum } from 'src/types';
 })
 export class Tab3Page {
   school_routes: any = [];
-  token = ""
+  token = '';
   constructor(
     private routeService: RouteService,
     private toastService: ToastService,
@@ -33,15 +33,23 @@ export class Tab3Page {
     private storage: StorageService
   ) {}
 
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
   ngOnInit(): void {
-  const self = this
+    const self = this;
     // this.getAllRoute();
-      this.storage.get(hostUrlEnum.FCM_TOKEN).then((resp) => {
-        self.token = JSON.stringify(resp)
-      })
-    
+    this.storage.get(hostUrlEnum.FCM_TOKEN).then((resp) => {
+      self.token = JSON.stringify(resp);
+    });
   }
 
+  handleRefresh(event: RefresherCustomEvent) {
+    this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
+  }
 
   ionViewWillEnter() {
     // this.openModalUbicacion()
@@ -73,11 +81,19 @@ export class Tab3Page {
   // --- FIN MÉTODOS DE CICLO DE VIDA DE IONIC ---
 
   getAllRoute() {
+    this.isLoading = true;
+    this.errorMessage = null;
     this.routeService.getAllroute().subscribe({
       next: (response: any) => {
+        this.isLoading = false;
+
         this.school_routes = response.data.school_routes;
       },
       error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Error al cargar las rutas: ' + (err.message || 'Error desconocido');
+
         // this.mostrarAnimacion = false;
         const errorMessage =
           err?.error?.error?.message ||

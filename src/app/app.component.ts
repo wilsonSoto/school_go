@@ -15,10 +15,10 @@ import { ToastService } from './services/toast.service';
 export class AppComponent implements OnInit {
   userData: any = '';
 
-  constructor(private translate: TranslateService, 
-    private router: Router, 
+  constructor(private translate: TranslateService,
+    private router: Router,
     private platform: Platform, private fcm: FcmService,
-  
+
     private parentService: ParentService,
     private toastService: ToastService
   ) {
@@ -59,6 +59,13 @@ export class AppComponent implements OnInit {
   getParent() {
     this.parentService.getParent(this.userData?.partner_id).subscribe({
       next: (response: any) => {
+    //       const studentsWithoutLocation2 = response.data.students.map((student: any) => {
+    //   return {
+    //     ...student,
+    //     home_latitude: 0,
+    //     home_longitude: 0,
+    //   };
+    // });
         const studentsWithoutLocation = response.data.students.filter(
           (student: any) =>
             !student.home_latitude ||

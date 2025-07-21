@@ -3,7 +3,7 @@
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
         <ion-col>
-          <ion-title size="large"> Choferes y Vehiculos </ion-title>
+          <ion-title size="large">Rutas programadas </ion-title>
         </ion-col>
         <ion-col size="auto">
           <div>
@@ -29,7 +29,7 @@
 
       <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
         <ion-segment-button value="first" content-id="first">
-          <ion-label>Regogida </ion-label>
+          <ion-label>Recogida </ion-label>
         </ion-segment-button>
         <ion-segment-button value="second" content-id="second">
           <ion-label>Entrega</ion-label>
@@ -40,7 +40,20 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
-  <ion-segment-view>
+   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Rutas...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="getAllRoute()">Reintentar</ion-button>
+  </div>
+  <ion-segment-view *ngIf="!isLoading">
     <ion-segment-content id="first">
       <app-all-route
         *ngFor="let route of school_routes_pickup"
@@ -55,7 +68,6 @@
         (click)="handleOpenRouteModal('edit',route)"
         ></app-all-route>
     </ion-segment-content>
-    <!-- <ion-segment-content id="third">Third</ion-segment-content> -->
   </ion-segment-view>
 <!--
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">

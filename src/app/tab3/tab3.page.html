@@ -2,46 +2,59 @@
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
-         <ion-col>
-          <ion-title size="large" >
-            Rutas programadas
-
-            {{token}}
-          </ion-title>
+        <ion-col>
+          <ion-title size="large"> Planificacion de Rutas </ion-title>
         </ion-col>
         <ion-col size="auto">
           <div>
-<!-- <ion-button id="popover-button">Open Menu</ion-button> -->
-<ion-input type="text"  [(ngModel)]="token"></ion-input>
-
             <ion-avatar id="popover-button">
-              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+              <img
+                alt="Silhouette of a person's head"
+                src="https://ionicframework.com/docs/img/demos/avatar.svg"
+              />
             </ion-avatar>
-
           </div>
         </ion-col>
       </ion-row>
-
-
     </div>
-    <ion-searchbar mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar>
+    <ion-searchbar
+      mode="ios"
+      show-clear-button="always"
+      clear-icon="trash-bin"
+      value="Custom Clear Icon"
+    ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
- <app-all-route
-  *ngFor="let route of school_routes"
-  [route]="route"
-  (click)="handleOpenRouteModal('edit',route)"
-  ></app-all-route>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Rutas...</p>
+  </div>
 
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="getAllRoute()">Reintentar</ion-button>
+  </div>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-list *ngIf="!isLoading">
+    <app-all-route
+      *ngFor="let route of school_routes"
+      [route]="route"
+      (click)="handleOpenRouteModal('edit',route)"
+    ></app-all-route>
+  </ion-list>
+
+  <!-- <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button  [routerLink]="['/add-route']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
 
-  </ion-fab>
+  </ion-fab> -->
 </ion-content>
 
 <ion-popover trigger="popover-button" [dismissOnSelect]="true">
@@ -51,8 +64,9 @@
         <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
         <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
         <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
-        <ion-item [button]="true" [detail]="false" routerLink="/sign-in">Cerrar Sesión</ion-item>
-
+        <ion-item [button]="true" [detail]="false" routerLink="/sign-in"
+          >Cerrar Sesión</ion-item
+        >
       </ion-list>
     </ion-content>
   </ng-template>

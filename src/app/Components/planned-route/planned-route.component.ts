@@ -8,7 +8,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { AlertController, IonPopover, ModalController } from '@ionic/angular';
+import {
+  AlertController,
+  IonPopover,
+  ModalController,
+  RefresherCustomEvent,
+} from '@ionic/angular';
 import {
   FormBuilder,
   FormGroup,
@@ -79,7 +84,7 @@ export class PlannedRouteComponent implements OnInit {
   markers: any[] = [];
 
   rutaDelBus = false;
-  maps = true;
+  maps = false;
   showCalendar = false;
   selectedDays: any[] = [];
   selectedDayForPopover: any = null;
@@ -87,7 +92,7 @@ export class PlannedRouteComponent implements OnInit {
   selectedStudents: Student[] = [];
   selectedStudentsForRoute: Student[] = [];
   allStudents: any[] = [];
-
+  isAccordionSelect = 'third'
   isOpenApprovalStudents: boolean = false;
   isLoadingMap: boolean = true;
   errorMessage: string | null = null;
@@ -99,6 +104,8 @@ export class PlannedRouteComponent implements OnInit {
   selectedDriver: Driver | null = null; // New property to store the full driver object
   selectedBus: Bus | null = null; // New property to store the full bus object
 
+  isLoading: boolean = true;
+  // errorMessage: string | null = null;
   get defaultHref(): string {
     let href = '/tabs';
     return href;
@@ -118,12 +125,14 @@ export class PlannedRouteComponent implements OnInit {
         (rol: any) => rol.external_id == 'pool.group_school_father'
       )
     ) {
+      this.isAccordionSelect = 'first'
       return 'partner';
     } else if (
       userData?.roles?.some(
         (rol: any) => rol.external_id == 'pool.group_school_driver'
       )
     ) {
+      this.isAccordionSelect = 'third'
       this.rutaDelBus = true;
       return 'driver';
     }
@@ -161,6 +170,14 @@ export class PlannedRouteComponent implements OnInit {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
+  }
+
+  handleRefresh(event: RefresherCustomEvent) {
+    this.getRute(); // Llama a tu función para cargar las rutas aquí
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
   }
 
   sendInformation(group: any) {
@@ -370,10 +387,12 @@ export class PlannedRouteComponent implements OnInit {
   getRute() {
     this.maps = false;
 
+    this.isLoading = true;
+    this.errorMessage = null;
     this.routeSubscription = this.routeService
       .getRoute(this.route_id)
       .pipe(
-        tap(async(response: any) => {
+        tap(async (response: any) => {
           if (response.data) {
             const routeData = response.data.school_route;
             const students = routeData.route_points.map((route: any) => {
@@ -384,20 +403,25 @@ export class PlannedRouteComponent implements OnInit {
             });
 
             const location = await this.getLocation();
-            let driver: any = {}
+            let driver: any = {};
             driver.name = 'Ubicacion de chofer';
             driver.point_latitude = location.latitude;
             driver.point_longitude = location.longitude;
             routeData.route_points.students = [...students];
-            routeData.route_points.push(driver)
+            routeData.route_points.push(driver);
             this.planned_route = routeData;
-            this.markers = this.generateMarkersFromGroups(
-              routeData.route_points
-            );
+            if (this.showBtnPermission !== 'partner') {
+              this.markers = this.generateMarkersFromGroups(
+                routeData.route_points
+              );
+            }
             this.maps = true;
           }
+          this.isLoading = false;
         }),
         catchError((err) => {
+          this.isLoading = false;
+
           console.error('Error fetching students:', err);
           this.errorMessage =
             'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
@@ -428,6 +452,7 @@ export class PlannedRouteComponent implements OnInit {
   }
   // request
   async getDriverCurrentLocation() {
+    this.maps = false;
     try {
       const position = await this.getLocation();
       const { latitude, longitude } = position.coords ?? position;
@@ -436,7 +461,6 @@ export class PlannedRouteComponent implements OnInit {
         lat: latitude,
         lng: longitude,
       };
-      this.maps = false;
       this.routeTrackingPlannedService
         .getDriverCurrentLocation(this.route_id)
         .pipe(
@@ -514,10 +538,10 @@ export class PlannedRouteComponent implements OnInit {
       this.routeSubscription = this.routeTrackingPlannedService
         .startTheRoute(data)
         .pipe(
-          tap((response: any) => {
+          tap(async (response: any) => {
             if (response) {
               // console.log(response);
-              const watchId: any = this.locationService.startTrackingLocation();
+              const watchId: any = await this.locationService.startTrackingLocation();
               if (watchId) {
                 localStorage.setItem('watchId', JSON.stringify(watchId));
               }

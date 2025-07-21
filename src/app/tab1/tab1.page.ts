@@ -6,6 +6,7 @@ import {
   AlertController,
   LoadingController,
   ModalController,
+  RefresherCustomEvent,
 } from '@ionic/angular';
 
 import { CheckboxCustomEvent, IonModal } from '@ionic/angular';
@@ -38,9 +39,19 @@ export class Tab1Page implements OnInit {
   parents: any = [];
   students: any = [];
 
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
   ngOnInit() {
     this.getAllParents()
   }
+
+     handleRefresh(event: RefresherCustomEvent) {
+    this.getAllParents(); // Llama a tu función para cargar las rutas aquí
+      setTimeout(() => {
+        // Any calls to load data go here
+        event.target.complete();
+      }, 2000);
+    }
 
     ionViewWillEnter() {
     console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
@@ -48,11 +59,14 @@ export class Tab1Page implements OnInit {
   }
 
   getAllParents() {
+    this.isLoading = true;
+    this.errorMessage = null;
         this.parentService
         .getAllParents()
         .subscribe({
           next: (response: any) => {
-            // console.log(response,'respo ,,,,,,,,,,,,,,,,,,,,,,');
+                    this.isLoading = false;
+// console.log(response,'respo ,,,,,,,,,,,,,,,,,,,,,,');
             // response.data.parent.number_students = response.data.students?.length
             console.log(response,'parentsssssssssssssssss');
 
@@ -66,6 +80,9 @@ export class Tab1Page implements OnInit {
           },
           error: (err: any) => {
       // this.mostrarAnimacion = false;
+              this.isLoading = false;
+        this.errorMessage = 'Error al cargar padres: ' + (err.message || 'Error desconocido');
+
             const errorMessage =
               err?.error?.error.message ||
               err?.error?.error ||

@@ -8,7 +8,7 @@ import {
   Output,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { ModalController, RefresherCustomEvent } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
@@ -34,6 +34,8 @@ export class RoutePage {
   students: any = [];
   school_routes_pickup: any = [];
   school_routes_delivery: any = [];
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
 
   changeLanguage(lang: string) {
     if (lang == 'es') {
@@ -50,13 +52,25 @@ export class RoutePage {
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }
 
+  handleRefresh(event: RefresherCustomEvent) {
+    this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
+  }
+
   getAllRoute() {
+    this.isLoading = true;
+    this.errorMessage = null;
     console.log(
       '....................................................................1111'
     );
 
     this.routeService.getAllroute().subscribe({
       next: (response: any) => {
+        this.isLoading = false;
+
         console.log(response, 'respo ,,,,,,,,,,,,,,,,,,,,,,');
         this.school_routes_pickup = response.data.school_routes.filter(
           (route: any) => route.route_type == 'Recogida'
@@ -66,6 +80,10 @@ export class RoutePage {
         );
       },
       error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Error al cargar las rutas: ' + (err.message || 'Error desconocido');
+
         // this.mostrarAnimacion = false;
         const errorMessage =
           err?.error?.error?.message ||

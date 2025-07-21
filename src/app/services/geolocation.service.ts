@@ -90,7 +90,7 @@ export class LocationService {
       }
       return permissionStatus.location === 'granted';
     } catch (error: any) {
-      alert(JSON.stringify(error));
+      // alert(JSON.stringify(error));
       console.error('Error al solicitar permisos de geolocalización:', error);
       console.log('Error al solicitar permisos de geolocalización:', error);
       this.toastService.presentToast(
