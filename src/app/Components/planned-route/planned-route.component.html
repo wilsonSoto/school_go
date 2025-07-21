@@ -6,7 +6,7 @@
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
         <ion-col>
-          <ion-title size="large">Ruta Planeada</ion-title>
+          <ion-title size="large">Ruta Planeada </ion-title>
         </ion-col>
       </ion-row>
     </div>
@@ -14,9 +14,22 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="p-full-5">
-  <div class="split-layout">
+     <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div *ngIf="isLoading" class="loading-state ion-text-center">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Rutas...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-state ion-text-center">
+    <ion-icon name="warning-outline" color="danger"></ion-icon>
+    <p>{{ errorMessage }}</p>
+    <ion-button (click)="getRute()">Reintentar</ion-button>
+  </div>
+  <div *ngIf="!isLoading" class="split-layout">
     <div class="list-panel">
-      <ion-accordion-group expand="inset" [value]="['third']">
+      <ion-accordion-group expand="inset" [value]="[isAccordionSelect]">
         <ion-accordion value="first">
           <ion-item slot="header" color="rose">
             <ion-label>Chofer</ion-label>
@@ -154,7 +167,7 @@
             </ion-card-content>
           </div>
         </ion-accordion>
-        <ion-accordion value="third">
+        <ion-accordion *ngIf="showBtnPermission !== 'partner'" value="third">
           <ion-item slot="header" color="rose">
             <ion-label>Estudiantes en ruta</ion-label>
           </ion-item>
@@ -239,12 +252,13 @@
       </ion-list>
       <!-- <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
       </app-maps> -->
-      <app-maps
+      <app-maps *ngIf="maps"
       [markers]="markers"
       [routePoints]="rutaDelBus"
+      [showBtnPermission]="showBtnPermission"
       (markerMoved)="onMarkerMoved($event)"
     ></app-maps>
-    
+
       <div
         *ngIf="!isLoadingMap && getTotalStudents() === 0"
         class="no-students-map-overlay"
