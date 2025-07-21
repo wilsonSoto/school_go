@@ -1,0 +1,42 @@
+.update-screen {
+  background: #f7f7f7;
+  text-align: center;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.update-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 250px;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+p {
+  margin: 1rem 0 2rem;
+  color: #444;
+}
+.d-flex-img {
+  display: flex;
+  // flex-direction: column;
+
+}
+
+@media (max-width: 1023px) {
+  .d-flex-img{
+    flex-direction: column;
+    img {
+      margin-bottom: 0px;
+
+    }
+  }
+}

@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
+    localStorage.removeItem('studentsWithoutLocation')
     this.translate.setDefaultLang('es');
     this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
       ?.userInfo;
@@ -48,16 +49,13 @@ export class AppComponent implements OnInit {
       next: (response: any) => {
         const studentsWithoutLocation = response.data.students.filter(
           (student: any) =>
-            student.home_latitude ||
-            student.home_longitude ||
+            !student.home_latitude ||
+            !student.home_longitude ||
             student.home_latitude === 0 ||
             student.home_longitude === 0
         );
         if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
-          localStorage.setItem(
-            'studentsWithoutLocation',
-            JSON.stringify(studentsWithoutLocation)
-          );
+          localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
         }
       },

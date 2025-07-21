@@ -47,9 +47,6 @@ export class RoutePage {
   async ionViewWillEnter() {
     this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
       ?.userInfo;
-    console.log(this.userData, ';;;;;;;;;;;;;;;;55555');
-
-    console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }
 
@@ -91,37 +88,5 @@ export class RoutePage {
         action,
       },
     });
-  }
-  async openModalUbicacion() {
-    console.log('Ubicación recibida desde modal+++++++++++++++++++:');
-    const studentsWithoutLocation = this.students.map((student: any) => {
-      return {
-        ...student,
-        home_latitude: 0,
-        home_longitude: 0,
-      };
-    });
-    const modal = await this.modalController.create({
-      component: UbicationModalComponent,
-      componentProps: {
-        students: studentsWithoutLocation, // pasa tu lista aquí
-        // students: this.students // pasa tu lista aquí
-      },
-
-      // component: UbicacionModalComponent,
-      cssClass: 'full-screen-modal',
-      breakpoints: [0, 1],
-      initialBreakpoint: 1,
-      backdropDismiss: false, // ❌ No se puede cerrar tocando afuera
-      canDismiss: false,
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-    if (data) {
-      console.log('Ubicación recibida desde modal:', data);
-      // Aquí puedes guardar la ubicación o usarla en el mapa
-    }
   }
 }

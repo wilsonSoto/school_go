@@ -9,6 +9,7 @@ import { AddVehiclesComponent } from './Components/add-vehicles/add-vehicles.com
 import { EditProfileComponent } from './Components/edit-profile/edit-profile.component';
 import { PlannedRouteComponent } from './Components/planned-route/planned-route.component';
 import { UbicationModalComponent } from './Components/actions-services/ubication-modal/ubication-modal.component';
+import { VersionUpdateComponent } from './Components/actions-services/version-update/version-update.component';
 
 const routes: Routes = [
   {
@@ -61,6 +62,10 @@ const routes: Routes = [
    {
     path: 'pending-location',
     component: UbicationModalComponent,
+  },
+   {
+    path: 'version',
+    component: VersionUpdateComponent,
   },
   //   {
   //   path: '',
