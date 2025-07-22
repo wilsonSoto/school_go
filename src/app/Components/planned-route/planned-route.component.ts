@@ -119,7 +119,6 @@ export class PlannedRouteComponent implements OnInit {
 
   get showBtnPermission() {
     const userData = JSON.parse(localStorage.getItem('userData') ?? '');
-    this.rutaDelBus = true;
 
     if (
       userData?.roles?.some(
