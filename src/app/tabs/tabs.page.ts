@@ -20,8 +20,8 @@ userData: any = null;
   tabs!: IonTabs; // Declara la propiedad para la referencia a IonTabs
 
 
- ngOnInit() {
-      this.userData = JSON.parse(localStorage.getItem('userData') ?? "")
+ async ngOnInit() {
+      this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
 
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
   }

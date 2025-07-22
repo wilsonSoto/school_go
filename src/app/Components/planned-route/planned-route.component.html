@@ -6,7 +6,7 @@
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
         <ion-col>
-          <ion-title size="large">Ruta Planeada </ion-title>
+          <ion-title size="large">Ruta Planeada {{planned_route?.state}}</ion-title>
         </ion-col>
       </ion-row>
     </div>
@@ -201,7 +201,7 @@
                           Lng: {{ student?.home_longitude | number : "1.4-4" }}
                         </p>
                       </ion-label>
-                      <div *ngIf="showBtnPermission == 'driver'" class="action-button">
+                      <div *ngIf="showBtnPermission == 'driver' && isStudentVisited(student)" class="action-button">
                         <span  *ngIf="group?.students?.length == 1">
                           <ion-button
                             color="dark"
@@ -292,7 +292,7 @@
       Ver Ubicacion del conductor
     </ion-button>
 
-    <ion-button *ngIf="showBtnPermission != 'partner'"
+    <ion-button *ngIf="showBtnPermission != 'partner' && planned_route?.state == 'to-start'"
       class="login-button"
       type="button"
       (click)="startTrackingLocation()"
@@ -301,7 +301,16 @@
       Iniciar Ruta Escolar
     </ion-button>
 
-    <ion-button *ngIf="showBtnPermission != 'partner'"
+    <ion-button *ngIf="showBtnPermission != 'partner' && planned_route?.state == 'in-progress'"
+    class="login-button"
+    type="button"
+    (click)="startTrackingLocation()"
+    expand="block"
+  >
+    Siguiente...
+  </ion-button>
+
+    <ion-button *ngIf="showBtnPermission != 'partner' && planned_route?.state == 'Completada'"
       class="login-button"
       type="button"
       (click)="setEndTheRoute()"
