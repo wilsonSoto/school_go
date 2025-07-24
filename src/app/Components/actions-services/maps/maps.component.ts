@@ -16,6 +16,7 @@ import { IonicModule } from '@ionic/angular';
 import { GoogleMap } from '@capacitor/google-maps';
 import { environment } from 'src/environments/environment.prod';
 import { GoogleDirectionsService } from 'src/app/services/google-directions.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   standalone: true,
@@ -36,7 +37,10 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
 
 
-  constructor(private googleDirectionsService: GoogleDirectionsService){}
+  constructor(private googleDirectionsService: GoogleDirectionsService,
+        private toastService: ToastService,
+    
+  ){}
 
   @Input() routePoints:boolean = false;
   @Input() showBtnPermission: string = '';
@@ -149,56 +153,68 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.map?.destroy();
   }
 
+  // if (response.status === 'OK' && response.routes.length > 0) {
+  //   const route = response.routes[0];
+  //   const path = route.overview_path.map(coord => ({
+  //     lat: coord.lat(),
+  //     lng: coord.lng(),
+  //   }));
+  
+  //   // ✅ Solo si hay path válido, agregas el polyline
+  //   if (path.length > 0) {
+  //     await this.map.addPolylines({
+  //       id: 'my-map',
+  //       polylines: [
+  //         {
+  //           path,
+  //           color: '#4285F4',  // ✅ Esto es `strokeColor`
+  //           width: 5,
+  //         },
+  //       ],
+  //     });
+  //   }
+  // } else {
+  //   console.error('No se pudo obtener la ruta:', response.status);
+  // }
 
-
-private async drawPolyline000(points: { lat: number; lng: number }[]) {
-  if (!this.map || points.length < 2) return;
-
-  if (this.polylineId) {
-    await this.map.removePolylines([this.polylineId]);
-    this.polylineId = undefined;
-  }
-  const ids = await this.map.addPolylines([
-    {
-      path: points,
-      color: '#4285F4',
-      width: 4,
-    } as any,
-  ]);
-
-  this.polylineId = ids[0];
-  await this.map.setCamera({
-    coordinate: points[0],
-    zoom: 14,
-  });
-}
-
+  
 async drawRouteUsingGoogleAPI() {
   if (!this.map || this.markers.length < 2) return;
 
   try {
     const routePoints = await this.googleDirectionsService.getRoutePolyline(this.markers);
-    
-    // Elimina la línea anterior si existe
-    if (this.polylineId) {
-      await this.map.removePolylines([this.polylineId]);
+    if (routePoints) {
+      // Elimina la línea anterior si existe
+      if (this.polylineId) {
+        await this.map.removePolylines([this.polylineId]);
+      }
+  
+      const ids = await this.map.addPolylines([
+        {
+          path: routePoints,
+          color: '#4285F4',
+          width: 5,
+        } as any,
+      ]);
+  
+      this.polylineId = ids[0];
+  
+      // Opcional: centrar cámara
+      await this.map.setCamera({
+        coordinate: routePoints[0],
+        zoom: 14,
+      });
+      
+    } else {
+      this.toastService.presentToast(
+        `📍 No se encontro una ruta para las coordenadas proporcionadas`, 'danger', 1000000
+      );
+      this.toastService.presentToast(
+       JSON.stringify(routePoints), 'danger', 9000000
+      );
+    console.error(routePoints,'No se pudo obtener la ruta??????????????????????????????????????????????????????????????????????????????????************************************************:', );
+      
     }
-
-    const ids = await this.map.addPolylines([
-      {
-        path: routePoints,
-        color: '#4285F4',
-        width: 5,
-      } as any,
-    ]);
-
-    this.polylineId = ids[0];
-
-    // Opcional: centrar cámara
-    await this.map.setCamera({
-      coordinate: routePoints[0],
-      zoom: 14,
-    });
   } catch (err) {
     console.error('Error obteniendo ruta:', err);
   }

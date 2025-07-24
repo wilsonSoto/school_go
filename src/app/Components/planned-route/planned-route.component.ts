@@ -413,6 +413,7 @@ export class PlannedRouteComponent implements OnInit {
   
   getRute() {
     this.maps = false;
+    alert(JSON.stringify('000000000000'))
 
     this.isLoading = true;
     this.errorMessage = null;
@@ -430,11 +431,14 @@ export class PlannedRouteComponent implements OnInit {
             });
 
             const location = await this.getLocation();
+            alert(JSON.stringify(location))
+            alert(JSON.stringify('11111111111111111'))
             let driver: any = {}
             driver.id = '1-dr';
             driver.name = 'Ubicacion de chofer';
             driver.point_latitude = location.latitude;
             driver.point_longitude = location.longitude;
+    console.log(JSON.stringify(location),'No se pudo location la rutalocation-------------------------------------------------------------------------------------------------------------------------------------------------------------' );
             // let add: any = {}
             // add.id = '1-add';
             // add.name = 'Ubicacion de sambil';
@@ -457,6 +461,8 @@ export class PlannedRouteComponent implements OnInit {
         }),
         catchError((err) => {
           this.isLoading = false;
+            alert(JSON.stringify('3333333333333333333'))
+          alert(JSON.stringify(err))
 
           console.error('Error fetching students:', err);
           this.errorMessage =
@@ -476,6 +482,8 @@ export class PlannedRouteComponent implements OnInit {
       // console.log('33333333333');
 
       let local = await this.locationService.getCurrentLocation();
+      alert(JSON.stringify(local))
+      
       if (!local) {
         local = { latitude: 0, longitude: 0 };
       }
@@ -495,6 +503,8 @@ export class PlannedRouteComponent implements OnInit {
     try {
       const position = await this.getLocation();
       const { latitude, longitude } = position.coords ?? position;
+    console.log(JSON.stringify(position),'No se pudo location la position-----------------------------position---------------------------------------------position-----------------------------------------------------------------------------------' );
+
       const data = {
         name: 'Mi ubicación',
         lat: latitude,

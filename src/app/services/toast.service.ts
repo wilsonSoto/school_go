@@ -27,7 +27,7 @@ export class ToastService {
     });
 
     if (qtyTime) {
-      toast.duration =qtyTime;
+      // toast.duration =qtyTime;
 
     }
 

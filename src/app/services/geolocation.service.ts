@@ -156,7 +156,12 @@ export class LocationService {
         'Ubicación obtenida correctamente.',
         'success'
       );
-      return position;
+      this.toastService.presentToast(JSON.stringify(position), 'danger');
+
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      }//position.coords ?? position;
     } catch (error: any) {
       console.error('Error al obtener la ubicación:', error);
 
