@@ -231,7 +231,7 @@ export class LocationService {
   const hasPermission = await this.requestGeolocationPermissions();
   if (!hasPermission) return;
   const data = {
-    watchId: localStorage.getItem('watchId') ?? null,
+    watchId: JSON.parse(localStorage.getItem('watchId') || 'null') ?? null,
     lastPosition:  localStorage.getItem('trackingLocation') ?? null,
   }
 

@@ -119,6 +119,7 @@ export class PlannedRouteComponent implements OnInit {
 
   get showBtnPermission() {
     const userData = JSON.parse(localStorage.getItem('userData') ?? '');
+    this.rutaDelBus = true;
 
     if (
       userData?.roles?.some(
@@ -138,6 +139,7 @@ export class PlannedRouteComponent implements OnInit {
     }
     return 'admin';
   }
+
   ngOnInit() {
     this.route_id = this.route.snapshot.paramMap.get('routeId');
 
@@ -194,6 +196,27 @@ export class PlannedRouteComponent implements OnInit {
       (control: any) => control.id === studentId
     );
   }
+
+  isStudentVisited(student: any): boolean {
+    const studentPoint = this.planned_route.route_points?.find((route: any) =>
+      route.students?.some((s: any) => s.id === student.id)
+    );
+  
+    if (!studentPoint) {
+      return false;
+    }
+  
+    const visit = studentPoint.student_visiteds.find(
+      (v: any) => v.student.id === student.id
+    );
+  
+    if (visit) {
+      return !visit.was_present;
+    }
+  
+    return true;
+  }
+  
 
   // Handle checkbox change for a student
   onStudentCheckboxChange(event: CustomEvent, student: any): void {
@@ -350,40 +373,45 @@ export class PlannedRouteComponent implements OnInit {
     };
   }
 
-  generateMarkersFromGroups(
-    groups: any[]
-  ): { lat: number; lng: number; name: string }[] {
-    const markers: { lat: number; lng: number; name: string; id: any }[] = [];
-
+  generateMarkersFromGroups(groups: any[]): { lat: number; lng: number; name: string; id: any }[] {
+    const markers: { lat: number; lng: number; name: string; id: any; visit_order: number }[] = [];
+  
     for (const group of groups) {
+      // Saltar si ya fue visitado
+      if (group.is_visited) continue;
+  
       const hasGroupCoords = group.point_latitude && group.point_longitude;
-
+  
       if (hasGroupCoords) {
         markers.push({
           lat: group.point_latitude,
           lng: group.point_longitude,
           name: group.name,
           id: group.id,
+          visit_order: group.visit_order ?? 999 // por si no tiene valor
         });
       } else if (Array.isArray(group.students)) {
         for (const student of group.students) {
-          const hasStudentCoords =
-            student.home_latitude && student.home_longitude;
+          const hasStudentCoords = student.home_latitude && student.home_longitude;
           if (hasStudentCoords) {
             markers.push({
               lat: student.home_latitude,
               lng: student.home_longitude,
               name: student.name,
               id: student.id,
+              visit_order: group.visit_order ?? 999
             });
           }
         }
       }
     }
-
-    return markers;
+  
+    // Ordenar por visit_order
+    const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
+  
+    return sorted.map(({ visit_order, ...rest }) => rest); // remover visit_order del resultado final
   }
-
+  
   getRute() {
     this.maps = false;
 
@@ -403,18 +431,27 @@ export class PlannedRouteComponent implements OnInit {
             });
 
             const location = await this.getLocation();
-            let driver: any = {};
+            let driver: any = {}
+            driver.id = '1-dr';
             driver.name = 'Ubicacion de chofer';
             driver.point_latitude = location.latitude;
             driver.point_longitude = location.longitude;
-            routeData.route_points.students = [...students];
-            routeData.route_points.push(driver);
+            // let add: any = {}
+            // add.id = '1-add';
+            // add.name = 'Ubicacion de sambil';
+            // add.point_latitude = 18.482384;
+            // add.point_longitude = -69.911896;
+            routeData.route_points.students = [...students,...students];
+            routeData.route_points.unshift(driver);
+            // routeData.route_points.push(add);
             this.planned_route = routeData;
             if (this.showBtnPermission !== 'partner') {
               this.markers = this.generateMarkersFromGroups(
                 routeData.route_points
               );
             }
+            console.log(this.planned_route,'?????????????????????????????????////////@@@@@');
+            
             this.maps = true;
           }
           this.isLoading = false;
@@ -452,6 +489,9 @@ export class PlannedRouteComponent implements OnInit {
   }
   // request
   async getDriverCurrentLocation() {
+    
+    this.isLoading = true;
+    this.errorMessage = null;
     this.maps = false;
     try {
       const position = await this.getLocation();
@@ -460,6 +500,7 @@ export class PlannedRouteComponent implements OnInit {
         name: 'Mi ubicación',
         lat: latitude,
         lng: longitude,
+        id: '1-pt'
       };
       this.routeTrackingPlannedService
         .getDriverCurrentLocation(this.route_id)
@@ -473,9 +514,13 @@ export class PlannedRouteComponent implements OnInit {
               this.markers.push(data);
               this.maps = true;
             }
+            this.isLoading = false;
+
           }),
           catchError((err) => {
             this.maps = true;
+            this.isLoading = false;
+
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             return of([]);
@@ -493,6 +538,9 @@ export class PlannedRouteComponent implements OnInit {
 
   getTheNextPoint() {
     const watchId = false;
+    
+    this.isLoading = true;
+    this.errorMessage = null;
     try {
       // this.routeSubscription = this.routeService
       this.routeTrackingPlannedService
@@ -501,8 +549,12 @@ export class PlannedRouteComponent implements OnInit {
           tap((response: any) => {
             if (response.data) {
             }
+            this.isLoading = false;
+
           }),
           catchError((err) => {
+            this.isLoading = false;
+
             // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
@@ -523,6 +575,9 @@ export class PlannedRouteComponent implements OnInit {
   }
 
   async startTrackingLocation() {
+    
+    this.isLoading = true;
+    this.errorMessage = null;
     // const watchId = false;
     try {
       // console.log('1111');
@@ -546,8 +601,12 @@ export class PlannedRouteComponent implements OnInit {
                 localStorage.setItem('watchId', JSON.stringify(watchId));
               }
             }
+            this.isLoading = true;
+
           }),
           catchError((err) => {
+            this.isLoading = false;
+
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             return of([]);
@@ -562,6 +621,9 @@ export class PlannedRouteComponent implements OnInit {
 
   async setdriverLocation(position: any) {
     // const watchId = false;
+    
+    this.isLoading = true;
+    this.errorMessage = null;
     try {
       // const location = await this.getLocation();
       const data = {
@@ -577,9 +639,11 @@ export class PlannedRouteComponent implements OnInit {
             if (response.data) {
               console.log(response);
             }
-          }),
+      this.isLoading = false;
+    }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
+      this.isLoading = false;
+      // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
@@ -634,22 +698,31 @@ export class PlannedRouteComponent implements OnInit {
       };
       // const location = await this.getLocation();
       // this.routeSubscription = this.routeService
+      
+    this.isLoading = true;
+    this.errorMessage = null;
       this.routeTrackingPlannedService
         .markARouteAsVisited(this.route_id, data)
         .pipe(
           tap((response: any) => {
             if (response.data) {
               console.log(response);
+              this.getRute()
             }
+      this.isLoading = false;
+
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
+      this.isLoading = false;
+      console.error('Error fetching students:', err);
             this.errorMessage =
-              'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+              'Error al cargar al actualizar la visita. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
             return of([]);
           }),
           finalize(() => {
+            this.isLoading = false;
+
             setTimeout(() => {}, 0);
           })
         )
@@ -659,9 +732,14 @@ export class PlannedRouteComponent implements OnInit {
 
   async setEndTheRoute() {
     // const watchId = false;
+    
+    this.isLoading = true;
+    this.errorMessage = null;
     try {
       const location = await this.getLocation();
 
+      this.isLoading = true;
+      this.errorMessage = null;
       const data = {
         route_id: this.route_id,
         lat: location.latitude,
@@ -676,9 +754,12 @@ export class PlannedRouteComponent implements OnInit {
               console.log(response);
               this.stopTrackingLocation();
             }
+      this.isLoading = false;
+
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
+      this.isLoading = false;
+      // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];

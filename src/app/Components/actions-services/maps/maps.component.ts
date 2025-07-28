@@ -48,7 +48,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     await this.createMap();
     await this.addMarkersFromInput();
-    if (this.routePoints && this.showBtnPermission != 'driver') {
+    if (this.routePoints && this.showBtnPermission == 'driver') {
       await this.drawRouteUsingGoogleAPI();
 
 
@@ -70,8 +70,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (hasChanges && this.map) {
       await this.removeAllMarkers();
       await this.addMarkersFromInput();
-      if (this.routePoints) {
-        console.log(this.markers,'///////////markers///////22/////////');
+    if (this.routePoints && this.showBtnPermission == 'driver') {
 
         await this.drawRouteUsingGoogleAPI();
 
@@ -175,25 +174,12 @@ private async drawPolyline000(points: { lat: number; lng: number }[]) {
 }
 
 async drawRouteUsingGoogleAPI() {
-  if (!this.map || !this.markers || this.markers.length < 2) {
-    console.warn('Se necesitan al menos dos marcadores para dibujar una ruta.');
-    return;
-  }
-
-  const origin = { lat: this.markers[0].lat, lng: this.markers[0].lng };
-  const destination = {
-    lat: this.markers[this.markers.length - 1].lat,
-    lng: this.markers[this.markers.length - 1].lng,
-  };
+  if (!this.map || this.markers.length < 2) return;
 
   try {
-    const routePoints = await this.googleDirectionsService.getRoutePoints(origin, destination);
-
-    if (!routePoints || routePoints.length === 0) {
-      throw new Error('La ruta no devolvió puntos válidos.');
-    }
-
-    // Elimina cualquier línea previa si es necesario
+    const routePoints = await this.googleDirectionsService.getRoutePolyline(this.markers);
+    
+    // Elimina la línea anterior si existe
     if (this.polylineId) {
       await this.map.removePolylines([this.polylineId]);
     }
@@ -202,101 +188,20 @@ async drawRouteUsingGoogleAPI() {
       {
         path: routePoints,
         color: '#4285F4',
-        width: 4,
+        width: 5,
       } as any,
     ]);
 
     this.polylineId = ids[0];
 
+    // Opcional: centrar cámara
     await this.map.setCamera({
       coordinate: routePoints[0],
-      zoom: 14,
-    });
-
-  } catch (error) {
-    console.error('Error al dibujar la ruta:', error);
-  }
-}
-
-
-
-
-private async getDrawPolyline(points: { lat: number; lng: number }[]) {
-
-  if (!this.map || points.length < 2) return;
-
-  // Usa los primeros y últimos puntos como origen y destino
-  const origin = `${points[0].lat},${points[0].lng}`;
-  const destination = `${points[points.length - 1].lat},${points[points.length - 1].lng}`;
-  const apiKey = 'AIzaSyBsnbQOBYbbUuDL2Dzpd_7D-wlXz-1B5bg'; // Reemplaza esto con tu clave de Google válida
-
-  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}&mode=driving`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.routes.length === 0) return;
-
-    const encodedPolyline = data.routes[0].overview_polyline.points;
-    const decodedPath = this.decodePolyline(encodedPolyline);
-
-    if (this.polylineId) {
-      await this.map.removePolylines([this.polylineId]);
-      this.polylineId = undefined;
-    }
-
-    const ids = await this.map.addPolylines([
-      {
-        path: decodedPath,
-        color: '#4285F4',
-        width: 4,
-      } as any,
-    ]);
-
-    this.polylineId = ids[0];
-
-    await this.map.setCamera({
-      coordinate: decodedPath[0],
       zoom: 14,
     });
   } catch (err) {
     console.error('Error obteniendo ruta:', err);
   }
 }
-
-private decodePolyline(encoded: string): { lat: number; lng: number }[] {
-  let index = 0;
-  const len = encoded.length;
-  let lat = 0;
-  let lng = 0;
-  const path = [];
-
-  while (index < len) {
-    let b, shift = 0, result = 0;
-    do {
-      b = encoded.charCodeAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    const deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
-    lat += deltaLat;
-
-    shift = 0;
-    result = 0;
-    do {
-      b = encoded.charCodeAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    const deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
-    lng += deltaLng;
-
-    path.push({ lat: lat / 1e5, lng: lng / 1e5 });
-  }
-
-  return path;
-}
-
 
 }
