@@ -20,15 +20,14 @@ userData: any = null;
   tabs!: IonTabs; // Declara la propiedad para la referencia a IonTabs
 
 
- ngOnInit() {
-      this.userData = JSON.parse(localStorage.getItem('userData') ?? "")
+ async ngOnInit() {
+      this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
 
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
   }
 
   get showTabsPermission () {
     if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father" || rol.external_id == "pool.group_school_driver")) {
-      return [true, true, true, true, true ]
       return [false, false, true, false, true ]
     } else {
       return [true, true, true, true, true ]
