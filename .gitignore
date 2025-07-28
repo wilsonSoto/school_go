@@ -20,8 +20,8 @@ log.txt
 # Ionic
 /.ionic
 /www
-/android
-/ios
+# /android
+# /ios
 /platforms
 /plugins
 
