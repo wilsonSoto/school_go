@@ -1,0 +1,10 @@
+{
+	"appId": "io.school.go.starter",
+	"appName": "schoolGo",
+	"webDir": "www",
+	"plugins": {
+		"GoogleMap": {
+			"apiKey": "AIzaSyDcWETz-oJarwWF7lheeNKYOdw8BwaGrKk"
+		}
+	}
+}
