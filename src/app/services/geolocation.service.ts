@@ -78,21 +78,21 @@ export class LocationService {
     try {
       const permissionStatus = await Geolocation.requestPermissions();
       console.log(
-        'Estado de los permisos de geolocalización:',
+        'Estado de los permisos de geolocalización: ********************************************************************************************************************************',
         permissionStatus.location
       );
 
       if (permissionStatus.location !== 'granted') {
         this.toastService.presentToast(
-          'Por favor, concede permisos de ubicación para usar esta función.',
+          'Por favor, concede permisos de ubicación para usar esta función. ',
           'danger'
         );
       }
       return permissionStatus.location === 'granted';
     } catch (error: any) {
       // alert(JSON.stringify(error));
-      console.error('Error al solicitar permisos de geolocalización:', error);
-      console.log('Error al solicitar permisos de geolocalización:', error);
+      console.error('Error al solicitar permisos de geolocalización: ---------------------------------------------------------------------------------------------------------------------------------------------------------', error);
+      console.log('Error al solicitar permisos de geolocalización-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:', error);
       this.toastService.presentToast(
         'Error al solicitar permisos de ubicación.',
         'danger'
@@ -106,13 +106,13 @@ export class LocationService {
     // Primero, verifica/solicita permisos
     const isMobile = isMobileOrWebOperatingSystem();
     let hasPermission = false;
-    // alert(isMobile)
+    alert(isMobile)
     if (isMobile !== 'unknown') {
       hasPermission = await this.requestGeolocationPermissions();
     }
 
     if (!hasPermission) {
-      // alert(1)
+      alert(1)
       const locationFromWeb: any = await this.getLocationWeb(); // <--- AWAIT AQUÍ
       if (locationFromWeb?.latitude !== '' && locationFromWeb?.longitude !== '') {
       // alert(2)
@@ -138,7 +138,7 @@ export class LocationService {
 
       const position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true, // Intenta obtener la mejor precisión posible
-        timeout: 10000, // Tiempo máximo para esperar la ubicación (10 segundos)
+        timeout: 30000, // Tiempo máximo para esperar la ubicación (10 segundos)
         maximumAge: 0, // No usar una ubicación en caché, obtener una nueva
       });
 

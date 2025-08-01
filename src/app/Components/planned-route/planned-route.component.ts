@@ -429,22 +429,28 @@ export class PlannedRouteComponent implements OnInit {
               }
               return route;
             });
-
-            const location = await this.getLocation();
-            alert(JSON.stringify(location))
-            alert(JSON.stringify('11111111111111111'))
+            
             let driver: any = {}
-            driver.id = '1-dr';
-            driver.name = 'Ubicacion de chofer';
-            driver.point_latitude = location.latitude;
-            driver.point_longitude = location.longitude;
-    console.log(JSON.stringify(location),'No se pudo location la rutalocation-------------------------------------------------------------------------------------------------------------------------------------------------------------' );
-            // let add: any = {}
-            // add.id = '1-add';
-            // add.name = 'Ubicacion de sambil';
-            // add.point_latitude = 18.482384;
-            // add.point_longitude = -69.911896;
-            routeData.route_points.students = [...students,...students];
+            try {
+              const location = await this.getLocation();
+              alert(JSON.stringify(location))
+              alert(JSON.stringify('11111111111111111'))
+              driver.id = '1-dr';
+              driver.name = 'Ubicacion de chofer';
+              driver.point_latitude = location.latitude;
+              driver.point_longitude = location.longitude;
+              console.log(JSON.stringify(location),' location la rutalocation-------------------------------------------------------------------------------------------------------------------------------------------------------------' );
+              
+            } catch (error) {
+              console.log(JSON.stringify(error),'No se pudo location la rutalocation------------------erereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-------------------------------------------------------------------------------------------------------------------------------------------' );
+              
+            }
+            let add: any = {}
+            add.id = '1-add';
+            add.name = 'Ubicacion de sambil';
+            add.point_latitude = 18.482384;
+            add.point_longitude = -69.911896;
+            routeData.route_points.students = [...students];
             routeData.route_points.unshift(driver);
             // routeData.route_points.push(add);
             this.planned_route = routeData;
@@ -455,8 +461,8 @@ export class PlannedRouteComponent implements OnInit {
             }
             console.log(this.planned_route,'?????????????????????????????????////////@@@@@');
             
-            this.maps = true;
           }
+          this.maps = true;
           this.isLoading = false;
         }),
         catchError((err) => {

@@ -52,7 +52,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     await this.createMap();
     await this.addMarkersFromInput();
-    if (this.routePoints && this.showBtnPermission == 'driver') {
+    if (this.routePoints && this.showBtnPermission == 'driver' && this.markers.length < 2) {
       await this.drawRouteUsingGoogleAPI();
 
 
@@ -99,7 +99,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.map = await GoogleMap.create({
       id: 'my-map',
       element: this.mapRef.nativeElement,
-      apiKey: 'AIzaSyBsnbQOBYbbUuDL2Dzpd_7D-wlXz-1B5bg',
+      apiKey: 'AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao',
       config: {
         center: { lat: 18.48, lng: -69.9 },
         zoom: 12,

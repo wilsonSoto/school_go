@@ -13,8 +13,7 @@ export class TabsPage   {
 userData: any = null;
 
   students: any = [];
-  constructor(private router: Router,
-  ) {} // Inyecta el Router
+  constructor(private router: Router,  ) {} // Inyecta el Router
 
   @ViewChild('myTabs')
   tabs!: IonTabs; // Declara la propiedad para la referencia a IonTabs

@@ -1,5 +1,5 @@
 .update-screen {
-  background: #f7f7f7;
+  background: var(--ion-background-color);// #f7f7f7;
   text-align: center;
 }
 
@@ -23,7 +23,7 @@ h2 {
 
 p {
   margin: 1rem 0 2rem;
-  color: #444;
+  color:  var(--ion-text-color);// #444;
 }
 .d-flex-img {
   display: flex;

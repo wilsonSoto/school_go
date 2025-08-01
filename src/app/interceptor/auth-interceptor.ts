@@ -7,10 +7,12 @@ import {
   HttpErrorResponse,
 } from '@angular/common/http';
 import { catchError, Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
+  constructor(private router: Router,  ) {} // Inyecta el Router
 
 
    intercept(
@@ -33,6 +35,10 @@ console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[');
             // this.handleUnauthorized(req, next);
             console.log(req,error , 'http');
 
+          }
+          if ( [400].includes(error.status)) {
+    this.router.navigateByUrl('/sign-in', { replaceUrl: true });
+            
           }
         // }
 
