@@ -19,19 +19,26 @@
     </div>
 
     <div class="segment">
-      <ion-searchbar
-        size="mediun"
-        mode="ios"
-        show-clear-button="always"
-        clear-icon="trash-bin"
-        value="Custom Clear Icon"
-      ></ion-searchbar>
 
-      <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
-        <ion-segment-button value="first" content-id="first">
+      <ion-searchbar
+  size="mediun"
+  mode="ios"
+  show-clear-button="always"
+  clear-icon="trash-bin"
+  placeholder="Buscar chofer o vehículo"
+  (ionInput)="filterData($event)">
+</ion-searchbar>
+
+      <ion-segment
+        [(ngModel)]="typeSelect"
+        size="large"
+        mode="ios"
+        (ionChange)="handleSegmentChange($event)"
+      >
+        <ion-segment-button value="driver" content-id="driver">
           <ion-label>Choferes </ion-label>
         </ion-segment-button>
-        <ion-segment-button value="second" content-id="second">
+        <ion-segment-button value="vehicle" content-id="vehicle">
           <ion-label>Vehiculos</ion-label>
         </ion-segment-button>
       </ion-segment>
@@ -53,23 +60,33 @@
     <p>{{ errorMessage }}</p>
     <ion-button (click)="loadDriversAndBuses()">Reintentar</ion-button>
   </div>
-  <ion-segment-view *ngIf="!isLoading">
-    <ion-segment-content id="first">
+
+  <div *ngIf="!isLoading && !hasData" class="empty-state ion-text-center">
+    <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+    <p>No hay información disponible para esta sección.</p>
+  </div>
+  
+  
+  <ion-segment-view *ngIf="!isLoading && hasData">
+    <ion-segment-content *ngIf="typeSelect == 'driver'" id="driver">
       <app-drivers
-        *ngFor="let driver of currentDrivers"
+        *ngFor="let driver of filteredDrivers"
         [currentDriver]="driver"
         (handleActionDriver)="handleOpenDriverModal($event, driver)"
-      ></app-drivers>
+        >
+      </app-drivers>
     </ion-segment-content>
-    <ion-segment-content id="second">
+
+    <ion-segment-content *ngIf="typeSelect == 'vehicle'" id="vehicle">
       <app-vehicles
-        *ngFor="let bus of currentVehicles"
+        *ngFor="let bus of filteredVehicles"
         [currentVehicle]="bus"
         (handleActionDriver)="handleOpenBusModal($event, bus)"
-      ></app-vehicles>
+        >
+      </app-vehicles>
     </ion-segment-content>
-    <!-- <ion-segment-content id="third">Third</ion-segment-content> -->
   </ion-segment-view>
+
 
   <ion-fab *ngIf="!isLoading" slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button [routerLink]="['/add-bus']">
@@ -88,21 +105,10 @@
   <ng-template>
     <ion-content>
       <ion-list>
-        <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
-        <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
-        <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
-        <ion-item [button]="true" [detail]="false" routerLink="/sign-in"
-          >Cerrar Sesión</ion-item
-        >
+      
+        <ion-item [button]="true" (click)="logoutAndGoToSignIn()" [detail]="false">Cerrar Sesión</ion-item>
 
-        <!-- <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
-          <ng-template>
-            <ion-content>
-              <ion-list>
-                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
+      
         </ion-popover> -->
       </ion-list>
     </ion-content>

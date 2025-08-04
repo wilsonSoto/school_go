@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { ToastService } from '../services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
-import { LoginService } from './../services/login.service';
+import { AuthService } from './../services/login.service';
 import { FcmService } from '../services/fcm.service';
 // import {} from '../../assets/images/logo.png'
 import { StorageService } from '../services/storage.service';
@@ -27,7 +27,7 @@ token = ""
     private fb: FormBuilder,
     private toastCtrl: ToastController,
     private toastService: ToastService,
-    private loginService: LoginService,
+    private loginService: AuthService,
     private router: Router,
     private storage: StorageService,
         private platform: Platform,
@@ -63,7 +63,6 @@ token = ""
 
       }).catch((e: any) => {
         console.log(e);
-        alert(e)
         this.login() 
 
       })
@@ -87,8 +86,6 @@ token = ""
         .subscribe({
           next: (response: any) => {
             console.log(response,'respo');
-localStorage.setItem('token', response.result.token)
-localStorage.setItem('userData', JSON.stringify(response.result))
           this.toastService.presentToast('Bienvenido!','custom-success-toast')
           this.router.navigate(['tabs'])
 

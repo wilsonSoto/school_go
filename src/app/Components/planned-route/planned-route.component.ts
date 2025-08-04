@@ -413,8 +413,6 @@ export class PlannedRouteComponent implements OnInit {
   
   getRute() {
     this.maps = false;
-    alert(JSON.stringify('000000000000'))
-
     this.isLoading = true;
     this.errorMessage = null;
     this.routeSubscription = this.routeService
@@ -433,8 +431,6 @@ export class PlannedRouteComponent implements OnInit {
             let driver: any = {}
             try {
               const location = await this.getLocation();
-              alert(JSON.stringify(location))
-              alert(JSON.stringify('11111111111111111'))
               driver.id = '1-dr';
               driver.name = 'Ubicacion de chofer';
               driver.point_latitude = location.latitude;
@@ -467,9 +463,6 @@ export class PlannedRouteComponent implements OnInit {
         }),
         catchError((err) => {
           this.isLoading = false;
-            alert(JSON.stringify('3333333333333333333'))
-          alert(JSON.stringify(err))
-
           console.error('Error fetching students:', err);
           this.errorMessage =
             'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
@@ -488,8 +481,6 @@ export class PlannedRouteComponent implements OnInit {
       // console.log('33333333333');
 
       let local = await this.locationService.getCurrentLocation();
-      alert(JSON.stringify(local))
-      
       if (!local) {
         local = { latitude: 0, longitude: 0 };
       }

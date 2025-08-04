@@ -18,7 +18,6 @@ export class LocationService {
     latitude: number | '';
     longitude: number | '';
   }> {
-    // alert('1==')
 
     const isConnected = await checkNetworkStatus();
     if (!isConnected) {
@@ -31,11 +30,9 @@ export class LocationService {
         longitude: '',
       };
     }
-    // alert('22==')
 
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-    // alert('33==')
         const text = 'Geolocation is not supported by this browser.'
         reject(new Error(text));
         this.toastService.presentToast(
@@ -90,7 +87,6 @@ export class LocationService {
       }
       return permissionStatus.location === 'granted';
     } catch (error: any) {
-      // alert(JSON.stringify(error));
       console.error('Error al solicitar permisos de geolocalización: ---------------------------------------------------------------------------------------------------------------------------------------------------------', error);
       console.log('Error al solicitar permisos de geolocalización-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:', error);
       this.toastService.presentToast(
@@ -106,28 +102,22 @@ export class LocationService {
     // Primero, verifica/solicita permisos
     const isMobile = isMobileOrWebOperatingSystem();
     let hasPermission = false;
-    alert(isMobile)
     if (isMobile !== 'unknown') {
       hasPermission = await this.requestGeolocationPermissions();
     }
 
     if (!hasPermission) {
-      alert(1)
       const locationFromWeb: any = await this.getLocationWeb(); // <--- AWAIT AQUÍ
       if (locationFromWeb?.latitude !== '' && locationFromWeb?.longitude !== '') {
-      // alert(2)
         this.toastService.presentToast(
           'Ubicación obtenida por API web.',
           'info'
         );
-      // alert(3)
 
         return locationFromWeb; // Permisos 'simulados' y ubicación obtenida
       }
-      // alert(4)
       return false;
     }
-      // alert(5)
 
     try {
       this.toastService.presentToast(

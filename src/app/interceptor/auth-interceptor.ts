@@ -1,48 +1,38 @@
 import { Injectable } from '@angular/core';
 import {
-  HttpInterceptor,
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpErrorResponse,
+  HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 } from '@angular/common/http';
-import { catchError, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-
+import { Observable, throwError, from } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { AuthService } from '../services/login.service';
 
 @Injectable()
-export class AuthInterceptorService implements HttpInterceptor {
-  constructor(private router: Router,  ) {} // Inyecta el Router
+export class AuthInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService, private router: Router) {}
 
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return from(this.authService.getToken()).pipe(
+      switchMap(token => {
+        const authReq = token
+        
+          ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+          : req;
 
-   intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[');
-
-    return next.handle(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-            console.log(req,error , '0000000000000000000000err');
-        // if (req.headers.has('Auth')) {
-            console.log(req,error , 'http11111111');
-
-          if (
-            error instanceof HttpErrorResponse &&
-            [401, 403].includes(error.status) &&
-            !req.url.includes('/authenticate')
-          ) {
-            // this.handleUnauthorized(req, next);
-            console.log(req,error , 'http');
-
-          }
-          if ( [400].includes(error.status)) {
-    this.router.navigateByUrl('/sign-in', { replaceUrl: true });
-            
-          }
-        // }
-
-        throw error;
+        return next.handle(authReq).pipe(
+          catchError((error: HttpErrorResponse) => {
+            if (error.status === 401 || error.status === 0) {
+              console.warn('⚠️ Sesión expirada o usuario no logueado');
+              this.authService.logout();
+              this.router.navigate(['/sign-in']);
+            }
+            if ( [400].includes(error.status)) {
+                  this.router.navigateByUrl('/sign-in', { replaceUrl: true });
+                          
+                        }
+            return throwError(() => error);
+          })
+        );
       })
     );
   }

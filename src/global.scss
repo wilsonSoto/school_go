@@ -306,7 +306,15 @@
 /* =========================
    Theme variables
    ========================= */
-:root {
+   :root {
+    --ion-color-scheme: light; /* Fuerza el modo claro */
+  }
+  
+  html {
+    color-scheme: light; /* Evita que el navegador aplique dark */
+  }
+  
+   :root {
   --ion-color-rose: #f6df9652;
   --ion-color-rose-rgb: 252 245 221;
   --ion-color-rose-contrast: #000000;
@@ -331,14 +339,14 @@
 }
 
 body.dark {
-  --ion-background-color: #1e1e1e;
-  --ion-text-color: #f1f1f1;
-  --ion-text-placeholder-color: #cfc3c3;
+  --ion-background-color: #1e1e1e !important;
+  --ion-text-color: #f1f1f1 !important;
+  --ion-text-placeholder-color: #cfc3c3 !important;
 
-  --custom-bg-color: #2a2a2a;
-  --custom-label-color: #dddddd;
-  --custom-note-color: #cccccc;
-  --custom-header-bg: #2a2a2a;
+  --custom-bg-color: #2a2a2a !important;
+  --custom-label-color: #dddddd !important;
+  --custom-note-color: #cccccc !important;
+  --custom-header-bg: #2a2a2a !important;
 }
 
 .ion-color-rose {
@@ -373,13 +381,13 @@ ion-card {
 }
 
 ion-label {
-  color: var(--custom-label-color) !important;
+  color: var(--custom-label-color);
   font-weight: 600;
 }
 
 ion-note {
   font-weight: 500;
-  color: var(--custom-note-color) !important;
+  // color: var(--custom-note-color);
 }
 
 .custom-danger-toast {

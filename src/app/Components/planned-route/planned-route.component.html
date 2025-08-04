@@ -256,8 +256,8 @@
       [markers]="markers"
       [routePoints]="rutaDelBus"
       [showBtnPermission]="showBtnPermission"
-      (markerMoved)="onMarkerMoved($event)"
-    ></app-maps>
+      ></app-maps>
+      <!-- (markerMoved)="onMarkerMoved($event)" -->
 
       <div
         *ngIf="!isLoadingMap && getTotalStudents() === 0"

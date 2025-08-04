@@ -16,6 +16,7 @@ import { TranslateService } from '@ngx-translate/core'; // Importa TranslateServ
 import { ToastService } from '../services/toast.service';
 import { AddParentComponent } from '../Components/add-parent/add-parent.component';
 import { ParentService } from '../services/parents.service';
+import { AuthService } from '../services/login.service';
 // register();
 
 @Component({
@@ -33,12 +34,16 @@ export class Tab1Page implements OnInit {
     private parentService: ParentService,
     private toastService: ToastService,
     private translate: TranslateService ,
+    private authService: AuthService,
        private modalController: ModalController
 
   ) { }
   parents: any = [];
   students: any = [];
-
+  searchTerm: string = '';
+  filteredParents: any[] = [];
+  hasData: boolean = true;
+  
   isLoading: boolean = true;
   errorMessage: string | null = null;
   ngOnInit() {
@@ -53,11 +58,38 @@ export class Tab1Page implements OnInit {
       }, 2000);
     }
 
-    ionViewWillEnter() {
-    console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
-    this.getAllParents(); // Llama a tu función para cargar las rutas aquí
+    async logoutAndGoToSignIn() {
+      await this.authService.logout();
+      this.router.navigate(['/sign-in']);
+    }
+    
+  ionViewWillLeave() {
+    if (this.router.url === '/sign-in') {
+      this.authService.logout();
+    }
   }
 
+  filterParents(event: any) {
+    const query = (event.target.value || '').toLowerCase();
+  
+    if (!query) {
+      // Si el buscador está vacío, restauramos la lista original
+      this.filteredParents = [...this.parents];
+    } else {
+      this.filteredParents = this.parents.filter((parent: any) => {
+        return (
+          parent.name?.toLowerCase().includes(query) ||
+          parent.email?.toLowerCase().includes(query) ||
+          parent.mobile?.toLowerCase().includes(query) ||
+          parent.phone?.toLowerCase().includes(query)
+        );
+      });
+    }
+  
+    this.hasData = this.filteredParents.length > 0;
+  }
+
+  
   getAllParents() {
     this.isLoading = true;
     this.errorMessage = null;
@@ -70,8 +102,12 @@ export class Tab1Page implements OnInit {
             // response.data.parent.number_students = response.data.students?.length
             console.log(response,'parentsssssssssssssssss');
 
-            this.parents = response.data.parents
+            // this.parents = response.data.parents
             this.students = [response.data.students]
+            this.parents = response.data.parents;
+this.filteredParents = [...this.parents]; // Inicializa el listado filtrado
+this.hasData = this.filteredParents.length > 0;
+
           this.toastService.presentToast('Bienvenido!','custom-success-toast')
           this.router.navigate(['tabs'])
 

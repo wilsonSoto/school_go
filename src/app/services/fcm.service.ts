@@ -106,7 +106,7 @@ export class FcmService {
         console.log('registration 1');
         console.log('My Token: ');
         console.log(JSON.stringify({ token }));
-        alert(JSON.stringify(token))
+        // alert(JSON.stringify(token))
         const fcmtoken = token?.value;
         let go = 1;
         console.log('registration 2');
