@@ -17,12 +17,16 @@
         </ion-col>
       </ion-row>
     </div>
+
     <ion-searchbar
+      size="mediun"
       mode="ios"
       show-clear-button="always"
       clear-icon="trash-bin"
-      value="Custom Clear Icon"
-    ></ion-searchbar>
+      (ionInput)="filterRoutes($event)"
+      placeholder="Buscar por ruta, chofer o estudiante"
+    >
+    </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
@@ -41,30 +45,32 @@
     <ion-button (click)="getAllRoute()">Reintentar</ion-button>
   </div>
 
-  <ion-list *ngIf="!isLoading">
+  <!-- Mostrar mensaje si no hay datos -->
+  <div *ngIf="!isLoading && !hasData" class="empty-state ion-text-center">
+    <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+    <p>No hay información disponible para esta sección.</p>
+  </div>
+
+  <ion-list *ngIf="!isLoading && hasData">
     <app-all-route
-      *ngFor="let route of school_routes"
+      *ngFor="let route of filteredRoutes"
       [route]="route"
       (click)="handleOpenRouteModal('edit',route)"
     ></app-all-route>
   </ion-list>
 
-  <!-- <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button  [routerLink]="['/add-route']">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
 
-  </ion-fab> -->
 </ion-content>
 
 <ion-popover trigger="popover-button" [dismissOnSelect]="true">
   <ng-template>
     <ion-content>
       <ion-list>
-        <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
-        <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
-        <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
-        <ion-item [button]="true" [detail]="false" routerLink="/sign-in"
+     
+        <ion-item
+          [button]="true"
+          (click)="logoutAndGoToSignIn()"
+          [detail]="false"
           >Cerrar Sesión</ion-item
         >
       </ion-list>

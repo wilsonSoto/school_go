@@ -91,7 +91,7 @@ export class EditProfileComponent {
       phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
       mobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
       email: ['', [Validators.required, Validators.email]], // Requerido y formato de email
-      vat: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], // Requerido y 11 dígitos (ejemplo para Dominicana)
+      vat: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^\d{11}$/)]],
       contact_address: ['', Validators.required],
       parentImage: [''],
       nationalIdImage: [''],

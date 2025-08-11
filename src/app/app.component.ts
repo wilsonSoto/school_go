@@ -27,7 +27,6 @@ export class AppComponent implements OnInit {
       this.fcm.initPush().then();
     }).catch((e: any) => {
       console.log(e);
-      alert(e)
     })
 
   }
@@ -39,7 +38,9 @@ export class AppComponent implements OnInit {
     this.translate.setDefaultLang('es');
     this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
       ?.userInfo;
-    if (this.userData?.partner_id) {
+
+      const currentRoute = this.router.url;
+    if (this.userData?.partner_id && currentRoute !== '/sign-in' && currentRoute !== '/') {
       this.getParent();
     }
   }
@@ -80,8 +81,8 @@ export class AppComponent implements OnInit {
       },
       error: (err: any) => {
         const errorMessage =
-          err.error.error.message ||
-          err.error.error ||
+          err?.error?.error?.message ||
+          err?.error?.error ||
           err?.message ||
           'Error desconocido';
 

@@ -16,7 +16,7 @@
   }
 
   p {
-    color: #666;
+    color: var(--ion-text-placeholder-color);//#666;
     font-size: 14px;
   }
 }
