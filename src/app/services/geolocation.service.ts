@@ -132,22 +132,10 @@ export class LocationService {
         maximumAge: 0, // No usar una ubicación en caché, obtener una nueva
       });
 
-      // this.currentLatitude = position.coords.latitude;
-      // this.currentLongitude = position.coords.longitude;
-
-      // // Actualiza los campos del formulario con la ubicación obtenida
-      // this.parentForm.patchValue({
-      //   partner_latitude: this.currentLatitude,
-      //   partner_longitude: this.currentLongitude
-      // });
-
-      // console.log('Ubicación obtenida:', this.currentLatitude, this.currentLongitude);
       this.toastService.presentToast(
         'Ubicación obtenida correctamente.',
         'success'
       );
-      this.toastService.presentToast(JSON.stringify(position), 'danger');
-
       return {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -173,67 +161,79 @@ export class LocationService {
   }
 
   // Método para observar cambios de ubicación (si necesitas seguimiento en tiempo real)
-  async startTrackingLocation111(watchId: any) {
-      const isMobile = isMobileOrWebOperatingSystem();
+  // async startTrackingLocation111(watchId: any) {
+  //     const isMobile = isMobileOrWebOperatingSystem();
 
-      if (isMobile == 'unknown') {
-      return;
-    }
-    const hasPermission = await this.requestGeolocationPermissions();
-    if (!hasPermission) {
-      return;
-    }
+  //     if (isMobile == 'unknown') {
+  //     return;
+  //   }
+  //   const hasPermission = await this.requestGeolocationPermissions();
+  //   if (!hasPermission) {
+  //     return;
+  //   }
 
-    if (watchId) {
-      // Si ya hay un observador, primero lo detenemos
-      await this.stopTrackingLocation(watchId);
-    }
+  //   if (watchId) {
+  //     // Si ya hay un observador, primero lo detenemos
+  //     await this.stopTrackingLocation(watchId);
+  //   }
 
-    this.toastService.presentToast(
-      'Iniciando seguimiento de ubicación...',
-      'primary'
-    );
+  //   this.toastService.presentToast(
+  //     'Iniciando seguimiento de ubicación...',
+  //     'primary'
+  //   );
 
-    watchId = await Geolocation.watchPosition(
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      },
-      (position, err) => {
-        if (err) {
-          console.error('Error en el seguimiento de ubicación:', err);
-          this.toastService.presentToast(
-            'Error en el seguimiento de ubicación.',
-            'danger'
-          );
-          return;
-        }
-        if (position) {
-          console.log('Nueva ubicación:', position);
-          return position;
-          // this.toastService.presentToast('Ubicación actualizada.', 'light', 1500); // Puedes mostrar esto o no, según el caso
-        }
-        return false;
-      }
-    );
-  }
+  //   watchId = await Geolocation.watchPosition(
+  //     {
+  //       enableHighAccuracy: true,
+  //       timeout: 10000,
+  //       maximumAge: 0,
+  //     },
+  //     (position, err) => {
+  //       if (err) {
+  //         console.error('Error en el seguimiento de ubicación:', err);
+  //         this.toastService.presentToast(
+  //           'Error en el seguimiento de ubicación.',
+  //           'danger'
+  //         );
+  //         return;
+  //       }
+  //       if (position) {
+  //         console.log('Nueva ubicación:', position);
+  //         return position;
+  //         // this.toastService.presentToast('Ubicación actualizada.', 'light', 1500); // Puedes mostrar esto o no, según el caso
+  //       }
+  //       return false;
+  //     }
+  //   );
+  // }
 
- async startTrackingLocation(): Promise<string | undefined> {
-  const isMobile = isMobileOrWebOperatingSystem();
+ async startTrackingLocation8888888888888888(): Promise<string | undefined> {
+ console.log('📡 Iniciando startTrackingLocation  1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111');
+  
+ alert(1)
+ const isMobile = isMobileOrWebOperatingSystem();
   if (isMobile === 'unknown') return;
+ alert(2)
 
+console.log('📱 Tipo de dispositivo: 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222', isMobile);
   const hasPermission = await this.requestGeolocationPermissions();
   if (!hasPermission) return;
+ alert(3)
+
+  console.warn('⛔ No se otorgaron permisos 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
   const data = {
     watchId: JSON.parse(localStorage.getItem('watchId') || 'null') ?? null,
     lastPosition:  localStorage.getItem('trackingLocation') ?? null,
   }
+ alert(4)
 
   // Detener observador anterior si existe
   if (data.watchId) {
+ alert(5)
+
     await this.stopTrackingLocation(data.watchId);
   }
+ alert(6)
 
   let lastPosition: GeolocationPosition | any = data?.lastPosition ?? null;
   let lastMovementTime: number = Date.now();
@@ -250,6 +250,7 @@ export class LocationService {
     async (position, err) => {
       if (err || !position) {
         console.error('❌ Error obteniendo ubicación:', err);
+        this.toastService.presentToast('Error obteniendo ubicación');
         return;
       }
 
@@ -284,67 +285,112 @@ export class LocationService {
       localStorage.setItem('watchId', JSON.stringify(newWatchId))
     }
   );
+ alert(7)
+
   return newWatchId;
 }
+// import { Geolocation } from '@capacitor/geolocation';
 
+async  startTrackingLocation() {
+  try {
+    console.log('📍 Solicitando permisos...');
+    const perm = await Geolocation.requestPermissions();
 
-  async startTrackingLocation4444(watchId: any): Promise<string | undefined> {
-      const isMobile = isMobileOrWebOperatingSystem();
-
-      if (isMobile == 'unknown') {
-          console.error('Tipo de dispositivo es web:');
-
+    if (perm.location !== 'granted') {
+      console.warn('🚫 Permiso de ubicación no otorgado.');
       return;
     }
 
-    const hasPermission = await this.requestGeolocationPermissions();
-    if (!hasPermission) {
-      return;
-    }
+    console.log('✅ Permiso otorgado. Iniciando watchPosition...');
 
-    if (watchId) {
-      await this.stopTrackingLocation(watchId);
-    }
-
-    this.toastService.presentToast(
-      'Iniciando seguimiento de ubicación...',
-      'primary'
-    );
-
-    const newWatchId = Geolocation.watchPosition(
+    const watchId = Geolocation.watchPosition(
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 10000, // 10 segundos
         maximumAge: 0,
       },
-      (position, err) => {
-        if (err) {
-          console.error('Error en el seguimiento de ubicación:', err);
-          this.toastService.presentToast(
-            'Error en el seguimiento de ubicación.',
-            'danger'
-          );
+      (position, error) => {
+        if (error) {
+          console.error('❌ Error obteniendo ubicación:', error.message);
           return;
         }
 
         if (position) {
-           this.toastService.presentToast(
-            'Nueva ubicación: lat'+
-            position.coords.latitude+' lng'+
-            position.coords.longitude
-          );
-          console.log(
-            'Nueva ubicación:',
-            position.coords.latitude,
-            position.coords.longitude
-          );
-          // Aquí puedes actualizar alguna propiedad o emitir un evento
+          this.observerService.changeDriverLocation(position); // ejemplo: empieza una carga
+
+          console.log('📡 Posición actual:', position.coords);
+          // Aquí podrías emitir la posición
+          // this.observerService.changeDriverLocation(position);
         }
       }
     );
 
-    return newWatchId;
+    console.log('🆔 ID del watchPosition:', watchId);
+    return watchId;
+  } catch (error) {
+    console.error('❌ Error en startTrackingLocation:', error);
+    return error
   }
+}
+
+
+  // async startTrackingLocation4444(watchId: any): Promise<string | undefined> {
+  //     const isMobile = isMobileOrWebOperatingSystem();
+
+  //     if (isMobile == 'unknown') {
+  //         console.error('Tipo de dispositivo es web:');
+
+  //     return;
+  //   }
+
+  //   const hasPermission = await this.requestGeolocationPermissions();
+  //   if (!hasPermission) {
+  //     return;
+  //   }
+
+  //   if (watchId) {
+  //     await this.stopTrackingLocation(watchId);
+  //   }
+
+  //   this.toastService.presentToast(
+  //     'Iniciando seguimiento de ubicación...',
+  //     'primary'
+  //   );
+
+  //   const newWatchId = Geolocation.watchPosition(
+  //     {
+  //       enableHighAccuracy: true,
+  //       timeout: 10000,
+  //       maximumAge: 0,
+  //     },
+  //     (position, err) => {
+  //       if (err) {
+  //         console.error('Error en el seguimiento de ubicación:', err);
+  //         this.toastService.presentToast(
+  //           'Error en el seguimiento de ubicación.',
+  //           'danger'
+  //         );
+  //         return;
+  //       }
+
+  //       if (position) {
+  //          this.toastService.presentToast(
+  //           'Nueva ubicación: lat'+
+  //           position.coords.latitude+' lng'+
+  //           position.coords.longitude
+  //         );
+  //         console.log(
+  //           'Nueva ubicación:',
+  //           position.coords.latitude,
+  //           position.coords.longitude
+  //         );
+  //         // Aquí puedes actualizar alguna propiedad o emitir un evento
+  //       }
+  //     }
+  //   );
+
+  //   return newWatchId;
+  // }
 
   // Método para detener el observador de ubicación
   async stopTrackingLocation(watchId: any) {
@@ -358,4 +404,51 @@ export class LocationService {
       console.log('Seguimiento de ubicación detenido.');
     }
   }
+
+
+simulateMovement(startLat: number, startLng: number, intervalMs = 15000) {
+  let currentLat = startLat;
+  let currentLng = startLng;
+
+  const move = () => {
+    const distanceMeters = 1000;
+
+    // Sumar 100 metros al norte
+    const deltaLat = distanceMeters / 111320; // ~0.000899
+
+    currentLat += deltaLat;
+
+    const fakeCoords: GeolocationCoordinates = {
+      latitude: currentLat,
+      longitude: currentLng,
+      accuracy: 5,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      toJSON: () => ({
+        latitude: currentLat,
+        longitude: currentLng,
+        accuracy: 5,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        speed: null
+      })
+    };
+
+    const fakePosition: GeolocationPosition = {
+      coords: fakeCoords,
+      timestamp: Date.now(),
+      toJSON: () => ({ coords: fakeCoords, timestamp: Date.now() })
+    };
+
+    console.log(fakePosition, 'fakePosition');
+
+    this.observerService.changeDriverLocation(fakePosition);
+  };
+
+  setInterval(move, intervalMs);
+}
+
 }

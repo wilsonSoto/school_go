@@ -31,8 +31,8 @@ export class FcmService {
     const data = {
       params: {
         message: {
-          token:
-            'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw2_RNzJ0xgU2g3NIsXyGdUqd9y4qa5lXtMUnxhLhjZMW23rHj5EpYPpJMxzKaPHDDNez_itINnPyM',
+          token: notificationData.token,
+          //  'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw2_RNzJ0xgU2g3NIsXyGdUqd9y4qa5lXtMUnxhLhjZMW23rHj5EpYPpJMxzKaPHDDNez_itINnPyM',
           notification: {
             body: notificationData.msm, //'This is an FCM notification message!',
             title: notificationData.title //'FCM Message',

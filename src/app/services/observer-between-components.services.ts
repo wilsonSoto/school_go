@@ -12,10 +12,25 @@ export class ObserverBetweenComponentsService {
     this.sourceMessage.next(message);
   }
 
-  private sendDriverLocation = new BehaviorSubject<any>(null);
-  currentDriverLocation = this.sendDriverLocation.asObservable();
+  // private sendDriverLocation = new BehaviorSubject<any>(null);
+  // currentDriverLocation = this.sendDriverLocation.asObservable();
 
-  changeDriverLocation(message: any) {
-    this.sendDriverLocation.next(message);
-  }
+  // changeDriverLocation(message: any) {
+  //   this.sendDriverLocation.next(message);
+  // }
+
+  // private driverLocationSubject = new BehaviorSubject<any | null>(null);
+  // driverLocation$ = this.driverLocationSubject.asObservable();
+
+  // changeDriverLocation(location: any) {
+  //   this.driverLocationSubject.next(location);
+  // }
+
+  private driverLocationSubject = new BehaviorSubject<any | null>(null);
+driverLocation$ = this.driverLocationSubject.asObservable();
+
+changeDriverLocation(position: any) {
+  this.driverLocationSubject.next(position);
+}
+
 }

@@ -109,7 +109,7 @@ this.filteredParents = [...this.parents]; // Inicializa el listado filtrado
 this.hasData = this.filteredParents.length > 0;
 
           this.toastService.presentToast('Bienvenido!','custom-success-toast')
-          this.router.navigate(['tabs'])
+          // this.router.navigate(['tabs'])
 
       // this.mostrarAnimacion = false;
 

@@ -116,19 +116,19 @@ export class PlannedRouteComponent implements OnInit {
   reorderableStudentGroups: StudentGroup[] = [];
   studentsInToSchool: any = [];
   studentsInToSchoolGroup: any = [];
+  userData: any = null;
 
   get showBtnPermission() {
-    const userData = JSON.parse(localStorage.getItem('userData') ?? '');
 
     if (
-      userData?.roles?.some(
+      this.userData?.roles?.some(
         (rol: any) => rol.external_id == 'pool.group_school_father'
       )
     ) {
       this.isAccordionSelect = 'first'
       return 'partner';
     } else if (
-      userData?.roles?.some(
+      this.userData?.roles?.some(
         (rol: any) => rol.external_id == 'pool.group_school_driver'
       )
     ) {
@@ -141,30 +141,32 @@ export class PlannedRouteComponent implements OnInit {
 
   ngOnInit() {
     this.route_id = this.route.snapshot.paramMap.get('routeId');
+    // this.userData = JSON.parse(localStorage.getItem('userData') ?? '');
+      this.userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
 
     if (this.route_id) {
       this.getRute();
     }
-    this.observerService.currentMessage.subscribe(async (position) => {
-      if (position) {
-        const studentsNotVisited =
-          this.planned_route.route_points.students.filter((student: any) => {
-            return !this.planned_route.route_points.student_visiteds.some(
-              (visited: any) => visited.id === student.id
-            );
-          });
+    // this.observerService.currentMessage.subscribe(async (position) => {
+    //   if (position) {
+    //     const studentsNotVisited =
+    //       this.planned_route.route_points.students.filter((student: any) => {
+    //         return !this.planned_route.route_points.student_visiteds.some(
+    //           (visited: any) => visited.id === student.id
+    //         );
+    //       });
 
-        studentsNotVisited.forEach((student: any) => {
-          this.getDistanceAndCheckRadius(student, position);
-        });
-      }
-    });
+    //     studentsNotVisited.forEach((student: any) => {
+    //       this.getDistanceAndCheckRadius(student, position);
+    //     });
+    //   }
+    // });
 
-    this.observerService.currentDriverLocation.subscribe(async (position) => {
-      if (position) {
-        this.setdriverLocation(position);
-      }
-    });
+    // this.observerService.driverLocation$.subscribe(async (position) => {
+    //   if (position) {
+    //     this.setdriverLocation(position);
+    //   }
+    // });
   }
 
   ngOnDestroy() {
@@ -372,7 +374,7 @@ export class PlannedRouteComponent implements OnInit {
     };
   }
 
-  generateMarkersFromGroups(groups: any[]): { lat: number; lng: number; name: string; id: any }[] {
+  generateMarkersFromGroups22(groups: any[]): { lat: number; lng: number; name: string; id: any }[] {
     const markers: { lat: number; lng: number; name: string; id: any; visit_order: number }[] = [];
   
     for (const group of groups) {
@@ -410,6 +412,64 @@ export class PlannedRouteComponent implements OnInit {
   
     return sorted.map(({ visit_order, ...rest }) => rest); // remover visit_order del resultado final
   }
+
+  generateMarkersFromGroups(groups: any[]): {
+  lat: number;
+  lng: number;
+  name: string;
+  id: any;
+  fcm_token?: string | boolean; // 👈 opcional, puede ser string o false
+}[] {
+  const markers: {
+    lat: number;
+    lng: number;
+    name: string;
+    id: any;
+    fcm_token?: string | boolean;
+    visit_order: number;
+  }[] = [];
+
+  for (const group of groups) {
+    // Saltar si ya fue visitado
+    console.log(group,';;lhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+    
+    if (group.is_visited) continue;
+
+    const hasGroupCoords = group.point_latitude && group.point_longitude;
+const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw2_RNzJ0xgU2g3NIsXyGdUqd9y4qa5lXtMUnxhLhjZMW23rHj5EpYPpJMxzKaPHDDNez_itINnPyM'
+    if (hasGroupCoords) {
+      markers.push({
+        lat: group.point_latitude,
+        lng: group.point_longitude,
+        name: group.name,
+        id: group.id,
+        fcm_token: group.fcm_token ?? toke , // 👈 aquí se asigna el token
+        visit_order: group.visit_order ?? 999,
+      });
+    } else if (Array.isArray(group.students)) {
+      for (const student of group.students) {
+        const hasStudentCoords = student.home_latitude && student.home_longitude;
+        if (hasStudentCoords) {
+          markers.push({
+            lat: student.home_latitude,
+            lng: student.home_longitude,
+            name: student.name,
+            id: student.id,
+            fcm_token: student.fcm_token ?? student.company?.fcm_token ?? toke, // 👈 token del estudiante o empresa
+            visit_order: group.visit_order ?? 999,
+          });
+        }
+      }
+    }
+  }
+
+  // Ordenar por orden de visita
+  const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
+
+  // Eliminar el campo 'visit_order' antes de devolver
+  return sorted.map(({ visit_order, ...rest }) => rest);
+}
+
   
   getRute() {
     this.maps = false;
@@ -429,33 +489,34 @@ export class PlannedRouteComponent implements OnInit {
             });
             
             let driver: any = {}
-            try {
+            // try {
               const location = await this.getLocation();
               driver.id = '1-dr';
               driver.name = 'Ubicacion de chofer';
               driver.point_latitude = location.latitude;
               driver.point_longitude = location.longitude;
-              console.log(JSON.stringify(location),' location la rutalocation-------------------------------------------------------------------------------------------------------------------------------------------------------------' );
+              // console.log(JSON.stringify(location),' location la rutalocation-------------------------------------------------------------------------------------------------------------------------------------------------------------' );
+              // let add: any = {}
+              // add.id = '1-add';
+              // add.name = 'Ubicacion de sambil';
+              // add.point_latitude = 18.482384;
+              // add.point_longitude = -69.911896;
+              routeData.route_points.students = [...students];
+              routeData.route_points.unshift(driver);
+              // routeData.route_points.push(add);
+              this.planned_route = routeData;
+              if (this.showBtnPermission !== 'partner') {
+                this.markers = this.generateMarkersFromGroups(
+                  routeData.route_points
+                );
+              }
               
-            } catch (error) {
-              console.log(JSON.stringify(error),'No se pudo location la rutalocation------------------erereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-------------------------------------------------------------------------------------------------------------------------------------------' );
+            // } catch (error) {
+            //   console.log(JSON.stringify(error),'No se pudo location la rutalocation------------------erereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-------------------------------------------------------------------------------------------------------------------------------------------' );
               
-            }
-            let add: any = {}
-            add.id = '1-add';
-            add.name = 'Ubicacion de sambil';
-            add.point_latitude = 18.482384;
-            add.point_longitude = -69.911896;
-            routeData.route_points.students = [...students];
-            routeData.route_points.unshift(driver);
-            // routeData.route_points.push(add);
-            this.planned_route = routeData;
-            if (this.showBtnPermission !== 'partner') {
-              this.markers = this.generateMarkersFromGroups(
-                routeData.route_points
-              );
-            }
+            // }
             console.log(this.planned_route,'?????????????????????????????????////////@@@@@');
+            console.log(this.markers,'??????????????????????????dd???????////////@@@@@');
             
           }
           this.maps = true;
@@ -602,27 +663,39 @@ export class PlannedRouteComponent implements OnInit {
           tap(async (response: any) => {
             if (response) {
               // console.log(response);
-              const watchId: any = await this.locationService.startTrackingLocation();
-              if (watchId) {
-                localStorage.setItem('watchId', JSON.stringify(watchId));
+              try {
+                
+                const watchId: any = await this.locationService.startTrackingLocation();
+                if (watchId) {
+                  localStorage.setItem('watchId', JSON.stringify(watchId));
+                }
+              } catch (error) {
+                console.log(error,'333/////////////////////////////////');
+                
               }
             }
-            this.isLoading = true;
+            this.isLoading = false;
 
           }),
           catchError((err) => {
             this.isLoading = false;
+      console.log(err,'ereer00000000000000000000000000000000000000000000000000000000000000000rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
 
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             return of([]);
           }),
           finalize(() => {
+            this.isLoading = false;
+
             setTimeout(() => {}, 0);
           })
         )
         .subscribe();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error,'ereerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
+      
+    }
   }
 
   async setdriverLocation(position: any) {

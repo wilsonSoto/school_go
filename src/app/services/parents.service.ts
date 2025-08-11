@@ -49,14 +49,14 @@ console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;')
     const { form, partner_id, company_id, action } = data;
     const formData = new FormData();
 
-    formData.append('fullName', form.fullName);
-    formData.append('login', form.national_id);
-    formData.append('password', form.national_id);
+    formData.append('fullName', form.name);
+    formData.append('login', form.vat);
+    formData.append('password', form.vat);
     formData.append('phone', form.phone);
     formData.append('mobile', form.mobile);
     formData.append('email', form.email);
-    formData.append('national_id', form.national_id);
-    formData.append('address', form.address);
+    formData.append('vat', form.vat);
+    formData.append('address', form.contact_address);
     // formData.append('sector', form.sector);
     formData.append('location_latitude', form.location_latitude);
     formData.append('location_longitude', form.location_latitude);
