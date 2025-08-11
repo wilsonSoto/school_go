@@ -8,12 +8,12 @@ ion-item {
 }
 
 .input-wrapper.sc-ion-input-md {
-  --background: #ffffff;
+  --background: var(--ion-background-color);//#ffffff;
 
   background: var(--background);
 }
 ion-input {
-  --background: #ffffff !important;
+  --background: var(--ion-background-color);// #ffffff !important;
 
   background: var(--background);
 }
@@ -71,7 +71,7 @@ ion-content {
     right: 82px;
     font-size: 24px; // Tamaño del ícono
     color: var(--ion-color-danger, #eb445a); // Color rojo de Ionic o un color a tu elección
-    background-color: rgba(255, 255, 255, 0.7); // Fondo semi-transparente para visibilidad
+    background-color: var(--ion-background-color);// rgba(255, 255, 255, 0.7); // Fondo semi-transparente para visibilidad
     border-radius: 50%; // Hace que el fondo sea circular
     padding: 2px; // Pequeño padding alrededor del ícono
     cursor: pointer; // Indica que es clickeable

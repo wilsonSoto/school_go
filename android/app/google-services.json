@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "801493414174",
+    "project_id": "kabay-escolargo",
+    "storage_bucket": "kabay-escolargo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801493414174:android:91d78d96349504e9ed590f",
+        "android_client_info": {
+          "package_name": "io.kabaygroup.escolar.go"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2pZBGgOKwSkT8V2StwkGoYsbZth7khsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

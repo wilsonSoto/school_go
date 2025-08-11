@@ -24,10 +24,17 @@
         mode="ios"
         show-clear-button="always"
         clear-icon="trash-bin"
-        value="Custom Clear Icon"
-      ></ion-searchbar>
+        (ionInput)="filterRoutes($event)"
+        placeholder="Buscar por ruta, chofer o estudiante"
+      >
+      </ion-searchbar>
 
-      <ion-segment [(ngModel)]="typeSelect" size="large" mode="ios">
+      <ion-segment
+        [(ngModel)]="typeSelect"
+        size="large"
+        mode="ios"
+        (ionChange)="handleSegmentChange($event)"
+      >
         <ion-segment-button value="first" content-id="first">
           <ion-label>Recogida </ion-label>
         </ion-segment-button>
@@ -40,7 +47,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
-   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <div *ngIf="isLoading" class="loading-state ion-text-center">
@@ -53,56 +60,44 @@
     <p>{{ errorMessage }}</p>
     <ion-button (click)="getAllRoute()">Reintentar</ion-button>
   </div>
-  <ion-segment-view *ngIf="!isLoading">
+
+  <!-- Mostrar mensaje si no hay datos -->
+  <div *ngIf="!isLoading && !hasData" class="empty-state ion-text-center">
+    <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+    <p>No hay información disponible para esta sección.</p>
+  </div>
+
+  <ion-segment-view *ngIf="!isLoading && hasData">
     <ion-segment-content id="first">
       <app-all-route
-        *ngFor="let route of school_routes_pickup"
+        *ngFor="let route of filtered_pickup"
         [route]="route"
         (click)="handleOpenRouteModal('edit',route)"
-        ></app-all-route>
+      >
+      </app-all-route>
     </ion-segment-content>
+
     <ion-segment-content id="second">
-       <app-all-route
-        *ngFor="let route of school_routes_delivery"
+      <app-all-route
+        *ngFor="let route of filtered_delivery"
         [route]="route"
         (click)="handleOpenRouteModal('edit',route)"
-        ></app-all-route>
+      >
+      </app-all-route>
     </ion-segment-content>
   </ion-segment-view>
-<!--
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button [routerLink]="['/add-bus']">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button [routerLink]="['/add-bus']">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
 </ion-content>
 
 <ion-popover trigger="driver-bus-button" [dismissOnSelect]="true">
   <ng-template>
     <ion-content>
       <ion-list>
-        <!-- <ion-item [button]="true" [detail]="false">Option 1</ion-item>
-        <ion-item [button]="true" [detail]="false">Option 2</ion-item> -->
-        <!-- <ion-item [button]="true" id="nested-trigger">More options...</ion-item> -->
-        <ion-item [button]="true" [detail]="false" routerLink="/sign-in"
+        <ion-item
+          [button]="true"
+          (click)="logoutAndGoToSignIn()"
+          [detail]="false"
           >Cerrar Sesión</ion-item
         >
-
-        <!-- <ion-popover trigger="nested-trigger" [dismissOnSelect]="true" side="end">
-          <ng-template>
-            <ion-content>
-              <ion-list>
-                <ion-item [button]="true" [detail]="false">Nested option</ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover> -->
       </ion-list>
     </ion-content>
   </ng-template>

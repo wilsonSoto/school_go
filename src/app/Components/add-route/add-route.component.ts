@@ -486,7 +486,8 @@ console.log(this.studentIdsPickupOrderFormArray);
     });
 
     if (this.ruteForm.valid) {
-      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+      // const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
 
       const data = {
         name: this.ruteForm.value.name,

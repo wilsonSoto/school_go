@@ -8,12 +8,12 @@ ion-item {
 }
 
 .input-wrapper.sc-ion-input-md {
-  --background: #ffffff;
+  --background: var(--ion-background-color);//#ffffff;
 
   background: var(--background);
 }
 ion-input {
-  --background: #ffffff !important;
+  --background: var(--ion-background-color);// #ffffff !important;
 
   background: var(--background);
 }
@@ -61,7 +61,7 @@ ion-content {
 .no-image-placeholder {
   text-align: center;
   margin-top: 20px;
-  color: #888;
+  color: var(--ion-text-placeholder-color);//#888;
 }
 
 .image-preview-container {

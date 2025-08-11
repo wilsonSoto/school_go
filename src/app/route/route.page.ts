@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
+import { AuthService } from '../services/login.service';
 
 @Component({
   standalone: false,
@@ -26,16 +27,27 @@ export class RoutePage {
     private router: Router,
     private routeService: RouteService,
     private toastService: ToastService,
-
+    private authService: AuthService,
     private modalController: ModalController
   ) {}
   typeSelect: any = 'first';
+  hasData: boolean = true; // ✅ Para saber si hay datos en el segmento activo
+
   userData: any = '';
   students: any = [];
   school_routes_pickup: any = [];
   school_routes_delivery: any = [];
   isLoading: boolean = true;
   errorMessage: string | null = null;
+  searchTerm: string = '';
+
+  filtered_pickup: any[] = [];
+  filtered_delivery: any[] = [];
+
+  async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
+  }
 
   changeLanguage(lang: string) {
     if (lang == 'es') {
@@ -52,6 +64,18 @@ export class RoutePage {
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }
 
+  handleSegmentChange(event: any) {
+    const selected = event.detail.value;
+    this.typeSelect = selected;
+
+    // Limpiar los datos al cambiar de segmento
+    if (selected === 'first') {
+      this.hasData = this.school_routes_pickup.length > 0;
+    } else {
+      this.hasData = this.school_routes_delivery.length > 0;
+    }
+  }
+
   handleRefresh(event: RefresherCustomEvent) {
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
     setTimeout(() => {
@@ -60,31 +84,75 @@ export class RoutePage {
     }, 2000);
   }
 
+  filterRoutes(event: any) {
+    const query = (event.target.value || '').toLowerCase();
+    this.searchTerm = query;
+
+    if (!query) {
+      // 🔹 Si el buscador está vacío, restauramos las listas originales
+      this.filtered_pickup = [...this.school_routes_pickup];
+      this.filtered_delivery = [...this.school_routes_delivery];
+      this.hasData =
+        this.typeSelect === 'first'
+          ? this.filtered_pickup.length > 0
+          : this.filtered_delivery.length > 0;
+      return;
+    }
+
+    // 🔹 Filtro por nombre de ruta, chofer o estudiante
+    const filterFunction = (route: any) => {
+      const routeName = route.name?.toLowerCase() || '';
+      const driverName = route.school_driver?.name?.toLowerCase() || '';
+      const studentNames = (route.students || [])
+        .map((s: any) => s.name?.toLowerCase() || '')
+        .join(' ');
+
+      return (
+        routeName.includes(query) ||
+        driverName.includes(query) ||
+        studentNames.includes(query)
+      );
+    };
+
+    this.filtered_pickup = this.school_routes_pickup.filter(filterFunction);
+    this.filtered_delivery = this.school_routes_delivery.filter(filterFunction);
+
+    // 🔹 Validamos si hay datos para mostrar el mensaje de "No hay información"
+    this.hasData =
+      this.typeSelect === 'first'
+        ? this.filtered_pickup.length > 0
+        : this.filtered_delivery.length > 0;
+  }
+
   getAllRoute() {
     this.isLoading = true;
     this.errorMessage = null;
-    console.log(
-      '....................................................................1111'
-    );
 
     this.routeService.getAllroute().subscribe({
       next: (response: any) => {
         this.isLoading = false;
 
-        console.log(response, 'respo ,,,,,,,,,,,,,,,,,,,,,,');
         this.school_routes_pickup = response.data.school_routes.filter(
-          (route: any) => route.route_type == 'Recogida'
+          (route: any) => route.route_type === 'Recogida'
         );
         this.school_routes_delivery = response.data.school_routes.filter(
           (route: any) => route.route_type !== 'Recogida'
         );
+        this.filtered_pickup = [...this.school_routes_pickup];
+        this.filtered_delivery = [...this.school_routes_delivery];
+
+        // ✅ Actualizar si hay datos en el segmento actual
+        if (this.typeSelect === 'first') {
+          this.hasData = this.school_routes_pickup.length > 0;
+        } else {
+          this.hasData = this.school_routes_delivery.length > 0;
+        }
       },
       error: (err: any) => {
         this.isLoading = false;
         this.errorMessage =
           'Error al cargar las rutas: ' + (err.message || 'Error desconocido');
 
-        // this.mostrarAnimacion = false;
         const errorMessage =
           err?.error?.error?.message ||
           err?.error?.error ||
@@ -95,6 +163,7 @@ export class RoutePage {
       },
     });
   }
+
   handleOpenRouteModal(action: any, route: any) {
     if (!route.id) {
       console.log('error id route');

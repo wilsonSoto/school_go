@@ -14,6 +14,8 @@ import { ModalController, RefresherCustomEvent } from '@ionic/angular';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
 import { StorageService } from '../services/storage.service';
 import { hostUrlEnum } from 'src/types';
+import { AuthService } from '../services/login.service';
+// import { IonViewWillLeave } from '@ionic/angular';
 
 @Component({
   // <--- ESTE DECORADOR ES PROBABLEMENTE EL QUE FALTA O ESTÁ MAL ESCRITO
@@ -30,9 +32,14 @@ export class Tab3Page {
     private toastService: ToastService,
     private router: Router,
     private modalController: ModalController,
-    private storage: StorageService
-  ) {}
+    private storage: StorageService,
+    private authService: AuthService,
 
+  ) {}
+  searchTerm: string = '';
+  filteredRoutes: any[] = [];
+  hasData: boolean = true;
+  
   isLoading: boolean = true;
   errorMessage: string | null = null;
   ngOnInit(): void {
@@ -43,6 +50,12 @@ export class Tab3Page {
     });
   }
 
+
+  async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
+  }
+  
   handleRefresh(event: RefresherCustomEvent) {
     this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
     setTimeout(() => {
@@ -65,12 +78,7 @@ export class Tab3Page {
     // this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }
 
-  // Este se llama cada vez que la página está a punto de salir de la vista.
-  ionViewWillLeave() {
-    console.log(
-      'Tab3Page: ionViewWillLeave - La página va a dejar de ser visible'
-    );
-  }
+
 
   // Este se llama cada vez que la página ha salido completamente de la vista.
   ionViewDidLeave() {
@@ -81,6 +89,57 @@ export class Tab3Page {
   // --- FIN MÉTODOS DE CICLO DE VIDA DE IONIC ---
 
   getAllRoute() {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.routeService.getAllroute().subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+  
+        this.school_routes = response.data.school_routes;
+        this.filteredRoutes = [...this.school_routes]; // Inicializamos el filtrado
+        this.hasData = this.filteredRoutes.length > 0;
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Error al cargar las rutas: ' + (err.message || 'Error desconocido');
+  
+        const errorMessage =
+          err?.error?.error?.message ||
+          err?.error?.error ||
+          err?.message ||
+          'Error desconocido';
+  
+        this.toastService.presentToast(errorMessage);
+      },
+    });
+  }
+  
+  filterRoutes(event: any) {
+    const query = (event.target.value || '').toLowerCase();
+  
+    if (!query) {
+      this.filteredRoutes = [...this.school_routes]; // Restaurar listado
+    } else {
+      this.filteredRoutes = this.school_routes.filter((route: any) => {
+        const routeName = route.name?.toLowerCase() || '';
+        const driverName = route.school_driver?.name?.toLowerCase() || '';
+        const students = route.students
+          ?.map((s: any) => s.name?.toLowerCase())
+          .join(' ') || '';
+  
+        return (
+          routeName.includes(query) ||
+          driverName.includes(query) ||
+          students.includes(query)
+        );
+      });
+    }
+  
+    this.hasData = this.filteredRoutes.length > 0;
+  }
+  
+  getAllRoute2222222() {
     this.isLoading = true;
     this.errorMessage = null;
     this.routeService.getAllroute().subscribe({

@@ -1,4 +1,4 @@
-import { LoginService } from './services/login.service';
+import { AuthService } from './services/login.service';
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
@@ -27,7 +27,7 @@ import { AddVehiclesComponent } from './Components/add-vehicles/add-vehicles.com
 
 
 import { HttpInterceptorService } from './interceptor/http-interceptor';
-import { AuthInterceptorService } from './interceptor/auth-interceptor';
+import { AuthInterceptor } from './interceptor/auth-interceptor';
 import { AddParentComponent } from './Components/add-parent/add-parent.component';
 import { AddStudentsComponent } from './Components/add-students/add-students.component';
 import { StudentsComponent } from './Components/students/students.component';
@@ -99,7 +99,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CapitalCasePipe
 ],
   providers: [
-    LoginService,
+    AuthService,
     ParentService,
     StudentsService,
     RouteService,
@@ -114,14 +114,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     },
      {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptorService,
+      useClass: AuthInterceptor,
       multi: true
     },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpInterceptorService,
-      multi: true
-    },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: HttpInterceptorService,
+    //   multi: true
+    // },
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

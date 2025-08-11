@@ -87,6 +87,8 @@ export class AddStudentsComponent implements OnInit {
       mother_name: [''],
     });
     if (this.action === 'edit') {
+      console.log(this.student,'[[[][[][][[][[][]');
+      
       this.studentForm.patchValue(this.student);
       const date = moment(this.student.birth_date_timestamp).format(
         'YYYY-MM-DD'

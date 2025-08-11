@@ -27,15 +27,10 @@ import { ItemReorderEventDetail } from '@ionic/angular';
 import { Student } from 'src/app/interfaces/student.interface';
 import { StudentGroup } from 'src/app/interfaces/student-group.interface';
 import { StudentsService } from 'src/app/services/students.service';
-import { Subject, Subscription } from 'rxjs';
-import { tap, catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ToastService } from 'src/app/services/toast.service';
-// import { MapsRouteComponent } from '../maps/maps.component';
-import { GoogleMap } from '@capacitor/google-maps';
 import { MapsComponent } from '../maps/maps.component';
 import { getCentroid } from 'src/app/shared/utils/geo-utils';
-// import { MapsComponent } from '../../../../assets';
 
 // --- MOCK/CONCEPTUAL GoogleMapsService ---
 interface MapMarker {

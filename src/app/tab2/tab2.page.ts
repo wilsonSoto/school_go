@@ -21,6 +21,7 @@ import { tap, catchError, finalize, map } from 'rxjs/operators';
 import { Driver } from '../interfaces/driver.interface';
 import { Bus } from '../interfaces/bus.interface';
 import { AddVehiclesComponent } from '../Components/add-vehicles/add-vehicles.component';
+import { AuthService } from '../services/login.service';
 
 @Component({
   standalone: false,
@@ -33,13 +34,17 @@ export class Tab2Page {
     private translate: TranslateService,
     private modalController: ModalController,
     private busService: VehiclesService,
-
+    private authService: AuthService,
+    private router: Router,
     private toastService: ToastService,
     private driversService: DriversService
   ) {}
-  typeSelect: any = 'first';
-  // drivers: any = [1, 1, 1, 1];
-  // vehicles: any = [1, 1, 1, 1];
+  typeSelect: any = 'driver';
+  searchTerm: string = '';
+filteredDrivers: any[] = [];
+filteredVehicles: any[] = [];
+hasData: boolean = true;
+
   currentDrivers: any = [];
   currentVehicles: any = [];
   isLoading: boolean = true;
@@ -49,6 +54,12 @@ export class Tab2Page {
     console.log('Tab3Page: ionViewWillEnter - La página va a ser visible');
     this.loadDriversAndBuses(); // Llama a tu función para cargar las rutas aquí
   }
+
+  async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
+  }
+
   changeLanguage(lang: string) {
     if (lang == 'es') {
       lang = 'en';
@@ -56,6 +67,18 @@ export class Tab2Page {
       lang = 'es';
     }
     this.translate.use(lang);
+  }
+
+  handleSegmentChange(event: any) {
+    const selected = event.detail.value;
+    this.typeSelect = selected;
+
+    // Limpiar los datos al cambiar de segmento
+    if (selected === 'driver') {
+      this.hasData = this.currentDrivers.length > 0;
+    } else {
+      this.hasData = this.currentVehicles.length > 0;
+    }
   }
 
   handleRefresh(event: RefresherCustomEvent) {
@@ -112,6 +135,41 @@ export class Tab2Page {
     } catch (error: any) {}
   }
 
+  filterData(event: any) {
+    const query = (event.target.value || '').toLowerCase();
+  
+    if (!query) {
+      // Si el buscador está vacío, restauramos
+      this.filteredDrivers = [...this.currentDrivers];
+      this.filteredVehicles = [...this.currentVehicles];
+    } else {
+      // Filtrar choferes por nombre, email, teléfono
+      this.filteredDrivers = this.currentDrivers.filter((driver: any) => {
+        return (
+          driver.name?.toLowerCase().includes(query) ||
+          driver.email?.toLowerCase().includes(query) ||
+          driver.phone?.toLowerCase().includes(query) ||
+          driver.mobile?.toLowerCase().includes(query)
+        );
+      });
+  
+      // Filtrar vehículos por nombre, color o modelo
+      this.filteredVehicles = this.currentVehicles.filter((bus: any) => {
+        return (
+          bus.name?.toLowerCase().includes(query) ||
+          bus.vehicle_color?.toLowerCase().includes(query) ||
+          (bus.model || '').toLowerCase().includes(query)
+        );
+      });
+    }
+  
+    // Actualizamos el estado vacío
+    this.hasData = this.typeSelect === 'first'
+      ? this.filteredDrivers.length > 0
+      : this.filteredVehicles.length > 0;
+  }
+  
+
   loadDriversAndBuses(): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -144,6 +202,15 @@ export class Tab2Page {
           this.currentVehicles = data.buses;
           // console.log(this.availableBuses,'//////////////////////');
           // console.log(this.availableDrivers,'//////////////////////');
+          
+  // Inicializamos los filtros
+  this.filteredDrivers = [...this.currentDrivers];
+  this.filteredVehicles = [...this.currentVehicles];
+
+  // Estado inicial para mostrar datos
+  this.hasData = this.typeSelect === 'first'
+    ? this.filteredDrivers.length > 0
+    : this.filteredVehicles.length > 0;
         }),
         catchError((err) => {
           // This catchError handles errors from any of the forkJoined observables
