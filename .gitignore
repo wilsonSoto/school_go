@@ -18,12 +18,12 @@ log.txt
 /coverage
 
 # Ionic
-/.ionic
-/www
+# /.ionic
+# /www
 # /android
 # /ios
-/platforms
-/plugins
+# /platforms
+# /plugins
 
 # Compiled output
 /dist

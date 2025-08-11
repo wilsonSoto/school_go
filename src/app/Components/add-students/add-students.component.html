@@ -243,7 +243,8 @@
       expand="block"
       [disabled]="studentForm.invalid"
     >
-      Agregar
+     <span *ngIf="action !== 'edit'">Agregar</span>
+      <span *ngIf="action == 'edit'">Editar</span>
     </ion-button>
   </ion-toolbar>
 </ion-footer>

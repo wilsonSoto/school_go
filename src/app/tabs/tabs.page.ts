@@ -13,21 +13,22 @@ export class TabsPage   {
 userData: any = null;
 
   students: any = [];
-  constructor(private router: Router,
-  ) {} // Inyecta el Router
+  constructor(private router: Router,  ) {} // Inyecta el Router
 
   @ViewChild('myTabs')
   tabs!: IonTabs; // Declara la propiedad para la referencia a IonTabs
 
 
  async ngOnInit() {
-      this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
+    // this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
+      this.userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
 
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
   }
 
   get showTabsPermission () {
     if (this.userData?.roles?.some((rol: any) => rol.external_id == "pool.group_school_father" || rol.external_id == "pool.group_school_driver")) {
+      // return [true, true, true, true, true ]
       return [false, false, true, false, true ]
     } else {
       return [true, true, true, true, true ]

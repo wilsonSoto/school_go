@@ -6,7 +6,7 @@
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
         <ion-col>
-          <ion-title size="large">Ruta Planeada {{planned_route?.state}}</ion-title>
+          <ion-title size="large">Ruta Planeada </ion-title>
         </ion-col>
       </ion-row>
     </div>
@@ -14,9 +14,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="p-full-5">
-     <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+     <!-- <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  </ion-refresher> -->
   <div *ngIf="isLoading" class="loading-state ion-text-center">
     <ion-spinner name="circles"></ion-spinner>
     <p>Cargando Rutas...</p>
@@ -252,12 +252,12 @@
       </ion-list>
       <!-- <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
       </app-maps> -->
-      <app-maps *ngIf="maps"
+      <app-maps 
       [markers]="markers"
       [routePoints]="rutaDelBus"
       [showBtnPermission]="showBtnPermission"
-      (markerMoved)="onMarkerMoved($event)"
-    ></app-maps>
+      ></app-maps>
+      <!-- (markerMoved)="onMarkerMoved($event)" -->
 
       <div
         *ngIf="!isLoadingMap && getTotalStudents() === 0"

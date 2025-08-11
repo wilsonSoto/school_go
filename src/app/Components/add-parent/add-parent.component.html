@@ -131,13 +131,13 @@
         fill="solid"
         label="Cedula"
         labelPlacement="floating"
-        formControlName="national_id"
+        formControlName="vat"
       ></ion-input>
       <ion-note
         slot="error"
         *ngIf="
-          parentForm.get('national_id')?.invalid &&
-          parentForm.get('national_id')?.touched
+          parentForm.get('vat')?.invalid &&
+          parentForm.get('vat')?.touched
         "
       >
         Cédula inválida o requerida (11 dígitos).
@@ -150,13 +150,13 @@
         fill="solid"
         label="Dirección"
         labelPlacement="floating"
-        formControlName="address"
+        formControlName="contact_address"
       ></ion-input>
       <ion-note
         slot="error"
         *ngIf="
-          parentForm.get('address')?.invalid &&
-          parentForm.get('address')?.touched
+          parentForm.get('contact_address')?.invalid &&
+          parentForm.get('contact_address')?.touched
         "
       >
         Dirección es requerida.

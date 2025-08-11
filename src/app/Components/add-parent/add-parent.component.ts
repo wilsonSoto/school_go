@@ -91,8 +91,8 @@ export class AddParentComponent {
       phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
       mobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
       email: ['', [Validators.required, Validators.email]], // Requerido y formato de email
-      national_id: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], // Requerido y 11 dígitos (ejemplo para Dominicana)
-      address: ['', Validators.required],
+      vat: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], // Requerido y 11 dígitos (ejemplo para Dominicana)
+      contact_address: ['', Validators.required],
       parentImage: [''],
       nationalIdImage: [''],
       responsibleGuardianImage: [''],
@@ -186,7 +186,8 @@ export class AddParentComponent {
       //     this.toastService.presentToast(errorMessage);
       //   },
       // });
-      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+      // const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
 
       const data = {
         form: this.parentForm.value,
@@ -204,6 +205,8 @@ export class AddParentComponent {
               ? 'Estudiante Editado'
               : 'Estudiante Agregado';
           this.toastService.presentToast(msm, 'custom-success-toast');
+      this.getParent();
+
         },
         error: (err: any) => {
           const errorMessage =

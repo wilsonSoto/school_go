@@ -1,36 +1,74 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
-// import { map } from 'rxjs/operators';
-
-import { Observable, throwError, of } from 'rxjs';
-import { catchError, map, timeout } from 'rxjs/operators';
 import { hostUrlEnum } from '../../types'
-@Injectable()
-export class LoginService {
+import { map } from 'rxjs/operators';
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+import { Storage } from '@ionic/storage-angular';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private authState = new BehaviorSubject<boolean>(false);
+  private TOKEN_KEY = 'auth-token';
+  private apiUrl = 'https://tu-backend.com/api'; // ⚡ Cambia por tu API
   appURl = hostUrlEnum.is_production ? hostUrlEnum.prod : hostUrlEnum.develop
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-    credential: 'same-origin',
-  };
+  constructor(private httpClient: HttpClient, private storage: Storage) {
+    this.initStorage();
+  }
 
-  constructor(private httpClient: HttpClient) {}
+  private async initStorage() {
+    await this.storage.create();
+    this.checkToken();
+  }
 
+  /** Verifica si hay token guardado */
+  private async checkToken() {
+    const token = await this.storage.get(this.TOKEN_KEY);
+    this.authState.next(!!token);
+  }
 
-  login(dataLogin: any) {
+  /** Saber si el usuario está logueado */
+  isLoggedIn(): boolean {
+    return this.authState.value;
+  }
 
+  /** Observable para escuchar cambios de sesión */
+  authState$() {
+    return this.authState.asObservable();
+  }
+
+  /** Hacer login contra el backend y guardar token */
+   login(dataLogin: any) {
+    // const res: any = await this.httpClient.post(`${this.apiUrl}/login`, { email, password }).toPromise();
+    
+    
     const params = {
       "params": dataLogin
     }
     const url = this.appURl +'/authenticate';
     return this.httpClient.post(url, params).pipe(
-      map((res: any) => {
+      map(async(res: any) => {
+        if (res?.result.token) {
+          await this.storage.set(this.TOKEN_KEY, res.result.token);
+          this.authState.next(true);
+        }
+        return res;
         return res;
       })
     );
   }
 
+  /** Cerrar sesión */
+  async logout() {
+    await this.storage.remove(this.TOKEN_KEY);
+    this.authState.next(false);
+  }
 
+  /** Obtener token para los interceptores */
+  async getToken(): Promise<string | null> {
+    return await this.storage.get(this.TOKEN_KEY);
+  }
 }
