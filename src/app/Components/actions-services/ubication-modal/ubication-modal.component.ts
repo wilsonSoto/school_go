@@ -78,7 +78,7 @@ get allStudentsLoactionActive () {
   this.isSaving = true;
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
 
-      return
+      // return
       this.studentsService.updateStudentLocation(this.studentsWithoutLocation).subscribe({
         next: (response: any) => {
 

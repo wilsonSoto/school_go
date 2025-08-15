@@ -17,6 +17,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { StudentsService } from 'src/app/services/students.service';
 // import { MapsComponent } from '../actions-services/maps/maps.component';
 import { Components } from '@ionic/core';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: false,
@@ -29,7 +30,7 @@ export class AddParentComponent {
     private translate: TranslateService,
     private modalController: ModalController,
     private parentService: ParentService,
-
+    private router: Router,
     private fb: FormBuilder,
     private toastService: ToastService
   ) {}
@@ -40,6 +41,7 @@ export class AddParentComponent {
   @Input() modal!: Components.IonModal;
 
   showCalendar = false;
+  isLoading: boolean = false;
 
   colorCalendar = 'dark';
   date = new Date();
@@ -69,7 +71,6 @@ export class AddParentComponent {
 
     if (this.partner_id) {
       this.getParent();
-    } else {
     }
   }
 
@@ -102,34 +103,28 @@ export class AddParentComponent {
 
     // Opcional: Si el `action` es 'edit' y tienes datos existentes, puedes cargarlos
     if (this.action === 'edit') {
-      console.log(this.parent, '[[[[[[[[[[[[[[[[[[[[[[[[[[[[');
-
       this.parentForm.patchValue(this.parent);
       this.parentImage = this.parent.parentImage;
       this.responsibleGuardianImage = this.parent.responsibleGuardianImage;
       this.nationalIdImage = this.parent.nationalIdImage;
-
-      // Por ejemplo, si tuvieras un @Input() parentData: any;
-      // this.parentForm.patchValue(this.parentData);
     }
   }
 
   getParent() {
+    this.isLoading = true;
+
     this.parentService.getParent(this.partner_id).subscribe({
       next: (response: any) => {
-        console.log(response, 'respo ,,,,,,,,,,,,,,,,,,,,,,');
         response.data.parent.number_students = response.data.students?.length;
         this.parent = response.data.parent;
         this.students = response.data.students;
         this.initForm(); // Inicializamos el formulario cuando el componente se carga
 
-        // this.toastService.presentToast('Bienvenido!','custom-success-toast')
-        // this.router.navigate(['tabs'])
+        this.isLoading = false;
 
-        // this.mostrarAnimacion = false;
       },
       error: (err: any) => {
-        // this.mostrarAnimacion = false;
+        this.isLoading = false;
         const errorMessage =
           err.error.error.message ||
           err.error.error ||
@@ -150,70 +145,46 @@ export class AddParentComponent {
   }
 
   async onSubmit() {
-    // this.handleImageCapture()
-
     this.parentForm.markAllAsTouched(); // Asegura que los errores se muestren en el HTML
 
-    console.log('Estado completo del formulario:', this.parentForm);
-    console.log('Errores del formulario (si existen):', this.parentForm.errors); // Esto suele ser null a nivel de FormGroup
-    console.log('¿Formulario Válido?', this.parentForm.valid);
-
     if (this.parentForm.valid) {
-      // if (this.action == 'add') {
-
-      // this.parentService.postParent(this.parentForm.value).subscribe({
-      //   next: (response: any) => {
-      //     console.log(response, 'respo ,,,,,,,,,,,,,,,,,,,,,,');
-      //     console.log(response.data, 'esponse.data ,,,,,,,,,,,,,,,,,,,,,,');
-      //     // response.data.parent.number_students = response.data.students?.length
-      //     // this.clients = [response.data.parent]
-      //     // this.students = [response.data.students]
-      //     this.toastService.presentToast('Datos registrados', 'custom-success-toast');
-      //     // this.router.navigate(['tabs'])
-      //     this.partner_id = response.data.partner_id
-      //     this.parentForm.patchValue(response.data);
-
-      //     // this.mostrarAnimacion = false;
-      //   },
-      //   error: (err: any) => {
-      //     // this.mostrarAnimacion = false;
-      //     const errorMessage =
-      //       err.error.error.message ||
-      //       err.error.error ||
-      //       err?.message ||
-      //       'Error desconocido';
-
-      //     this.toastService.presentToast(errorMessage);
-      //   },
-      // });
-      // const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
-      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
+      const userData = JSON.parse(
+        localStorage.getItem('userData') ?? '{}'
+      )?.userInfo;
 
       const data = {
         form: this.parentForm.value,
         partner_id: this.partner_id,
-        company_id: userData.company.id ?? null,
+        company_id: userData.partner_company.id ?? null,
         action: this.action,
       };
+      this.isLoading = true;
 
       const observableResponse = await this.parentService.postParent(data);
 
       observableResponse.subscribe({
         next: (response: any) => {
           const msm =
-            this.action == 'edit'
-              ? 'Estudiante Editado'
-              : 'Estudiante Agregado';
+            this.action == 'edit' ? 'Padre Editado' : 'Padre Agregado';
           this.toastService.presentToast(msm, 'custom-success-toast');
-      this.getParent();
+          this.isLoading = false;
 
+          if (this.partner_id) {
+            this.modal.dismiss({ action: 'cancel' });
+
+            this.getParent();
+          } else {
+            this.router.navigate(['/tabs/tab1']);
+          }
         },
         error: (err: any) => {
+          this.isLoading = false;
+
           const errorMessage =
             err.error.error.message ||
             err.error.error ||
             err?.message ||
-            'Error desconocido al agregar estudiante';
+            'Error desconocido al agregar padre';
           this.toastService.presentToast(errorMessage);
         },
       });
@@ -276,12 +247,7 @@ export class AddParentComponent {
   }
   onDateSelected(event: any) {
     const date = moment(event.target.value).format('YYYY-MM-DDTHH:mm:ss');
-    // this.store.dispatch(
-    //   UiActions.updateLoadFilterDate({
-    //     date: date,
-    //   })
-    // );
-
+   
     this.modalController.dismiss(); // Dismiss the modal
   }
 
@@ -327,25 +293,4 @@ export class AddParentComponent {
       }
     } catch (error: any) {}
   }
-
-  //  async handleOpenMapsModal() {
-  //     try {
-  //       const modal = await this.modalController.create({
-  //         component: MapsComponent,
-  //         componentProps: {
-  //         },
-  //         initialBreakpoint: 1,
-  //         breakpoints: [0, 1],
-  //         cssClass: ['loading-truck-options-sheet-modal'],
-  //       });
-  //       await modal.present();
-
-  //       const { data } = await modal.onWillDismiss();
-  //       const { selectedOption, exception } = data;
-
-  //       if (data.action === 'cancel') {
-  //         return;
-  //       }
-  //     } catch (error: any) {}
-  //   }
 }

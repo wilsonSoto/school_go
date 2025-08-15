@@ -90,11 +90,11 @@ console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;')
 
 
     let url = null;
-   if (company_id || action == 'edit') {
+  //  if (company_id || action == 'edit') {
      url = `${this.appURl}/school/${data.company_id}/parent/signup`;
-    } else {
-      url = `${this.appURl}/school/parent/${partner_id}/student/`;
-    }
+    // } else {
+    //   url = `${this.appURl}/school/parent/${partner_id}/student/`;
+    // }
 
     // const url =  `${this.appURl} /school/${company_id}/parent/signup`;
     return this.httpClient.post(url, formData).pipe(
