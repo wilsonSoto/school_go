@@ -55,15 +55,17 @@ console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;')
     formData.append('phone', form.phone);
     formData.append('mobile', form.mobile);
     formData.append('email', form.email);
-    formData.append('vat', form.vat);
+    formData.append('national_id', form.vat);
+    // formData.append('vat', form.vat);
     formData.append('address', form.contact_address);
-    // formData.append('sector', form.sector);
     formData.append('location_latitude', form.location_latitude);
     formData.append('location_longitude', form.location_latitude);
+    formData.append('responsibleGuardian', form.client_company_name);
+    // formData.append('sector', form.sector);
     // formData.append('parentImage', form.parentImage);
-    formData.append('responsibleGuardian', form.responsibleGuardian);
     // formData.append('responsibleGuardianImage', form.responsibleGuardianImage);
     // formData.append('nationalIdImage', form.nationalIdImage);
+
     const images = [
       form.parentImage,
       form.responsibleGuardianImage,

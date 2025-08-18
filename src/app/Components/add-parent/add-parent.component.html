@@ -48,13 +48,13 @@
         fill="solid"
         label="Nombre del tutor"
         labelPlacement="floating"
-        formControlName="responsibleGuardian"
+        formControlName="client_company_name"
       ></ion-input>
       <ion-note
         slot="error"
         *ngIf="
-          parentForm.get('responsibleGuardian')?.invalid &&
-          parentForm.get('responsibleGuardian')?.touched
+          parentForm.get('client_company_name')?.invalid &&
+          parentForm.get('client_company_name')?.touched
         "
       >
         Nombre del tutor es requerido.
@@ -256,7 +256,7 @@
   </ion-fab>
 </ion-content>
 
-<ion-footer>
+<ion-footer *ngIf="action !== 'edit'">
   <ion-toolbar>
     <ion-button
       class="login-button"

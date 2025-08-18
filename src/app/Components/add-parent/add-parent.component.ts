@@ -88,10 +88,10 @@ export class AddParentComponent {
 
     this.parentForm = this.fb.group({
       name: ['', Validators.required], // Campo requerido
-      responsibleGuardian: ['', Validators.required], // Campo requerido
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
+      client_company_name: ['', Validators.required], // Campo requerido
+      phone: ['', [Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
       mobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]], // Requerido y 10 dígitos (ejemplo)
-      email: ['', [Validators.required, Validators.email]], // Requerido y formato de email
+      email: ['', [Validators.email]], // Requerido y formato de email
       vat: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], // Requerido y 11 dígitos (ejemplo para Dominicana)
       contact_address: ['', Validators.required],
       parentImage: [''],
@@ -104,7 +104,7 @@ export class AddParentComponent {
     // Opcional: Si el `action` es 'edit' y tienes datos existentes, puedes cargarlos
     if (this.action === 'edit') {
       this.parentForm.patchValue(this.parent);
-      this.parentImage = this.parent.parentImage;
+      this.parentImage = this.parent.image;
       this.responsibleGuardianImage = this.parent.responsibleGuardianImage;
       this.nationalIdImage = this.parent.nationalIdImage;
     }
@@ -247,7 +247,7 @@ export class AddParentComponent {
   }
   onDateSelected(event: any) {
     const date = moment(event.target.value).format('YYYY-MM-DDTHH:mm:ss');
-   
+
     this.modalController.dismiss(); // Dismiss the modal
   }
 
@@ -279,7 +279,9 @@ export class AddParentComponent {
       }
 
       if (data.action === 'add') {
-        this.allStudents.push(studentsForm);
+            this.getParent();
+
+        // this.allStudents.push(studentsForm);
         return;
       }
 

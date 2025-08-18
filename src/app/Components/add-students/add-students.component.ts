@@ -88,7 +88,7 @@ export class AddStudentsComponent implements OnInit {
     });
     if (this.action === 'edit') {
       console.log(this.student,'[[[][[][][[][[][]');
-      
+
       this.studentForm.patchValue(this.student);
       const date = moment(this.student.birth_date_timestamp).format(
         'YYYY-MM-DD'
@@ -147,6 +147,11 @@ export class AddStudentsComponent implements OnInit {
               ? 'Estudiante Editado'
               : 'Estudiante Agregado';
             this.toastService.presentToast(msm, 'custom-success-toast');
+            this.modal.dismiss({
+              action: this.action,
+              studentForm: this.studentForm.value,
+            });
+
           },
           error: (err: any) => {
             const errorMessage =
