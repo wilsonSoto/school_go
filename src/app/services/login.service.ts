@@ -1,4 +1,4 @@
-import { hostUrlEnum } from '../../types'
+import { hostUrlEnum, userDataEnum } from '../../types'
 import { map } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
@@ -53,6 +53,8 @@ export class AuthService {
       map(async(res: any) => {
         if (res?.result.token) {
           await this.storage.set(this.TOKEN_KEY, res.result.token);
+          // await this.storage.set(userDataEnum, res.result);
+          localStorage.setItem(userDataEnum,JSON.stringify(res.result))
           this.authState.next(true);
         }
         return res;
@@ -64,6 +66,7 @@ export class AuthService {
   /** Cerrar sesión */
   async logout() {
     await this.storage.remove(this.TOKEN_KEY);
+    localStorage.removeItem(userDataEnum)
     this.authState.next(false);
   }
 

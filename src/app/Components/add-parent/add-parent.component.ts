@@ -151,13 +151,23 @@ export class AddParentComponent {
       const userData = JSON.parse(
         localStorage.getItem('userData') ?? '{}'
       )?.userInfo;
-
-      const data = {
-        form: this.parentForm.value,
-        partner_id: this.partner_id,
-        company_id: userData.partner_company.id ?? null,
-        action: this.action,
-      };
+      let data = {}
+      try {
+        console.log(userData,'userData userData userDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserDatauserData');
+  
+        data = {
+          form: this.parentForm.value,
+          partner_id: this.partner_id,
+          company_id: userData.partner_company.id ?? null,
+          action: this.action,
+        };
+        
+      } catch (error: any) {
+        console.log(error,'ererrrrrrrrrrrrrr');
+        
+          this.toastService.presentToast(error);
+        
+      }
       this.isLoading = true;
 
       const observableResponse = await this.parentService.postParent(data);
