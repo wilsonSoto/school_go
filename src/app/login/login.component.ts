@@ -44,7 +44,7 @@ token = ""
         this.storage.get(hostUrlEnum.FCM_TOKEN).then((resp) => {
           this.token = JSON.stringify(resp)
           console.log(this.token,'11111111111111111111111111');
-          
+
         })
   }
     // Cambiar el idioma (por ejemplo, con un botón)
@@ -59,18 +59,18 @@ token = ""
     console.log(this.token,'33333333333');
     this.platform.ready().then(() => {
         this.fcm.initPush().then();
-        this.login() 
+        this.login()
 
       }).catch((e: any) => {
         console.log(e);
-        this.login() 
+        this.login()
 
       })
     // }
   }
 
   async login() {
-    
+
     if (this.loginForm.invalid) {
       this.toastService.presentToast('Por favor, completa todos los campos.')
       return;
@@ -89,11 +89,11 @@ token = ""
           this.toastService.presentToast('Bienvenido!','custom-success-toast')
           this.router.navigate(['tabs'])
 
-      // this.mostrarAnimacion = false;
+      this.mostrarAnimacion = false;
 
           },
           error: (err: any) => {
-      // this.mostrarAnimacion = false;
+      this.mostrarAnimacion = false;
             const errorMessage =
               err.error.error.message ||
               err.error.error ||

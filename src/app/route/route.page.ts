@@ -14,6 +14,7 @@ import { RouteService } from '../services/route.service';
 import { ToastService } from '../services/toast.service';
 import { UbicationModalComponent } from '../Components/actions-services/ubication-modal/ubication-modal.component';
 import { AuthService } from '../services/login.service';
+import { ParentService } from '../services/parents.service';
 
 @Component({
   standalone: false,
@@ -21,13 +22,14 @@ import { AuthService } from '../services/login.service';
   templateUrl: 'route.page.html',
   styleUrls: ['route.page.scss'],
 })
-export class RoutePage {
+export class RoutePage implements OnInit {
   constructor(
     private translate: TranslateService,
     private router: Router,
     private routeService: RouteService,
     private toastService: ToastService,
     private authService: AuthService,
+    private parentService: ParentService,
     private modalController: ModalController
   ) {}
   typeSelect: any = 'first';
@@ -57,11 +59,26 @@ export class RoutePage {
     }
     this.translate.use(lang);
   }
+  ngOnInit(): void {
+      const currentRoute = this.router.url;
+
+    if (this.userData?.partner_id && currentRoute !== '/sign-in' && currentRoute !== '/') {
+      this.getParent();
+    }
+
+  }
 
   async ionViewWillEnter() {
     this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
       ?.userInfo;
-    this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
+
+      const currentRoute = this.router.url;
+
+    if (this.userData?.partner_id && currentRoute !== '/sign-in' && currentRoute !== '/') {
+      this.getParent();
+    }
+
+      this.getAllRoute(); // Llama a tu función para cargar las rutas aquí
   }
 
   handleSegmentChange(event: any) {
@@ -164,6 +181,32 @@ export class RoutePage {
     });
   }
 
+    getParent() {
+    this.parentService.getParent(this.userData?.partner_id).subscribe({
+      next: (response: any) => {
+        const studentsWithoutLocation = response.data.students.filter(
+          (student: any) =>
+            !student.home_latitude ||
+            !student.home_longitude ||
+            student.home_latitude === 0 ||
+            student.home_longitude === 0
+        );
+        if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
+          localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
+          this.router.navigateByUrl('/pending-location', { replaceUrl: true });
+        }
+      },
+      error: (err: any) => {
+        const errorMessage =
+          err?.error?.error?.message ||
+          err?.error?.error ||
+          err?.message ||
+          'Error desconocido';
+
+        this.toastService.presentToast(errorMessage);
+      },
+    });
+  }
   handleOpenRouteModal(action: any, route: any) {
     if (!route.id) {
       console.log('error id route');

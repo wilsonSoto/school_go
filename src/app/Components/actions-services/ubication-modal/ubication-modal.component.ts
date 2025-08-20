@@ -16,7 +16,7 @@ export class UbicationModalComponent implements OnInit {
 
   studentsWithoutLocation: any[] = [];
 isSaving: boolean = false;
-
+sendUpdateStudentLocation: any = []
   constructor(
     private modalCtrl: ModalController,
     private locationService: LocationService,
@@ -39,7 +39,7 @@ get allStudentsLoactionActive () {
 }
 
   ngOnInit(): void {
-       this.studentsWithoutLocation =  JSON.parse(localStorage.getItem('studentsWithoutLocation') ?? '[]')
+    this.studentsWithoutLocation =  JSON.parse(localStorage.getItem('studentsWithoutLocation') ?? '[]')
   }
 
   async assignLocation(student: any) {
@@ -54,6 +54,7 @@ get allStudentsLoactionActive () {
       student.home_longitude = location.longitude;
 
       // Eliminar de la lista temporal
+      this.sendUpdateStudentLocation.push(student)
       this.studentsWithoutLocation = this.studentsWithoutLocation.filter(
         (s) => s.id !== student.id
       );
@@ -77,9 +78,16 @@ get allStudentsLoactionActive () {
 
   this.isSaving = true;
     this.router.navigateByUrl('/tabs/route', { replaceUrl: true });
+    const data = this.sendUpdateStudentLocation.map((st: any) => {
+      return {
+        id: st.id,
+        home_latitude: st.home_latitude,
+        home_longitude: st.home_longitude,
+      };
+    });
 
       // return
-      this.studentsService.updateStudentLocation(this.studentsWithoutLocation).subscribe({
+      this.studentsService.updateStudentLocation(data).subscribe({
         next: (response: any) => {
 
           this.isSaving = false;

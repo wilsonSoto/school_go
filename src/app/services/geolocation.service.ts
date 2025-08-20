@@ -209,31 +209,31 @@ export class LocationService {
 
  async startTrackingLocation8888888888888888(): Promise<string | undefined> {
  console.log('📡 Iniciando startTrackingLocation  1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111');
-  
- alert(1)
+
+//  alert(1)
  const isMobile = isMobileOrWebOperatingSystem();
   if (isMobile === 'unknown') return;
- alert(2)
+//  alert(2)
 
 console.log('📱 Tipo de dispositivo: 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222', isMobile);
   const hasPermission = await this.requestGeolocationPermissions();
   if (!hasPermission) return;
- alert(3)
+//  alert(3)
 
   console.warn('⛔ No se otorgaron permisos 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
   const data = {
     watchId: JSON.parse(localStorage.getItem('watchId') || 'null') ?? null,
     lastPosition:  localStorage.getItem('trackingLocation') ?? null,
   }
- alert(4)
+//  alert(4)
 
   // Detener observador anterior si existe
   if (data.watchId) {
- alert(5)
+//  alert(5)
 
     await this.stopTrackingLocation(data.watchId);
   }
- alert(6)
+//  alert(6)
 
   let lastPosition: GeolocationPosition | any = data?.lastPosition ?? null;
   let lastMovementTime: number = Date.now();

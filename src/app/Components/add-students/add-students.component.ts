@@ -80,14 +80,13 @@ export class AddStudentsComponent implements OnInit {
       active: [true],
       sex: ['', Validators.required],
       full_address: ['', Validators.required],
-      home_latitude: ['', Validators.required],
-      home_longitude: ['', Validators.required],
+      home_latitude: [0],
+      home_longitude: [0],
       profile: [''],
       father_name: [''],
       mother_name: [''],
     });
     if (this.action === 'edit') {
-      console.log(this.student,'[[[][[][][[][[][]');
 
       this.studentForm.patchValue(this.student);
       const date = moment(this.student.birth_date_timestamp).format(
@@ -164,6 +163,8 @@ export class AddStudentsComponent implements OnInit {
         });
       }
     } else {
+      this.toastService.presentToast('Formulario inválido. Errores por campo');
+
       console.log('Formulario inválido. Errores por campo:');
       Object.keys(this.studentForm.controls).forEach((key) => {
         const control = this.studentForm.get(key);
@@ -186,12 +187,12 @@ export class AddStudentsComponent implements OnInit {
     if (this.profile) {
       this.studentForm.get('profile')?.setValue(this.profile);
     }
-    if (this.action !== 'edit') {
-      this.studentForm.patchValue({
-        home_latitude: this.location.latitude,
-        home_longitude: this.location.longitude,
-      });
-    }
+    // if (this.action !== 'edit') {
+    //   this.studentForm.patchValue({
+    //     home_latitude: this.location.latitude,
+    //     home_longitude: this.location.longitude,
+    //   });
+    // }
   }
   changeLanguage(lang: string) {
     if (lang == 'es') {

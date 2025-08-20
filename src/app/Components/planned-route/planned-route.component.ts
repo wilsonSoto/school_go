@@ -47,6 +47,7 @@ import { LocationService } from 'src/app/services/geolocation.service';
 import { RouteTrackingPlannedService } from 'src/app/services/route-tracking-planned.service';
 import { getDistanceAndCheckRadius } from 'src/app/shared/utils/getDistanceAndCheckRadius';
 import { ObserverBetweenComponentsService } from 'src/app/services/observer-between-components.services';
+import { userRoleEnum } from 'src/types';
 
 @Component({
   standalone: true,
@@ -122,14 +123,14 @@ export class PlannedRouteComponent implements OnInit {
 
     if (
       this.userData?.roles?.some(
-        (rol: any) => rol.external_id == 'pool.group_school_father'
+        (rol: any) => rol.external_id == userRoleEnum.partner
       )
     ) {
       this.isAccordionSelect = 'first'
       return 'partner';
     } else if (
       this.userData?.roles?.some(
-        (rol: any) => rol.external_id == 'pool.group_school_driver'
+        (rol: any) => rol.external_id == userRoleEnum.driver
       )
     ) {
       this.isAccordionSelect = 'third'
@@ -202,22 +203,22 @@ export class PlannedRouteComponent implements OnInit {
     const studentPoint = this.planned_route.route_points?.find((route: any) =>
       route.students?.some((s: any) => s.id === student.id)
     );
-  
+
     if (!studentPoint) {
       return false;
     }
-  
+
     const visit = studentPoint.student_visiteds.find(
       (v: any) => v.student.id === student.id
     );
-  
+
     if (visit) {
       return !visit.was_present;
     }
-  
+
     return true;
   }
-  
+
 
   // Handle checkbox change for a student
   onStudentCheckboxChange(event: CustomEvent, student: any): void {
@@ -376,13 +377,13 @@ export class PlannedRouteComponent implements OnInit {
 
   generateMarkersFromGroups22(groups: any[]): { lat: number; lng: number; name: string; id: any }[] {
     const markers: { lat: number; lng: number; name: string; id: any; visit_order: number }[] = [];
-  
+
     for (const group of groups) {
       // Saltar si ya fue visitado
       if (group.is_visited) continue;
-  
+
       const hasGroupCoords = group.point_latitude && group.point_longitude;
-  
+
       if (hasGroupCoords) {
         markers.push({
           lat: group.point_latitude,
@@ -406,10 +407,10 @@ export class PlannedRouteComponent implements OnInit {
         }
       }
     }
-  
+
     // Ordenar por visit_order
     const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
-  
+
     return sorted.map(({ visit_order, ...rest }) => rest); // remover visit_order del resultado final
   }
 
@@ -432,7 +433,7 @@ export class PlannedRouteComponent implements OnInit {
   for (const group of groups) {
     // Saltar si ya fue visitado
     console.log(group,';;lhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
-    
+
     if (group.is_visited) continue;
 
     const hasGroupCoords = group.point_latitude && group.point_longitude;
@@ -470,7 +471,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
   return sorted.map(({ visit_order, ...rest }) => rest);
 }
 
-  
+
   getRute() {
     this.maps = false;
     this.isLoading = true;
@@ -487,7 +488,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
               }
               return route;
             });
-            
+
             let driver: any = {}
             // try {
               const location = await this.getLocation();
@@ -510,14 +511,14 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
                   routeData.route_points
                 );
               }
-              
+
             // } catch (error) {
             //   console.log(JSON.stringify(error),'No se pudo location la rutalocation------------------erereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-------------------------------------------------------------------------------------------------------------------------------------------' );
-              
+
             // }
             console.log(this.planned_route,'?????????????????????????????????////////@@@@@');
             console.log(this.markers,'??????????????????????????dd???????////////@@@@@');
-            
+
           }
           this.maps = true;
           this.isLoading = false;
@@ -554,7 +555,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
   }
   // request
   async getDriverCurrentLocation() {
-    
+
     this.isLoading = true;
     this.errorMessage = null;
     this.maps = false;
@@ -605,7 +606,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
 
   getTheNextPoint() {
     const watchId = false;
-    
+
     this.isLoading = true;
     this.errorMessage = null;
     try {
@@ -642,7 +643,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
   }
 
   async startTrackingLocation() {
-    
+
     this.isLoading = true;
     this.errorMessage = null;
     // const watchId = false;
@@ -664,14 +665,14 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
             if (response) {
               // console.log(response);
               try {
-                
+
                 const watchId: any = await this.locationService.startTrackingLocation();
                 if (watchId) {
                   localStorage.setItem('watchId', JSON.stringify(watchId));
                 }
               } catch (error) {
                 console.log(error,'333/////////////////////////////////');
-                
+
               }
             }
             this.isLoading = false;
@@ -694,13 +695,13 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
         .subscribe();
     } catch (error) {
       console.log(error,'ereerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
-      
+
     }
   }
 
   async setdriverLocation(position: any) {
     // const watchId = false;
-    
+
     this.isLoading = true;
     this.errorMessage = null;
     try {
@@ -777,7 +778,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
       };
       // const location = await this.getLocation();
       // this.routeSubscription = this.routeService
-      
+
     this.isLoading = true;
     this.errorMessage = null;
       this.routeTrackingPlannedService
@@ -811,7 +812,7 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
 
   async setEndTheRoute() {
     // const watchId = false;
-    
+
     this.isLoading = true;
     this.errorMessage = null;
     try {
