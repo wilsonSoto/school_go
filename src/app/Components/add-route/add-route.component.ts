@@ -247,7 +247,7 @@ export class AddRouteComponent implements OnInit {
         //   })
         // );
         console.log(data.selectedWeekDays, 'data.selectedWeekDays  data.selectedWeekDays====================');
-        
+
         // console.log(data.selectedWeekDays.days,'data.selectedWeekDays.days data.selectedWeekDays.days');
         if (this.action == 'edit') {
           this.setSelectDriver();
@@ -299,8 +299,8 @@ export class AddRouteComponent implements OnInit {
         this.setSelectStudents();
         this.studentIdsFormArray.clear();
         this.studentIdsPickupOrderFormArray.clear();
-console.log(newSelectedStudentIds, 'newSelectedStudentIdsnewSelectedStudentIdsv ...........................');
-console.log(this.studentIdsPickupOrderFormArray, 'studentIdsPickupOrderFormArray ..........studentIdsPickupOrderFormArray.................');
+// console.log(newSelectedStudentIds, 'newSelectedStudentIdsnewSelectedStudentIdsv ...........................');
+// console.log(this.studentIdsPickupOrderFormArray, 'studentIdsPickupOrderFormArray ..........studentIdsPickupOrderFormArray.................');
 this.setReorderStudentsUpdate(newSelectedStudentIds);
 
         // this.loadStudents(newSelectedStudentIds);
@@ -320,7 +320,7 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
         });
 
 
-        
+
       }
     } else {
       // console.log('Student selection cancelled or no students selected.');
@@ -407,7 +407,7 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
 
                 // Luego verifica si hay estudiantes
                 if (route.students.length > 0) {
-                  // console.log('//entreeeeeeeeeeeeeeeee///////////////////852');
+                  console.log('//entreeeeeeeeeeeeeeeee///////////////////852');
                   this.studentIdsPickupOrderFormArray.push(
                     this.fb.control(route)
                   );
@@ -415,9 +415,9 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
                 }
               });
             }
+            this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
             // console.log(this.studentIdsPickupOrderFormArray,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
             // console.log(this.selectedStudentsForRoute,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
-            this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
           }
         }),
         catchError((err) => {
@@ -444,10 +444,14 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
         return [route.students?.id];
       })
       .filter((id: any) => !!id);
+      const students = this.studentIdsFormArray.value;
 
     const filteredStudents = this.allStudents.filter(
-      (student) => !selectedStudentIds.includes(student.id)
-    );
+  (student) =>
+    !selectedStudentIds.includes(student.id) &&
+    students.some((s: any) => s.id === student.id)
+);
+
 
     this.studentIdsPickupOrderFormArray.push(
       this.fb.control({
@@ -576,7 +580,7 @@ console.log(this.studentIdsPickupOrderFormArray);
 
   loadStudents(allFetchedStudents: Student[]): void {
     // console.log(allFetchedStudents,'allFetchedStudents allFetchedStudents');
-    
+
     this.isLoadingMap = true;
     this.errorMessage = null;
     this.allStudents = allFetchedStudents.map((student) => ({

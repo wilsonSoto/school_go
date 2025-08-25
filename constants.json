@@ -6,7 +6,13 @@
     "TOKEN_AUTHENTICATION": "my-token",
     "FCM_TOKEN": "push_notification_token",
     "SAVE_CREDENTIAL": "save_credential"
- 
 
+
+  },
+  "userData": "userData",
+  "userRole": {
+    "partner": "pool.group_school_father",
+    "driver": "pool.group_school_driver",
+    "admin": "pool.group_school_manager"
   }
 }
