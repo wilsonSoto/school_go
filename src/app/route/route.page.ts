@@ -167,16 +167,16 @@ export class RoutePage implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.errorMessage =
-          'Error al cargar las rutas: ' + (err.message || 'Error desconocido');
 
         const errorMessage =
-          err?.error?.error?.message ||
-          err?.error?.error ||
-          err?.message ||
-          'Error desconocido';
+        err?.error?.error?.message ||
+        err?.error?.error ||
+        err?.message ||
+        'Error desconocido';
+        this.errorMessage =
+          'Error al cargar las rutas: ' + (errorMessage || 'Error desconocido');
 
-        this.toastService.presentToast(errorMessage);
+        this.toastService.presentToast(this.errorMessage);
       },
     });
   }
