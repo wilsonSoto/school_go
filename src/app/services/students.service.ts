@@ -78,15 +78,12 @@ export class StudentsService {
   }
 
   updateStudentLocation(students: any) {
-    const url = this.appURl + '/school/students/';
+    // {{host_local}}/api/school/students/locations/
+    const url = this.appURl + '/school/students/locations/';
     const data = {
-      params: [
-        {
-          id: students.id,
-          home_latitude: students.home_latitude,
-          home_longitude: students.home_longitude,
-        },
-      ],
+      params: {
+         "user_locations": students,
+      }
     };
     return this.httpClient.post(url, data).pipe(
       map((res: any) => {

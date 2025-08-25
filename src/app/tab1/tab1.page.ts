@@ -26,43 +26,42 @@ import { AuthService } from '../services/login.service';
   styleUrls: ['tab1.page.scss'],
 })
 export class Tab1Page implements OnInit {
-   constructor(
+  constructor(
     private router: Router,
     private actionSheetCtrl: ActionSheetController,
     private loading: LoadingController,
     private alertController: AlertController,
     private parentService: ParentService,
     private toastService: ToastService,
-    private translate: TranslateService ,
+    private translate: TranslateService,
     private authService: AuthService,
-       private modalController: ModalController
-
-  ) { }
+    private modalController: ModalController
+  ) {}
   parents: any = [];
   students: any = [];
   searchTerm: string = '';
   filteredParents: any[] = [];
   hasData: boolean = true;
-  
+
   isLoading: boolean = true;
   errorMessage: string | null = null;
   ngOnInit() {
-    this.getAllParents()
+    this.getAllParents();
   }
 
-     handleRefresh(event: RefresherCustomEvent) {
+  handleRefresh(event: RefresherCustomEvent) {
     this.getAllParents(); // Llama a tu función para cargar las rutas aquí
-      setTimeout(() => {
-        // Any calls to load data go here
-        event.target.complete();
-      }, 2000);
-    }
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
+  }
 
-    async logoutAndGoToSignIn() {
-      await this.authService.logout();
-      this.router.navigate(['/sign-in']);
-    }
-    
+  async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
+  }
+
   ionViewWillLeave() {
     if (this.router.url === '/sign-in') {
       this.authService.logout();
@@ -71,7 +70,7 @@ export class Tab1Page implements OnInit {
 
   filterParents(event: any) {
     const query = (event.target.value || '').toLowerCase();
-  
+
     if (!query) {
       // Si el buscador está vacío, restauramos la lista original
       this.filteredParents = [...this.parents];
@@ -85,85 +84,69 @@ export class Tab1Page implements OnInit {
         );
       });
     }
-  
+
     this.hasData = this.filteredParents.length > 0;
   }
 
-  
   getAllParents() {
     this.isLoading = true;
     this.errorMessage = null;
-        this.parentService
-        .getAllParents()
-        .subscribe({
-          next: (response: any) => {
-                    this.isLoading = false;
-// console.log(response,'respo ,,,,,,,,,,,,,,,,,,,,,,');
-            // response.data.parent.number_students = response.data.students?.length
-            console.log(response,'parentsssssssssssssssss');
+    this.parentService.getAllParents().subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        this.students = [response.data.students];
+        this.parents = response.data.parents;
+        this.filteredParents = [...this.parents]; // Inicializa el listado filtrado
+        this.hasData = this.filteredParents.length > 0;
 
-            // this.parents = response.data.parents
-            this.students = [response.data.students]
-            this.parents = response.data.parents;
-this.filteredParents = [...this.parents]; // Inicializa el listado filtrado
-this.hasData = this.filteredParents.length > 0;
+        this.toastService.presentToast('Bienvenido!', 'custom-success-toast');
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Error al cargar padres: ' + (err.message || 'Error desconocido');
 
-          this.toastService.presentToast('Bienvenido!','custom-success-toast')
-          // this.router.navigate(['tabs'])
+        const errorMessage =
+          err?.error?.error.message ||
+          err?.error?.error ||
+          err?.message ||
+          'Error desconocido';
 
-      // this.mostrarAnimacion = false;
-
-          },
-          error: (err: any) => {
-      // this.mostrarAnimacion = false;
-              this.isLoading = false;
-        this.errorMessage = 'Error al cargar padres: ' + (err.message || 'Error desconocido');
-
-            const errorMessage =
-              err?.error?.error.message ||
-              err?.error?.error ||
-              err?.message ||
-              'Error desconocido';
-
-            this.toastService.presentToast(errorMessage)
-
-          },
-        });
+        this.toastService.presentToast(errorMessage);
+      },
+    });
   }
   // Cambiar el idioma (por ejemplo, con un botón)
   changeLanguage(lang: string) {
     if (lang == 'es') {
-      lang = 'en'
+      lang = 'en';
     } else {
-      lang = 'es'
-
+      lang = 'es';
     }
     this.translate.use(lang);
   }
 
+  async handleOpenClientModal(action: any, parent: any) {
+    try {
+      const modal = await this.modalController.create({
+        component: AddParentComponent,
+        componentProps: {
+          action: action,
+          // students: this.stupartner_iddents,
+          partner_id: parent.partner_id,
+        },
+        initialBreakpoint: 1,
+        breakpoints: [0, 1],
+        cssClass: ['loading-truck-options-sheet-modal'],
+      });
+      await modal.present();
 
-    async handleOpenClientModal(action: any, parent: any) {
-      try {
-        const modal = await this.modalController.create({
-          component: AddParentComponent,
-          componentProps: {
-            action: action,
-            // students: this.stupartner_iddents,
-            partner_id: parent.partner_id,
-          },
-          initialBreakpoint: 1,
-          breakpoints: [0, 1],
-          cssClass: ['loading-truck-options-sheet-modal'],
-        });
-        await modal.present();
+      const { data } = await modal.onWillDismiss();
+      const { selectedOption, exception } = data;
 
-        const { data } = await modal.onWillDismiss();
-        const { selectedOption, exception } = data;
-
-        if (data.action === 'cancel') {
-          return;
-        }
-      } catch (error: any) {}
-    }
-
+      if (data.action === 'cancel') {
+        return;
+      }
+    } catch (error: any) {}
+  }
 }

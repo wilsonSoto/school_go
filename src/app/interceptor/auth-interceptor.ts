@@ -22,13 +22,16 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(authReq).pipe(
           catchError((error: HttpErrorResponse) => {
             if (error.status === 401 || error.status === 0) {
-              console.warn('⚠️ Sesión expirada o usuario no logueado');
+              console.error('⚠️ Sesión expirada o usuario no logueado');
               this.authService.logout();
               this.router.navigate(['/sign-in']);
             }
             if ( [400].includes(error.status)) {
+              console.error('⚠️ Sesión expirada o usuario no logueado');
+
+              this.authService.logout();
                   this.router.navigateByUrl('/sign-in', { replaceUrl: true });
-                          
+                  
                         }
             return throwError(() => error);
           })

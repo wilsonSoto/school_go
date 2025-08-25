@@ -1,10 +1,17 @@
 {
-	"appId": "io.school.go.starter",
-	"appName": "schoolGo",
+	"appId": "io.kabaygroup.escolar.go",
+	"appName": "EscolarGo",
 	"webDir": "www",
 	"plugins": {
 		"GoogleMap": {
-			"apiKey": "AIzaSyDcWETz-oJarwWF7lheeNKYOdw8BwaGrKk"
+			"apiKey": "AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao"
+		},
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
 		}
 	}
 }
