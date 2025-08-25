@@ -252,7 +252,7 @@
       </ion-list>
       <!-- <app-maps *ngIf="maps" [markers]="markers" (markerMoved)="onMarkerMoved($event)">
       </app-maps> -->
-      <app-maps 
+      <app-maps
       [markers]="markers"
       [routePoints]="rutaDelBus"
       [showBtnPermission]="showBtnPermission"
@@ -286,7 +286,7 @@
     <ion-button *ngIf="showBtnPermission == 'partner'"
       class="login-button"
       type="button"
-      (click)="getDriverCurrentLocation()"
+      (click)="startDriverTracking()"
       expand="block"
     >
       Ver Ubicacion del conductor

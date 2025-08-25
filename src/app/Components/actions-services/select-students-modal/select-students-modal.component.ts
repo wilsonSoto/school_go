@@ -115,7 +115,7 @@ export class SelectStudentsModalComponent implements OnInit {
     if (isChecked) {
       // Add student ID to FormArray if not already present
       if (!this.isStudentSelected(student.id)) {
-        this.selectedStudentsFormArray.push(this.fb.control(student.id));
+        this.selectedStudentsFormArray.push(this.fb.control(student));
       }
     } else {
       // Remove student ID from FormArray
@@ -142,6 +142,8 @@ export class SelectStudentsModalComponent implements OnInit {
 
   // Method to be called when the user clicks 'Select' button
   onSelect(): void {
+    // console.log(this.selectedStudentsFormArray,'[[[]]]33......');
+
     this.modal.dismiss({
         action: 'select',
       selectedStudentIds: this.selectedStudentsFormArray.value

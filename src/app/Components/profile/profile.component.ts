@@ -1,6 +1,8 @@
 
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from 'src/app/services/login.service';
 
 
 @Component({
@@ -12,7 +14,11 @@ import { TranslateService } from '@ngx-translate/core';
 export class ProfileComponent implements OnInit {
 
    constructor(
-      private translate: TranslateService
+      private translate: TranslateService,
+      private authService: AuthService,
+    private router: Router ,
+
+
     ) {}
 
     user: any = {
@@ -31,9 +37,11 @@ goToSettings() {
   console.log('Ir a configuración');
 }
 
-logout() {
-  console.log('Cerrar sesión');
-}
+
+  async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
+  }
 
   @Input() parent: any = null;
   @Output() handleActionClient = new EventEmitter<string>();

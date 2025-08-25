@@ -23,7 +23,7 @@
   <ion-list>
     <ion-item>
       <ion-icon name="mail-outline" slot="start"></ion-icon>
-      <ion-label>{{ user.email }}</ion-label>
+      <ion-label>{{ user.email }} <span *ngIf="!user.email">No Data</span></ion-label>
     </ion-item>
 
     <ion-item>
@@ -49,7 +49,7 @@
        Configuración
      </ion-button> -->
 
-     <ion-button class="logout" expand="block" fill="clear" color="medium" routerLink="/sign-in">
+     <ion-button class="logout" expand="block" fill="clear" color="medium" (click)="logoutAndGoToSignIn()">
        Cerrar sesión
      </ion-button>
 
