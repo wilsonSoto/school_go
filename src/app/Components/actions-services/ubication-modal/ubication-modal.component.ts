@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController,RefresherCustomEvent } from '@ionic/angular';
 import { LocationService } from 'src/app/services/geolocation.service';
 import { StudentsService } from 'src/app/services/students.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/login.service';
 
 @Component({
   standalone: false,
@@ -13,7 +14,8 @@ import { Router } from '@angular/router';
 })
 export class UbicationModalComponent implements OnInit {
   @Input() students: any[] = [];
-
+  isLoading: boolean = true;
+  
   studentsWithoutLocation: any[] = [];
 isSaving: boolean = false;
 sendUpdateStudentLocation: any = []
@@ -23,6 +25,7 @@ sendUpdateStudentLocation: any = []
     private toastService: ToastService,
     private studentsService: StudentsService,
     private router: Router,
+    private authService: AuthService,
     private alertController: AlertController
   ) {}
 
@@ -40,13 +43,29 @@ get allStudentsLoactionActive () {
 
   ngOnInit(): void {
     this.studentsWithoutLocation =  JSON.parse(localStorage.getItem('studentsWithoutLocation') ?? '[]')
+     this.isLoading = false;
+
   }
 
+    handleRefresh(event: RefresherCustomEvent) {
+    this.studentsWithoutLocation = []
+
+    this.studentsWithoutLocation =  JSON.parse(localStorage.getItem('studentsWithoutLocation') ?? '[]')
+      setTimeout(() => {
+        // Any calls to load data go here
+        event.target.complete();
+      }, 2000);
+    }
+
   async assignLocation(student: any) {
+    this.isLoading = true;
+
     try {
       const location = await this.locationService.getCurrentLocation();
 
       if (!location || !location.latitude || !location.longitude) {
+    this.isLoading = false;
+        return
         throw new Error('No se pudo obtener la ubicación');
       }
 
@@ -58,8 +77,11 @@ get allStudentsLoactionActive () {
       this.studentsWithoutLocation = this.studentsWithoutLocation.filter(
         (s) => s.id !== student.id
       );
+    this.isLoading = false;
 
     } catch (error) {
+    this.isLoading = false;
+
       console.error('Error al obtener ubicación:', error);
       const alert = await this.alertController.create({
         header: 'Error',
@@ -70,8 +92,14 @@ get allStudentsLoactionActive () {
     }
   }
 
-  closeModal() {
+  async closeModal() {
+    this.studentsWithoutLocation = [...this.studentsWithoutLocation, ...this.sendUpdateStudentLocation]
+    await this.logoutAndGoToSignIn()
     this.modalCtrl.dismiss(this.students);
+  }
+   async logoutAndGoToSignIn() {
+    await this.authService.logout();
+    this.router.navigate(['/sign-in']);
   }
 
    async updateStudentLocation() {

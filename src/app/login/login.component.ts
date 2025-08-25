@@ -10,6 +10,7 @@ import { FcmService } from '../services/fcm.service';
 import { StorageService } from '../services/storage.service';
 import { Platform } from '@ionic/angular';
 import { hostUrlEnum } from 'src/types';
+import { ParentService } from '../services/parents.service';
 @Component({
   selector: 'app-login',
   standalone: false,
@@ -21,7 +22,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
 mostrarAnimacion: boolean = false; // Variable para controlar la visibilidad del GIF de fondo
 token = ""
-
+userData: any = null;
   constructor(
     private translate: TranslateService,
     private fb: FormBuilder,
@@ -30,6 +31,8 @@ token = ""
     private loginService: AuthService,
     private router: Router,
     private storage: StorageService,
+    private parentService: ParentService,
+    
         private platform: Platform,
          private fcm: FcmService
   ) {
@@ -85,10 +88,13 @@ token = ""
         .login( this.loginForm.value)
         .subscribe({
           next: (response: any) => {
-            console.log(response,'respo');
+            console.log(JSON.parse(JSON.stringify(response)),'respo');
+
           this.toastService.presentToast('Bienvenido!','custom-success-toast')
           this.router.navigate(['tabs'])
-
+          // this.userData = 
+          this.getParent(JSON.parse(JSON.stringify(response) || "{}")?.userInfo)
+      // ?.userInfo;
       this.mostrarAnimacion = false;
 
           },
@@ -108,5 +114,44 @@ token = ""
       } else {
         this.toastService.presentToast('Usuario o contraseña no tiene información. Por favor complete todos los campos.')
       }
+  }
+
+  async delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+    async getParent(user: any) {
+  await this.delay(5000); 
+      this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
+      ?.userInfo;
+
+      if (this.userData == 'null') {
+        this.userData = user
+      }
+
+    this.parentService.getParent(this.userData?.partner_id).subscribe({
+      next: (response: any) => {
+        const studentsWithoutLocation = response.data.students.filter(
+          (student: any) =>
+            !student.home_latitude ||
+            !student.home_longitude ||
+            student.home_latitude === 0 ||
+            student.home_longitude === 0
+        );
+        if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
+          localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
+          this.router.navigateByUrl('/pending-location', { replaceUrl: true });
+        }
+      },
+      error: (err: any) => {
+        const errorMessage =
+          err?.error?.error?.message ||
+          err?.error?.error ||
+          err?.message ||
+          'Error desconocido';
+
+        this.toastService.presentToast(errorMessage);
+      },
+    });
   }
 }

@@ -57,7 +57,7 @@ export class AuthService {
           localStorage.setItem(userDataEnum,JSON.stringify(res.result))
           this.authState.next(true);
         }
-        return res;
+        return res.result;
         return res;
       })
     );

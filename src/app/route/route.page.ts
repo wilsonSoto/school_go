@@ -73,8 +73,10 @@ export class RoutePage implements OnInit {
       ?.userInfo;
 
       const currentRoute = this.router.url;
+console.log(this.userData,'[[[userrrrrrrrrrrrrrrrr]]]');
 
     if (this.userData?.partner_id && currentRoute !== '/sign-in' && currentRoute !== '/') {
+console.log(this.userData,'[[[000000000000000000000000000000000000]]]');
       this.getParent();
     }
 
