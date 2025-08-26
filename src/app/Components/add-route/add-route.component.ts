@@ -78,7 +78,7 @@ export class AddRouteComponent implements OnInit {
   selectedStudents: Student[] = [];
   selectedStudentsForRoute: Student[] = [];
   allStudents: any[] = [];
-
+  startAndEndOfTheRoute: any= [];
   isLoadingMap: boolean = true;
   errorMessage: string | null = null;
   isActiveAllStudents: boolean = true;
@@ -237,7 +237,10 @@ export class AddRouteComponent implements OnInit {
         // this.ruteForm.patchValue({
         //   schedules: data.selectedWeekDays.days,
         // });
-    this.ruteForm.setControl('schedules', this.fb.array(data.selectedWeekDays.days));
+        this.ruteForm.setControl(
+          'schedules',
+          this.fb.array(data.selectedWeekDays.days)
+        );
 
         // this.ruteForm.value.schedules.push(
         //   this.fb.control({
@@ -246,7 +249,10 @@ export class AddRouteComponent implements OnInit {
         //     students: dataPickUp,
         //   })
         // );
-        console.log(data.selectedWeekDays, 'data.selectedWeekDays  data.selectedWeekDays====================');
+        console.log(
+          data.selectedWeekDays,
+          'data.selectedWeekDays  data.selectedWeekDays===================='
+        );
 
         // console.log(data.selectedWeekDays.days,'data.selectedWeekDays.days data.selectedWeekDays.days');
         if (this.action == 'edit') {
@@ -299,9 +305,9 @@ export class AddRouteComponent implements OnInit {
         this.setSelectStudents();
         this.studentIdsFormArray.clear();
         this.studentIdsPickupOrderFormArray.clear();
-// console.log(newSelectedStudentIds, 'newSelectedStudentIdsnewSelectedStudentIdsv ...........................');
-// console.log(this.studentIdsPickupOrderFormArray, 'studentIdsPickupOrderFormArray ..........studentIdsPickupOrderFormArray.................');
-this.setReorderStudentsUpdate(newSelectedStudentIds);
+        // console.log(newSelectedStudentIds, 'newSelectedStudentIdsnewSelectedStudentIdsv ...........................');
+        // console.log(this.studentIdsPickupOrderFormArray, 'studentIdsPickupOrderFormArray ..........studentIdsPickupOrderFormArray.................');
+        this.setReorderStudentsUpdate(newSelectedStudentIds);
 
         // this.loadStudents(newSelectedStudentIds);
         newSelectedStudentIds.forEach((st: any) => {
@@ -318,9 +324,6 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
           //   })
           // );
         });
-
-
-
       }
     } else {
       // console.log('Student selection cancelled or no students selected.');
@@ -399,7 +402,9 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
               routeData.route_points.forEach((route: any) => {
                 // console.log(route,'/////////////////////852');
                 // console.log(route.students,'////students/////////////////852');
-
+                if (route.is_origin_point || route.is_target_point) {
+                  this.startAndEndOfTheRoute.push(route)
+                }
                 // Asegurarte de que route.students sea siempre un array
                 if (!Array.isArray(route.students)) {
                   route.students = [route.students];
@@ -444,14 +449,13 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
         return [route.students?.id];
       })
       .filter((id: any) => !!id);
-      const students = this.studentIdsFormArray.value;
+    const students = this.studentIdsFormArray.value;
 
     const filteredStudents = this.allStudents.filter(
-  (student) =>
-    !selectedStudentIds.includes(student.id) &&
-    students.some((s: any) => s.id === student.id)
-);
-
+      (student) =>
+        !selectedStudentIds.includes(student.id) &&
+        students.some((s: any) => s.id === student.id)
+    );
 
     this.studentIdsPickupOrderFormArray.push(
       this.fb.control({
@@ -463,9 +467,12 @@ this.setReorderStudentsUpdate(newSelectedStudentIds);
   }
 
   setReorderStudentsUpdate(dataPickUp: any) {
-    this.ruteForm.setControl('studentIdsPickupOrderFormArray', this.fb.array([]));
-console.log(this.studentIdsPickupOrderFormArray);
-    this.isActiveAllStudents =false;
+    this.ruteForm.setControl(
+      'studentIdsPickupOrderFormArray',
+      this.fb.array([])
+    );
+    console.log(this.studentIdsPickupOrderFormArray);
+    this.isActiveAllStudents = false;
     this.studentIdsPickupOrderFormArray.push(
       this.fb.control({
         id: 'group-general',
@@ -474,7 +481,6 @@ console.log(this.studentIdsPickupOrderFormArray);
       })
     );
   }
-
 
   async onSubmit() {
     this.ruteForm.markAllAsTouched();
@@ -491,7 +497,9 @@ console.log(this.studentIdsPickupOrderFormArray);
 
     if (this.ruteForm.valid) {
       // const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
-      const userData = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
+      const userData = JSON.parse(
+        localStorage.getItem('userData') ?? '{}'
+      )?.userInfo;
 
       const data = {
         name: this.ruteForm.value.name,
@@ -601,11 +609,15 @@ console.log(this.studentIdsPickupOrderFormArray);
       return;
     }
 
+    console.log(this.studentIdsPickupOrderFormArray.value,'this.studentIdsPickupOrderFormArray.value');
+    console.log(this.allStudents,'this.allStudents');
+
     const modal = await this.modalController.create({
       component: ReorderStudentsMapModalComponent,
       componentProps: {
         isActiveAllStudents: this.isActiveAllStudents, // Pass the prepared student objects
-        studentsForRoute: [...this.allStudents], // Pass the prepared student objects
+        // startAndEndOfTheRoute: this.startAndEndOfTheRoute, // Pass the prepared student objects
+        studentsForRoute: [...this.studentIdsFormArray.value], // Pass the prepared student objects
         studentIdsPickupOrderFormArray: [
           ...this.studentIdsPickupOrderFormArray.value,
         ], // Pass the prepared student objects
@@ -711,7 +723,11 @@ console.log(this.studentIdsPickupOrderFormArray);
   }
 
   setPoints() {
-   let visitCounter = 1;
+    let visitCounter = 1;
+    console.log(
+      this.studentIdsPickupOrderFormArray,
+      'this.studentIdsPickupOrderFormArray'
+    );
 
     const route_points = this.studentIdsPickupOrderFormArray.value.flatMap(
       (group: any) => {
@@ -757,6 +773,7 @@ console.log(this.studentIdsPickupOrderFormArray);
         return []; // Si no hay estudiantes válidos
       }
     );
+    console.log(route_points, '0222222');
 
     // console.log(route_points);
     return route_points;
@@ -764,15 +781,7 @@ console.log(this.studentIdsPickupOrderFormArray);
 
   async setPointsInRoute() {
     try {
-      // console.log(
-      //   this.selectedStudentsForRoute,
-      //   'this.selectedStudentsForRoute this.selectedStudentsForRoute'
-      // );
-      // console.log(
-      //   this.studentIdsPickupOrderFormArray,
-      //   ' this.studentIdsPickupOrderFormArray  this.studentIdsPickupOrderFormArray'
-      // );
-      const data = this.setPoints();
+      const data = [...this.setPoints(), ...this.startAndEndOfTheRoute];
       // console.log(data, '///////2/2/2/2/2/2//2/2/2/2/2/2/2');
 
       this.routeTrackingService
@@ -788,6 +797,13 @@ console.log(this.studentIdsPickupOrderFormArray);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
+
+            const errorMessage =
+              err.error.error.message ||
+              err.error.error ||
+              err?.message ||
+              'Error desconocido al agregar/editar ruta';
+            this.toastService.presentToast(errorMessage);
             return of([]);
           }),
           finalize(() => {
