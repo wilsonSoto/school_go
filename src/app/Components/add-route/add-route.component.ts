@@ -85,7 +85,6 @@ export class AddRouteComponent implements OnInit {
   colorCalendar = 'dark';
   date = new Date();
   route_id: any = null;
-  // currentDriver: any = null // <<< Remove this or make it Driver | null
   selectedDriver: Driver | null = null; // New property to store the full driver object
   selectedBus: Bus | null = null; // New property to store the full bus object
 
@@ -100,7 +99,6 @@ export class AddRouteComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.route_id = this.route.snapshot.paramMap.get('routeId');
-    // console.log(this.route_id, 'id -------------------------------');
     this.route.queryParams
       .pipe(
         takeUntil(this.componentDestroyed$),
@@ -222,7 +220,6 @@ export class AddRouteComponent implements OnInit {
       const { data } = await modal.onWillDismiss();
 
       if (!data) {
-        // console.log('Modal dismissed without data.');
         return;
       }
 
@@ -234,27 +231,11 @@ export class AddRouteComponent implements OnInit {
           schedules: [],
         });
         this.selectedDays = data.selectedWeekDays.days;
-        // this.ruteForm.patchValue({
-        //   schedules: data.selectedWeekDays.days,
-        // });
         this.ruteForm.setControl(
           'schedules',
           this.fb.array(data.selectedWeekDays.days)
         );
 
-        // this.ruteForm.value.schedules.push(
-        //   this.fb.control({
-        //     id: 'group-general',
-        //     name: 'General (Todos los estudiantes)',
-        //     students: dataPickUp,
-        //   })
-        // );
-        console.log(
-          data.selectedWeekDays,
-          'data.selectedWeekDays  data.selectedWeekDays===================='
-        );
-
-        // console.log(data.selectedWeekDays.days,'data.selectedWeekDays.days data.selectedWeekDays.days');
         if (this.action == 'edit') {
           this.setSelectDriver();
         }
@@ -262,11 +243,8 @@ export class AddRouteComponent implements OnInit {
           'Horarios de ruta actualizados!',
           'custom-success-toast'
         );
-      } else {
-        // console.warn('Modal dismissed without valid schedule data.');
       }
     } catch (error: any) {
-      // console.error('Error opening or dismissing modal:', error);
       this.toastService.presentToast(
         'Error al abrir el selector de días.',
         'custom-error-toast'
@@ -279,7 +257,6 @@ export class AddRouteComponent implements OnInit {
     const modal = await this.modalController.create({
       component: SelectStudentsModalComponent,
       componentProps: {
-        // Pass currently selected student IDs to the modal for pre-selection
         currentStudentIds: this.allStudents,
       },
       initialBreakpoint: 1,
@@ -301,32 +278,16 @@ export class AddRouteComponent implements OnInit {
       newSelectedStudentIds.forEach((id) => {
         this.studentIdsFormArray.push(this.fb.control(id));
       });
-      if (this.action == 'edit') {
+      if (data.action == 'select') {
         this.setSelectStudents();
         this.studentIdsFormArray.clear();
         this.studentIdsPickupOrderFormArray.clear();
-        // console.log(newSelectedStudentIds, 'newSelectedStudentIdsnewSelectedStudentIdsv ...........................');
-        // console.log(this.studentIdsPickupOrderFormArray, 'studentIdsPickupOrderFormArray ..........studentIdsPickupOrderFormArray.................');
         this.setReorderStudentsUpdate(newSelectedStudentIds);
 
-        // this.loadStudents(newSelectedStudentIds);
         newSelectedStudentIds.forEach((st: any) => {
-          // st.checked = true;
           this.studentIdsFormArray.push(this.fb.control(st));
-          // return {
-          //   ...st,
-          // };
-          // this.studentIdsPickupOrderFormArray.push(
-          //   this.fb.control({
-          //     name: group.name,
-          //     id: group.id,
-          //     students: studentObjects,
-          //   })
-          // );
         });
       }
-    } else {
-      // console.log('Student selection cancelled or no students selected.');
     }
   }
 
@@ -334,7 +295,6 @@ export class AddRouteComponent implements OnInit {
   getStudentName(id: string): string {
     const student = this.allStudents.find((s) => s.id === id);
 
-    // const student = this.selectedStudentsForRoute.find(s => s.id === id);
     return student ? `${student.name} ${student.last_name}` : 'Unknown Student';
   }
   // NEW HELPER METHOD FOR COORDINATES
@@ -400,8 +360,6 @@ export class AddRouteComponent implements OnInit {
             ) {
               this.studentIdsPickupOrderFormArray.clear();
               routeData.route_points.forEach((route: any) => {
-                // console.log(route,'/////////////////////852');
-                // console.log(route.students,'////students/////////////////852');
                 if (route.is_origin_point || route.is_target_point) {
                   this.startAndEndOfTheRoute.push(route)
                 }
@@ -412,7 +370,6 @@ export class AddRouteComponent implements OnInit {
 
                 // Luego verifica si hay estudiantes
                 if (route.students.length > 0) {
-                  console.log('//entreeeeeeeeeeeeeeeee///////////////////852');
                   this.studentIdsPickupOrderFormArray.push(
                     this.fb.control(route)
                   );
@@ -421,15 +378,11 @@ export class AddRouteComponent implements OnInit {
               });
             }
             this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
-            // console.log(this.studentIdsPickupOrderFormArray,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
-            // console.log(this.selectedStudentsForRoute,'this.studentIdsPickupOrderFormArray this.studentIdsPickupOrderFormArray 3............');
           }
         }),
         catchError((err) => {
-          // console.error('Error fetching students:', err);
           this.errorMessage =
             'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-          // this.reorderableStudentGroups = [];
           return of([]);
         }),
         finalize(() => {
@@ -486,17 +439,13 @@ export class AddRouteComponent implements OnInit {
     this.ruteForm.markAllAsTouched();
 
     this.schedulesFormArray.controls.forEach((group: any, index) => {
-      // console.log(`Schedule Group ${index} Valid?`, group.valid);
       Object.keys(group.controls).forEach((key) => {
         const control = group.get(key);
-        if (control && control.invalid) {
-          // console.log(`  Control ${key} invalid. Errors:`, control.errors);
-        }
+
       });
     });
 
     if (this.ruteForm.valid) {
-      // const userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
       const userData = JSON.parse(
         localStorage.getItem('userData') ?? '{}'
       )?.userInfo;
@@ -519,7 +468,6 @@ export class AddRouteComponent implements OnInit {
         next: (response: any) => {
           const msm = this.action == 'edit' ? 'Ruta Editada' : 'Ruta Agregada';
           this.toastService.presentToast(msm, 'custom-success-toast');
-          // Optionally, dismiss modal or navigate
         },
         error: (err: any) => {
           const errorMessage =
@@ -531,17 +479,13 @@ export class AddRouteComponent implements OnInit {
         },
       });
     } else {
-      // console.log('Formulario inválido. Errores por campo:');
       Object.keys(this.ruteForm.controls).forEach((key) => {
         const control = this.ruteForm.get(key);
-        if (control && control.invalid) {
-          // console.log(`Campo '${key}' es inválido. Errores:`, control.errors);
-        }
+
       });
     }
   }
 
-  // ... (handleOpenSelectWeekDayToTimmeModal, getStudentName, getStudentCoordinates are fine)
 
   async openDriverBusSelectionModal() {
     const modal = await this.modalController.create({
@@ -579,16 +523,11 @@ export class AddRouteComponent implements OnInit {
         'Chofer y Autobús seleccionados',
         'success'
       );
-    } else {
-      // console.log('Driver/Bus selection cancelled.');
     }
   }
 
-  // ... (openStudentsSelectionModal is fine)
 
   loadStudents(allFetchedStudents: Student[]): void {
-    // console.log(allFetchedStudents,'allFetchedStudents allFetchedStudents');
-
     this.isLoadingMap = true;
     this.errorMessage = null;
     this.allStudents = allFetchedStudents.map((student) => ({
@@ -600,8 +539,6 @@ export class AddRouteComponent implements OnInit {
 
   async openReorderStudentsMapModal() {
     if (this.allStudents.length === 0) {
-      // Check this.allStudents (filtered and prepared)
-      // console.warn('No students prepared for reordering.');
       this.toastService.presentToast(
         'No hay estudiantes para reordenar en el mapa. Seleccione estudiantes y asegúrese de que tengan coordenadas.',
         'warning'
@@ -616,7 +553,6 @@ export class AddRouteComponent implements OnInit {
       component: ReorderStudentsMapModalComponent,
       componentProps: {
         isActiveAllStudents: this.isActiveAllStudents, // Pass the prepared student objects
-        // startAndEndOfTheRoute: this.startAndEndOfTheRoute, // Pass the prepared student objects
         studentsForRoute: [...this.studentIdsFormArray.value], // Pass the prepared student objects
         studentIdsPickupOrderFormArray: [
           ...this.studentIdsPickupOrderFormArray.value,
@@ -624,7 +560,6 @@ export class AddRouteComponent implements OnInit {
       },
       initialBreakpoint: 1,
       breakpoints: [0, 1],
-      // cssClass: ['full-screen-modal']
     });
     await modal.present();
 
@@ -658,8 +593,6 @@ export class AddRouteComponent implements OnInit {
     }
   }
 
-  //request
-
   async setSelectDriver() {
     try {
       console.log(
@@ -676,10 +609,8 @@ export class AddRouteComponent implements OnInit {
             }
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-            // this.reorderableStudentGroups = [];
             return of([]);
           }),
           finalize(() => {
@@ -692,10 +623,6 @@ export class AddRouteComponent implements OnInit {
 
   async setSelectStudents() {
     try {
-      // console.log(
-      //   this.ruteForm.value,
-      //   'this.ruteForm.value this.ruteForm.value'
-      // );
       const student_ids = this.ruteForm.value.student_ids.map(
         (student: any) => student.id ?? student
       );
@@ -708,10 +635,8 @@ export class AddRouteComponent implements OnInit {
             }
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-            // this.reorderableStudentGroups = [];
             return of([]);
           }),
           finalize(() => {
@@ -773,17 +698,12 @@ export class AddRouteComponent implements OnInit {
         return []; // Si no hay estudiantes válidos
       }
     );
-    console.log(route_points, '0222222');
-
-    // console.log(route_points);
     return route_points;
   }
 
   async setPointsInRoute() {
     try {
       const data = [...this.setPoints(), ...this.startAndEndOfTheRoute];
-      // console.log(data, '///////2/2/2/2/2/2//2/2/2/2/2/2/2');
-
       this.routeTrackingService
         .updatePointsInRoute(this.route_id, data)
         .pipe(
@@ -793,10 +713,8 @@ export class AddRouteComponent implements OnInit {
             }
           }),
           catchError((err) => {
-            // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-            // this.reorderableStudentGroups = [];
 
             const errorMessage =
               err.error.error.message ||
