@@ -120,7 +120,7 @@ export class RouteTrackingService {
   }
 
    updateStudentsInRoute (route_id: any, data: any) {
-      let url = `${this.appURl}/school/route/${route_id}/student`;
+      let url = `${this.appURl}/school/route/${route_id}/students`;
       // const {name, driverId, busId, schedules }
     const dataRoute = {
       params: {
