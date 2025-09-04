@@ -91,11 +91,11 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
       if (position) {
         if (this.googleMarker) {
           this.updateMapWithNewLocation(position);
-          
+
         } else {
-           const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-    await this.addMarkersFromInput();
+    //        const lat = position.coords.latitude;
+    // const lng = position.coords.longitude;
+          await this.addMarkersFromInput();
 
         }
 
@@ -118,7 +118,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
 
               if (distance < 1000 && !this.notifiedStudents.has(marker.id)) {
                 this.sendProximityNotification(marker);
-                this.notifiedStudents.add(marker.id);
+                // this.notifiedStudents.add(marker.id);
               }
             }
           }
@@ -126,29 +126,92 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    // this.observerService.driverLocation$.subscribe(async (position) => {
+    //   if (position) {
+    //     if (this.googleMarker) {
+    //       this.updateMapWithNewLocation(position);
+    //     } else {
+    //       await this.addMarkersFromInput();
+    //     }
+
+    //     // 🔔 Verificar distancia con estudiantes
+    //     const driverLat = position.coords.latitude;
+    //     const driverLng = position.coords.longitude;
+
+    //     for (const marker of this.markers) {
+    //       if (marker.id !== '1-dr') {
+    //         const distance = getDistanceFromLatLonInMeters(
+    //           driverLat,
+    //           driverLng,
+    //           marker.lat,
+    //           marker.lng
+    //         );
+
+    //         // 📢 Distancias a chequear
+    //         this.checkProximityAndNotify(marker, distance);
+    //       }
+    //     }
+    //   }
+    // });
+
+
+
     await this.addMarkersFromInput();
     if (this.routePoints && this.showBtnPermission === 'driver') {
       // await this.drawRouteUsingGoogleAPI();
     }
   }
 
-  sendProximityNotification(marker: any) {
-    const notificationData = {
-      token: marker.fcmToken ?? null, // Asumiendo que cada estudiante tiene su token
-      msm: `Tu transporte está llegando cerca de ti (${marker.name})`,
-      title: 'Transporte escolar cerca',
-    };
+  private checkProximityAndNotify(marker: any, distance: number) {
+  // Distancias a manejar
+  const thresholds = [
+    { value: 1000, message: `Tu transporte está a menos de 1 km de ti (${marker.name})` },
+    { value: 150, message: `Tu transporte está a menos de 150 m de ti (${marker.name})` },
+    { value: 20, message: `Tu transporte ha llegado a tu punto de recogida (${marker.name})` }, // ~20 m como tolerancia
+  ];
 
-    if (notificationData.token) {
-      this.fcmService.sendNotification(notificationData).subscribe((res) => {
-        console.log('✅ Notificación enviada', res);
-      });
-    } else {
-      console.warn(
-        `⚠️ No se encontró token FCM para el estudiante ${marker.name}`
-      );
+  for (const t of thresholds) {
+    const key = `${marker.id}-${t.value}`; // Clave única por estudiante y distancia
+    if (distance <= t.value && !this.notifiedStudents.has(key)) {
+      this.sendProximityNotification({ ...marker, customMsg: t.message });
+      this.notifiedStudents.add(key);
     }
   }
+}
+
+sendProximityNotification(marker: any) {
+  const notificationData = {
+    token: marker.fcmToken ?? null,
+    msm: marker.customMsg ?? `Tu transporte está llegando cerca de ti (${marker.name})`,
+    title: 'Transporte escolar cerca',
+  };
+
+  if (notificationData.token) {
+    this.fcmService.sendNotification(notificationData).subscribe((res) => {
+      console.log('✅ Notificación enviada', res);
+    });
+  } else {
+    console.warn(`⚠️ No se encontró token FCM para ${marker.name}`);
+  }
+}
+
+  // sendProximityNotification(marker: any) {
+  //   const notificationData = {
+  //     token: marker.fcmToken ?? null, // Asumiendo que cada estudiante tiene su token
+  //     msm: `Tu transporte está llegando cerca de ti (${marker.name})`,
+  //     title: 'Transporte escolar cerca',
+  //   };
+
+  //   if (notificationData.token) {
+  //     this.fcmService.sendNotification(notificationData).subscribe((res) => {
+  //       console.log('✅ Notificación enviada', res);
+  //     });
+  //   } else {
+  //     console.warn(
+  //       `⚠️ No se encontró token FCM para el estudiante ${marker.name}`
+  //     );
+  //   }
+  // }
 
   startSimulatedMovement() {
     // Puedes definir coordenadas iniciales o usarlas dinámicamente
@@ -239,7 +302,7 @@ console.log(this.markers,'[[[[[mark');
           : undefined,
       });
       console.log(marker,'//////lo');
-      
+
 
       // ✅ Identificar el marcador del chofer por ID
       if (marker.id === '1-dr') {
