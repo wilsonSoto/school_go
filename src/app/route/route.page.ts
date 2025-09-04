@@ -34,6 +34,7 @@ export class RoutePage implements OnInit {
   ) {}
   typeSelect: any = 'first';
   hasData: boolean = true; // ✅ Para saber si hay datos en el segmento activo
+  isSelectInfo: boolean = true; // ✅ Para saber si hay datos en el segmento activo
 
   userData: any = '';
   students: any = [];
@@ -86,12 +87,15 @@ console.log(this.userData,'[[[000000000000000000000000000000000000]]]');
   handleSegmentChange(event: any) {
     const selected = event.detail.value;
     this.typeSelect = selected;
+console.log(selected);
 
     // Limpiar los datos al cambiar de segmento
     if (selected === 'first') {
       this.hasData = this.school_routes_pickup.length > 0;
+      this.isSelectInfo = true;
     } else {
       this.hasData = this.school_routes_delivery.length > 0;
+      this.isSelectInfo = false;
     }
   }
 
