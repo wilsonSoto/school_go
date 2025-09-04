@@ -637,7 +637,13 @@ export class AddRouteComponent implements OnInit {
           catchError((err) => {
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-            return of([]);
+               const errorMessage =
+                err.error.error.message ||
+                err.error.error ||
+                err?.message ||
+                'Error desconocido al agregar/editar ruta';
+              this.toastService.presentToast(errorMessage);
+              return of([]);
           }),
           finalize(() => {
             setTimeout(() => {}, 0);

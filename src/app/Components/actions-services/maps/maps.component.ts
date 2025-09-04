@@ -52,28 +52,28 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
     // this.locationService.simulateMovement(19.3971, -70.5864);
   }
 
-  async ngAfterViewInit1111111111() {
-    await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
-    const mapElement = this.mapContainer.nativeElement;
+  // async ngAfterViewInit1111111111() {
+  //   await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
+  //   const mapElement = this.mapContainer.nativeElement;
 
-    this.map = new google.maps.Map(mapElement, {
-      center: { lat: 19.097195132864133, lng: -70.59881283897987 },
-      zoom: 7,
-      zoomControl: false, // Oculta el control de zoom
-      mapTypeControl: false, // Oculta la opción "Mapa/Satélite"
-      // streetViewControl: false, // Oculta el ícono de Street View
-      fullscreenControl: false, // Oculta el botón de pantalla completa
-    });
-    this.observerService.driverLocation$.subscribe(async (position) => {
-      if (position) {
-        this.updateMapWithNewLocation(position);
-      }
-    });
-    await this.addMarkersFromInput();
-    if (this.routePoints && this.showBtnPermission == 'driver') {
-      await this.drawRouteUsingGoogleAPI();
-    }
-  }
+  //   this.map = new google.maps.Map(mapElement, {
+  //     center: { lat: 19.097195132864133, lng: -70.59881283897987 },
+  //     zoom: 7,
+  //     zoomControl: false, // Oculta el control de zoom
+  //     mapTypeControl: false, // Oculta la opción "Mapa/Satélite"
+  //     // streetViewControl: false, // Oculta el ícono de Street View
+  //     fullscreenControl: false, // Oculta el botón de pantalla completa
+  //   });
+  //   this.observerService.driverLocation$.subscribe(async (position) => {
+  //     if (position) {
+  //       this.updateMapWithNewLocation(position);
+  //     }
+  //   });
+  //   await this.addMarkersFromInput();
+  //   if (this.routePoints && this.showBtnPermission == 'driver') {
+  //     await this.drawRouteUsingGoogleAPI();
+  //   }
+  // }
 
   async ngAfterViewInit() {
     await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
@@ -89,7 +89,15 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
 
     this.observerService.driverLocation$.subscribe(async (position) => {
       if (position) {
-        this.updateMapWithNewLocation(position);
+        if (this.googleMarker) {
+          this.updateMapWithNewLocation(position);
+          
+        } else {
+           const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    await this.addMarkersFromInput();
+
+        }
 
         // 🔔 Verificar distancia con estudiantes
         const driverLat = position.coords.latitude;
@@ -152,6 +160,8 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
   private updateMapWithNewLocation(position: GeolocationPosition) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
+console.log(this.markers,'[[[[[mark');
+console.log(this.googleMarker,'[[[[[googleMarker');
 
     const newLatLng = new google.maps.LatLng(lat, lng);
 
@@ -203,6 +213,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
 
   private async addMarkersFromInput() {
     if (!this.map || !Array.isArray(this.markers)) return;
+console.log(this.markers,'[[[[[mark');
 
     // Limpiar marcadores anteriores
     this.googleMarkers.forEach((m: any) => m.setMap(null));
@@ -227,6 +238,8 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
             }
           : undefined,
       });
+      console.log(marker,'//////lo');
+      
 
       // ✅ Identificar el marcador del chofer por ID
       if (marker.id === '1-dr') {

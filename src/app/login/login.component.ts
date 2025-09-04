@@ -40,7 +40,8 @@ userData: any = null;
       // email: ['', [Validators.required, Validators.email]],
       login: ['', [Validators.required]],
       password: ['', Validators.required],
-      fcm_token: ['']
+      fcm_token: [''],
+      save_credentials: [false]
     });
   }
   ngOnInit(): void {
@@ -78,6 +79,8 @@ userData: any = null;
       this.toastService.presentToast('Por favor, completa todos los campos.')
       return;
     }
+    console.log(this.token,'tokennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
+            this.toastService.presentToast(JSON.stringify(this.token))
 
     const { login, password } = this.loginForm.value;
     if (login && password) {

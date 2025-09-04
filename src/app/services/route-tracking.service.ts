@@ -124,7 +124,7 @@ export class RouteTrackingService {
       // const {name, driverId, busId, schedules }
     const dataRoute = {
       params: {
-        "student_id": data
+        "student_ids": data
     }
     };
     return this.httpClient.post(url, dataRoute).pipe(

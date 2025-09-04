@@ -146,34 +146,34 @@ private locationSub!: Subscription;
     return 'admin';
   }
 
-  ngOnInit() {
+   async ngOnInit() {
     this.route_id = this.route.snapshot.paramMap.get('routeId');
-    // this.userData = JSON.parse(localStorage.getItem('userData') ?? '');
       this.userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
 
     if (this.route_id) {
       this.getRute();
     }
-    // this.observerService.currentMessage.subscribe(async (position) => {
-    //   if (position) {
-    //     const studentsNotVisited =
-    //       this.planned_route.route_points.students.filter((student: any) => {
-    //         return !this.planned_route.route_points.student_visiteds.some(
-    //           (visited: any) => visited.id === student.id
-    //         );
-    //       });
 
-    //     studentsNotVisited.forEach((student: any) => {
-    //       this.getDistanceAndCheckRadius(student, position);
-    //     });
-    //   }
-    // });
+    if (this.userData?.roles?.some((rol: any) => rol.external_id == userRoleEnum.partner)) {
+    
+        try {
+     const position = await this.getLocation();
+            const { latitude, longitude } = position.coords ?? position;
+             const data = {
+              name: 'Mi ubicación',
+              lat: latitude,
+              lng: longitude,
+              id: '1-pt'
+            };
 
-    // this.observerService.driverLocation$.subscribe(async (position) => {
-    //   if (position) {
-    //     this.setdriverLocation(position);
-    //   }
-    // });
+            this.markers.push(data)
+
+  } catch (error) {
+    console.log(error);
+
+  }
+    }
+    
   }
 
   ngOnDestroy() {
@@ -271,16 +271,7 @@ private locationSub!: Subscription;
         );
         // return true;
       }
-      // } else {
-      //   this.toastService.presentToast(
-      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
-      //   );
-
-      //   console.log(
-      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
-      //   );
-      //   return false;
-      // }
+    
     } catch (error) {
       // return false;
     }
@@ -667,18 +658,28 @@ async startDriverTracking() {
                 tap((response: any) => {
                   if (response.data) {
                response.data.id = '1-dr';
+               console.log('1111111111111111111111111111111', response);
+                     this.markers = []
                     response.data.name = 'Ubicación de chofer';
                     response.data.lat = response.data.latitude;
+               console.log('222222222222222222222222222222');
+
                     response.data.lng = response.data.longitude;
                     this.markers.push(response.data);
-                    // this.markers.push(data);
+                    // this.markers.push(position);
                     this.maps = true;
-                    let driverPosition: any = {}
-    this.locationService.simulateMovement(response.data.latitude, response.data.longitude);
+                    let driverPosition: any = {
+                      coords: {}
+                    }
+    // this.locationService.simulateMovement(response.data.latitude, response.data.longitude);
+               console.log('3333333333333333333333333',response);
 
                     driverPosition.coords.latitude = response.data.latitude;
+                    driverPosition.id = '1-dr';
+                    console.log('444444444444444444444444444', driverPosition);
+
                     driverPosition.coords.longitude =response.data.longitude;
-                    // this.observerService.changeDriverLocation(driverPosition);
+                    this.observerService.changeDriverLocation(driverPosition);
 
                   }
                   this.isLoading = false;
@@ -687,7 +688,7 @@ async startDriverTracking() {
                   this.maps = true;
                   this.isLoading = false;
                   this.errorMessage =
-                    'Error al cargar el chofer. Por favor, inténtelo de nuevo.';
+                    'Error al cargar el chofer. Por favor, inténtelo de nuevo. Error: '+err;
                   return of([]);
                 }),
                 finalize(() => {
@@ -708,9 +709,9 @@ async startDriverTracking() {
 
 // 🛑 Para detener el tracking (ejemplo: al salir de la página)
 stopDriverTracking() {
-  alert(1)
+  // alert(1)
   if (this.locationSub) {
-  alert(2)
+  // alert(2)
 
     this.locationSub.unsubscribe();
   }

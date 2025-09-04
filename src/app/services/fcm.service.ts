@@ -11,6 +11,7 @@ import { BehaviorSubject } from 'rxjs';
 import { hostUrlEnum } from 'src/types';
 import { catchError, map, timeout } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +24,9 @@ export class FcmService {
     return this._redirect.asObservable();
   }
   constructor(
-    private storage: StorageService,
+    private storage: StorageService,  
+    private toastService: ToastService,
+    
     private httpClient: HttpClient
   ) {}
 
@@ -135,6 +138,9 @@ export class FcmService {
           await this.storage.set(hostUrlEnum.FCM_TOKEN, fcmtoken);
           console.log('registration 8');
         }
+
+            this.toastService.presentToast(JSON.stringify(fcmtoken))
+
       } catch (error) {
         console.log(`Error registration listner, ${error}`);
       }
