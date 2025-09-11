@@ -78,7 +78,7 @@ export class AddRouteComponent implements OnInit {
   selectedStudents: Student[] = [];
   selectedStudentsForRoute: Student[] = [];
   allStudents: any[] = [];
-  startAndEndOfTheRoute: any= [];
+  startAndEndOfTheRoute: any = [];
   isLoadingMap: boolean = true;
   errorMessage: string | null = null;
   isActiveAllStudents: boolean = true;
@@ -114,8 +114,44 @@ export class AddRouteComponent implements OnInit {
     }
   }
 
+  private initial3!: string;
+
+  private norm3(): string {
+    const v = this.ruteForm.getRawValue();
+    // normaliza y ordena para comparar sin falsos positivos
+    const schedules = (v.schedules || [])
+      .map((s: any) => ({
+        day: s.day ?? '',
+        start: s.session_start_time ?? '',
+        end: s.session_end_time ?? '',
+      }))
+      .sort(
+        (a: any, b: any) =>
+          a.day.localeCompare(b.day) ||
+          String(a.start).localeCompare(String(b.start))
+      );
+
+    const obj = {
+      name: (v.name || '').trim(),
+      route_type: v.route_type || '',
+      schedules,
+    };
+    return JSON.stringify(obj);
+  }
+
+  get hasChanges3(): boolean {
+    return this.initial3 !== this.norm3();
+  }
+
   get schedulesFormArray(): FormArray {
     return this.ruteForm.get('schedules') as FormArray;
+  }
+
+  get activeBtnforRoute(): boolean {
+    const nameValid = this.ruteForm.get('name')?.valid;
+    const typeValid = this.ruteForm.get('route_type')?.valid;
+    const schedLen = (this.ruteForm.get('schedules') as FormArray)?.length > 0;
+    return !!nameValid && !!typeValid && !!schedLen && this.hasChanges3;
   }
 
   get schedulesFormDays(): any {
@@ -135,6 +171,7 @@ export class AddRouteComponent implements OnInit {
   initForm(): void {
     this.ruteForm = this.fb.group({
       name: ['', Validators.required],
+      route_type: ['', Validators.required],
       schedules: this.fb.array([], Validators.required),
       driverId: [null, Validators.required],
       busId: [null, Validators.required],
@@ -148,6 +185,7 @@ export class AddRouteComponent implements OnInit {
         session_end_time: '',
         day: '',
         name: '',
+        route_type: '',
         checked: false,
       },
     ];
@@ -168,6 +206,7 @@ export class AddRouteComponent implements OnInit {
       session_end_time: [schedule.session_end_time, Validators.required],
       day: [schedule.day, Validators.required],
       name: [schedule.name, Validators.required],
+      route_type: [schedule.route_type, Validators.required],
       checked: [schedule.checked, Validators.required],
     });
   }
@@ -178,6 +217,7 @@ export class AddRouteComponent implements OnInit {
       session_end_time: '',
       day: '',
       name: '',
+      route_type: '',
       checked: false,
     };
     this.schedulesFormArray.push(this.createScheduleGroup(newSchedule));
@@ -195,6 +235,7 @@ export class AddRouteComponent implements OnInit {
         session_end_time: sc.session_end_time.label,
         day: sc.day.value,
         name: sc.day.label,
+        route_type: sc.day.route_type,
         checked: true,
       };
     });
@@ -210,6 +251,7 @@ export class AddRouteComponent implements OnInit {
         component: SelectWeekDayComponent,
         componentProps: {
           currentSchedules: this.selectedDays,
+          route_type: this.ruteForm.value.route_type,
         },
         initialBreakpoint: 1,
         breakpoints: [0, 1],
@@ -239,10 +281,6 @@ export class AddRouteComponent implements OnInit {
         if (this.action == 'edit') {
           this.setSelectDriver();
         }
-        this.toastService.presentToast(
-          'Horarios de ruta actualizados!',
-          'custom-success-toast'
-        );
       }
     } catch (error: any) {
       this.toastService.presentToast(
@@ -325,10 +363,10 @@ export class AddRouteComponent implements OnInit {
             }
             this.ruteForm.patchValue({
               name: routeData.name,
+              route_type: routeData.route_type,
               driverId: routeData?.school_driver?.id, // Assuming your backend provides these
               busId: routeData?.school_bus?.id, // Assuming your backend provides these
             });
-
             // Fetch full driver and bus objects if only IDs are returned
             if (routeData.school_driver?.id) {
               this.selectedDriver = routeData.school_driver;
@@ -361,7 +399,7 @@ export class AddRouteComponent implements OnInit {
               this.studentIdsPickupOrderFormArray.clear();
               routeData.route_points.forEach((route: any) => {
                 if (route.is_origin_point || route.is_target_point) {
-                  this.startAndEndOfTheRoute.push(route)
+                  this.startAndEndOfTheRoute.push(route);
                 }
                 // Asegurarte de que route.students sea siempre un array
                 if (!Array.isArray(route.students)) {
@@ -378,6 +416,10 @@ export class AddRouteComponent implements OnInit {
               });
             }
             this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
+            // después de setSchedules(), patchValue(), etc.
+            this.initial3 = this.norm3();
+            this.ruteForm.markAsPristine();
+            this.ruteForm.markAsUntouched();
           }
         }),
         catchError((err) => {
@@ -441,7 +483,6 @@ export class AddRouteComponent implements OnInit {
     this.schedulesFormArray.controls.forEach((group: any, index) => {
       Object.keys(group.controls).forEach((key) => {
         const control = group.get(key);
-
       });
     });
 
@@ -452,6 +493,7 @@ export class AddRouteComponent implements OnInit {
 
       const data = {
         name: this.ruteForm.value.name,
+        route_type: this.ruteForm.value.route_type,
         schedules: this.ruteForm.value.schedules,
         partner_id: this.partner_id,
         company_id: userData.company.id ?? null,
@@ -481,11 +523,9 @@ export class AddRouteComponent implements OnInit {
     } else {
       Object.keys(this.ruteForm.controls).forEach((key) => {
         const control = this.ruteForm.get(key);
-
       });
     }
   }
-
 
   async openDriverBusSelectionModal() {
     const modal = await this.modalController.create({
@@ -526,7 +566,6 @@ export class AddRouteComponent implements OnInit {
     }
   }
 
-
   loadStudents(allFetchedStudents: Student[]): void {
     this.isLoadingMap = true;
     this.errorMessage = null;
@@ -546,8 +585,11 @@ export class AddRouteComponent implements OnInit {
       return;
     }
 
-    console.log(this.studentIdsPickupOrderFormArray.value,'this.studentIdsPickupOrderFormArray.value');
-    console.log(this.allStudents,'this.allStudents');
+    console.log(
+      this.studentIdsPickupOrderFormArray.value,
+      'this.studentIdsPickupOrderFormArray.value'
+    );
+    console.log(this.allStudents, 'this.allStudents');
 
     const modal = await this.modalController.create({
       component: ReorderStudentsMapModalComponent,
@@ -607,10 +649,23 @@ export class AddRouteComponent implements OnInit {
             if (response.data) {
               console.log(response);
             }
+            this.getRute();
+
+            this.toastService.presentToast(
+              'Horarios de ruta actualizados!',
+              'custom-success-toast'
+            );
           }),
           catchError((err) => {
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+
+            const errorMessage =
+              err.error.error.message ||
+              err.error.error ||
+              err?.message ||
+              'Error desconocido al agregar/editar ruta';
+            this.toastService.presentToast(errorMessage);
             return of([]);
           }),
           finalize(() => {
@@ -637,13 +692,13 @@ export class AddRouteComponent implements OnInit {
           catchError((err) => {
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-               const errorMessage =
-                err.error.error.message ||
-                err.error.error ||
-                err?.message ||
-                'Error desconocido al agregar/editar ruta';
-              this.toastService.presentToast(errorMessage);
-              return of([]);
+            const errorMessage =
+              err.error.error.message ||
+              err.error.error ||
+              err?.message ||
+              'Error desconocido al agregar/editar ruta';
+            this.toastService.presentToast(errorMessage);
+            return of([]);
           }),
           finalize(() => {
             setTimeout(() => {}, 0);
@@ -744,5 +799,6 @@ interface RouteSchedule {
   session_end_time: string;
   day: string;
   name: string;
+  route_type: string;
   checked: boolean;
 }

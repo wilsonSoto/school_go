@@ -32,7 +32,7 @@ export class RoutePage implements OnInit {
     private parentService: ParentService,
     private modalController: ModalController
   ) {}
-  typeSelect: any = 'first';
+  typeSelect: any = 'pickup';
   hasData: boolean = true; // ✅ Para saber si hay datos en el segmento activo
   isSelectInfo: boolean = true; // ✅ Para saber si hay datos en el segmento activo
 
@@ -90,7 +90,7 @@ console.log(this.userData,'[[[000000000000000000000000000000000000]]]');
 console.log(selected);
 
     // Limpiar los datos al cambiar de segmento
-    if (selected === 'first') {
+    if (selected === 'pickup') {
       this.hasData = this.school_routes_pickup.length > 0;
       this.isSelectInfo = true;
     } else {
@@ -116,7 +116,7 @@ console.log(selected);
       this.filtered_pickup = [...this.school_routes_pickup];
       this.filtered_delivery = [...this.school_routes_delivery];
       this.hasData =
-        this.typeSelect === 'first'
+        this.typeSelect === 'pickup'
           ? this.filtered_pickup.length > 0
           : this.filtered_delivery.length > 0;
       return;
@@ -142,7 +142,7 @@ console.log(selected);
 
     // 🔹 Validamos si hay datos para mostrar el mensaje de "No hay información"
     this.hasData =
-      this.typeSelect === 'first'
+      this.typeSelect === 'pickup'
         ? this.filtered_pickup.length > 0
         : this.filtered_delivery.length > 0;
   }
@@ -165,7 +165,7 @@ console.log(selected);
         this.filtered_delivery = [...this.school_routes_delivery];
 
         // ✅ Actualizar si hay datos en el segmento actual
-        if (this.typeSelect === 'first') {
+        if (this.typeSelect === 'pickup') {
           this.hasData = this.school_routes_pickup.length > 0;
         } else {
           this.hasData = this.school_routes_delivery.length > 0;

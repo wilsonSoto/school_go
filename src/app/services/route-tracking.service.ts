@@ -109,7 +109,8 @@ export class RouteTrackingService {
         "name": data.name,
         "school_driver_id": data.driverId,
         "school_bus_id": data.busId,
-        "schedules": data.schedules
+        "schedules": data.schedules,
+        "route_type": data.route_type
     }
     };
     return this.httpClient.post(url, dataRoute).pipe(

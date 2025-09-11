@@ -14,6 +14,10 @@ import { ObserverBetweenComponentsService } from 'src/app/services/observer-betw
 import { LocationService } from 'src/app/services/geolocation.service';
 import { getDistanceFromLatLonInMeters } from 'src/app/shared/utils/getDistanceFromLatLonInMeters';
 import { FcmService } from 'src/app/services/fcm.service';
+import { tap, catchError, finalize, switchMap, map } from 'rxjs/operators';
+import { ToastService } from 'src/app/services/toast.service';
+import { Observable, of, interval, Subscription } from 'rxjs';
+import { cleanToken } from 'src/app/shared/utils/cleanToken';
 
 @Component({
   selector: 'app-maps',
@@ -43,7 +47,8 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
     private googleDirectionsService: GoogleDirectionsService,
     private fcmService: FcmService,
     private locationService: LocationService,
-    private observerService: ObserverBetweenComponentsService
+    private observerService: ObserverBetweenComponentsService,
+    private toastService: ToastService
   ) {}
   markerSelected: any = null;
   private notifiedStudents: Set<any> = new Set();
@@ -51,29 +56,6 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
   ngOnInit() {
     // this.locationService.simulateMovement(19.3971, -70.5864);
   }
-
-  // async ngAfterViewInit1111111111() {
-  //   await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
-  //   const mapElement = this.mapContainer.nativeElement;
-
-  //   this.map = new google.maps.Map(mapElement, {
-  //     center: { lat: 19.097195132864133, lng: -70.59881283897987 },
-  //     zoom: 7,
-  //     zoomControl: false, // Oculta el control de zoom
-  //     mapTypeControl: false, // Oculta la opción "Mapa/Satélite"
-  //     // streetViewControl: false, // Oculta el ícono de Street View
-  //     fullscreenControl: false, // Oculta el botón de pantalla completa
-  //   });
-  //   this.observerService.driverLocation$.subscribe(async (position) => {
-  //     if (position) {
-  //       this.updateMapWithNewLocation(position);
-  //     }
-  //   });
-  //   await this.addMarkersFromInput();
-  //   if (this.routePoints && this.showBtnPermission == 'driver') {
-  //     await this.drawRouteUsingGoogleAPI();
-  //   }
-  // }
 
   async ngAfterViewInit() {
     await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
@@ -87,74 +69,82 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
       fullscreenControl: false,
     });
 
-    this.observerService.driverLocation$.subscribe(async (position) => {
-      if (position) {
-        if (this.googleMarker) {
-          this.updateMapWithNewLocation(position);
-
-        } else {
-    //        const lat = position.coords.latitude;
-    // const lng = position.coords.longitude;
-          await this.addMarkersFromInput();
-
-        }
-
-        // 🔔 Verificar distancia con estudiantes
-        const driverLat = position.coords.latitude;
-        const driverLng = position.coords.longitude;
-
-        for (const marker of this.markers) {
-          if (marker.id !== '1-dr') {
-            // Evitar compararse consigo mismo
-            const distance = await getDistanceFromLatLonInMeters(
-              driverLat,
-              driverLng,
-              marker.lat,
-              marker.lng
-            );
-
-            if (distance < 1000) {
-              // 👇 Enviar notificación
-
-              if (distance < 1000 && !this.notifiedStudents.has(marker.id)) {
-                this.sendProximityNotification(marker);
-                // this.notifiedStudents.add(marker.id);
-              }
-            }
-          }
-        }
-      }
-    });
-
     // this.observerService.driverLocation$.subscribe(async (position) => {
     //   if (position) {
     //     if (this.googleMarker) {
     //       this.updateMapWithNewLocation(position);
     //     } else {
+    //       //        const lat = position.coords.latitude;
+    //       // const lng = position.coords.longitude;
     //       await this.addMarkersFromInput();
     //     }
 
     //     // 🔔 Verificar distancia con estudiantes
     //     const driverLat = position.coords.latitude;
     //     const driverLng = position.coords.longitude;
-
-    //     for (const marker of this.markers) {
+    //     const studentsNotification = this.markers.filter((st: any) => st.is_student_point)
+    //     // console.log(studentsNotification,'/////?????????????????????????');
+    //         // this.toastService.presentToast(JSON.stringify(studentsNotification), 1);
+    //         // this.toastService.presentToast(JSON.stringify(this.markers), 1);
+        
+    //     for (const marker of studentsNotification) {
+    //       // alert(1)
     //       if (marker.id !== '1-dr') {
-    //         const distance = getDistanceFromLatLonInMeters(
+    //       // alert(2)
+    //          if (!marker.is_student_point) continue; // ✅ solo estudiantes
+    //       // alert(3)
+
+    //         // Evitar compararse consigo mismo
+    //         const distance = await getDistanceFromLatLonInMeters(
     //           driverLat,
     //           driverLng,
     //           marker.lat,
     //           marker.lng
     //         );
 
-    //         // 📢 Distancias a chequear
-    //         this.checkProximityAndNotify(marker, distance);
+    //         // if (distance < 1000) {
+    //         // 👇 Enviar notificación
+
+    //         if (!this.notifiedStudents.has(marker.id)) {
+    //           this.sendProximityNotification(marker);
+    //           // this.notifiedStudents.add(marker.id);
+    //         }
+    //         // }
     //       }
     //     }
     //   }
     // });
 
+    this.observerService.driverLocation$.subscribe(async (position) => {
+      if (position) {
+        if (this.googleMarker) {
+          this.updateMapWithNewLocation(position);
+        } else {
+          await this.addMarkersFromInput();
+        }
 
+        // 🔔 Verificar distancia con estudiantes
+        const driverLat = position.coords.latitude;
+        const driverLng = position.coords.longitude;
+        const studentsNotification = this.markers.filter((st: any) => st.is_student_point)
+
+        for (const marker of studentsNotification) {
+          if (marker.id !== '1-dr') {
+            //  if (!marker.is_student_point) continue; // ✅ solo estudiantes
+
+            const distance = getDistanceFromLatLonInMeters(
+              driverLat,
+              driverLng,
+              marker.lat,
+              marker.lng
+            );
+
+            // 📢 Distancias a chequear
+            this.checkProximityAndNotify(marker, distance);
+          }
+        }
+      }
+    });
 
     await this.addMarkersFromInput();
     if (this.routePoints && this.showBtnPermission === 'driver') {
@@ -163,55 +153,87 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
   }
 
   private checkProximityAndNotify(marker: any, distance: number) {
-  // Distancias a manejar
-  const thresholds = [
-    { value: 1000, message: `Tu transporte está a menos de 1 km de ti (${marker.name})` },
-    { value: 150, message: `Tu transporte está a menos de 150 m de ti (${marker.name})` },
-    { value: 20, message: `Tu transporte ha llegado a tu punto de recogida (${marker.name})` }, // ~20 m como tolerancia
-  ];
+    //  if (!marker.is_student_point) return; // ✅ doble seguridad
 
-  for (const t of thresholds) {
-    const key = `${marker.id}-${t.value}`; // Clave única por estudiante y distancia
-    if (distance <= t.value && !this.notifiedStudents.has(key)) {
-      this.sendProximityNotification({ ...marker, customMsg: t.message });
-      this.notifiedStudents.add(key);
+    // Distancias a manejar
+    const thresholds = [
+      {
+        value: 1000,
+        message: `Tu transporte está a menos de 5 minutos de ti (${marker.name})`,
+      },
+      {
+        value: 150,
+        message: `Tu transporte está a menos de 2 minutos m de ti (${marker.name})`,
+      },
+      {
+        value: 20,
+        message: `Tu transporte ha llegado a tu punto de recogida (${marker.name})`,
+      }, // ~20 m como tolerancia
+    ];
+
+    for (const t of thresholds) {
+      const key = `${marker.id}-${t.value}`; // Clave única por estudiante y distancia
+      if (distance <= t.value && !this.notifiedStudents.has(key)) {
+        this.sendProximityNotification({ ...marker, customMsg: t.message });
+        this.notifiedStudents.add(key);
+      }
     }
   }
-}
 
-sendProximityNotification(marker: any) {
-  const notificationData = {
-    token: marker.fcmToken ?? null,
-    msm: marker.customMsg ?? `Tu transporte está llegando cerca de ti (${marker.name})`,
-    title: 'Transporte escolar cerca',
-  };
+  async sendProximityNotification(marker: any) {
+    let tokenReview = await cleanToken(marker.fcm_token);
 
-  if (notificationData.token) {
-    this.fcmService.sendNotification(notificationData).subscribe((res) => {
-      console.log('✅ Notificación enviada', res);
-    });
-  } else {
-    console.warn(`⚠️ No se encontró token FCM para ${marker.name}`);
+    const notificationData = {
+      token: tokenReview ?? null,
+      msm:
+        marker.customMsg ??
+        `Tu transporte está llegando cerca de ti (${marker.name})`,
+      title: 'Transporte escolar cerca',
+    };
+
+    if (notificationData.token) {
+      this.fcmService
+        .sendNotification(notificationData)
+        .pipe(
+          tap((response: any) => {
+            this.toastService.presentToast('✅ Notificación enviada');
+            if (response.data) {
+              console.log(response);
+              console.log('✅ Notificación enviada', response);
+            }
+          }),
+          catchError((err) => {
+            this.toastService.presentToast(JSON.stringify(err));
+            return of([]);
+          }),
+          finalize(() => {
+            setTimeout(() => {}, 0);
+          })
+        )
+        .subscribe();
+    } else {
+            this.toastService.presentToast(`⚠️ No se encontró token FCM para prueba`);
+
+      console.warn(`⚠️ No se encontró token FCM para prueba`);
+    }
   }
+
+  startSimulatedMovementToStudents() {
+  const driver = this.markers.find(m => m.id === '1-dr');
+  const students = this.markers.filter(m => m.is_student_point);
+alert(1)
+  if (!driver || students.length === 0) {
+    console.warn('No hay chofer o estudiantes.');
+    return;
+  }
+
+  const startLat = driver.lat;
+  const startLng = driver.lng;
+  const targets = students.map(s => ({ lat: s.lat, lng: s.lng, id: s.id }));
+
+  this.locationService.simulateMovementToMarkers(startLat, startLng, targets);
 }
 
-  // sendProximityNotification(marker: any) {
-  //   const notificationData = {
-  //     token: marker.fcmToken ?? null, // Asumiendo que cada estudiante tiene su token
-  //     msm: `Tu transporte está llegando cerca de ti (${marker.name})`,
-  //     title: 'Transporte escolar cerca',
-  //   };
-
-  //   if (notificationData.token) {
-  //     this.fcmService.sendNotification(notificationData).subscribe((res) => {
-  //       console.log('✅ Notificación enviada', res);
-  //     });
-  //   } else {
-  //     console.warn(
-  //       `⚠️ No se encontró token FCM para el estudiante ${marker.name}`
-  //     );
-  //   }
-  // }
 
   startSimulatedMovement() {
     // Puedes definir coordenadas iniciales o usarlas dinámicamente
@@ -223,8 +245,8 @@ sendProximityNotification(marker: any) {
   private updateMapWithNewLocation(position: GeolocationPosition) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
-console.log(this.markers,'[[[[[mark');
-console.log(this.googleMarker,'[[[[[googleMarker');
+    console.log(this.markers, '[[[[[mark');
+    console.log(this.googleMarker, '[[[[[googleMarker');
 
     const newLatLng = new google.maps.LatLng(lat, lng);
 
@@ -276,7 +298,7 @@ console.log(this.googleMarker,'[[[[[googleMarker');
 
   private async addMarkersFromInput() {
     if (!this.map || !Array.isArray(this.markers)) return;
-console.log(this.markers,'[[[[[mark');
+    // console.log(this.markers, '[[[[[mark');
 
     // Limpiar marcadores anteriores
     this.googleMarkers.forEach((m: any) => m.setMap(null));
@@ -301,8 +323,7 @@ console.log(this.markers,'[[[[[mark');
             }
           : undefined,
       });
-      console.log(marker,'//////lo');
-
+      // console.log(marker, '//////lo');
 
       // ✅ Identificar el marcador del chofer por ID
       if (marker.id === '1-dr') {
@@ -394,7 +415,7 @@ console.log(this.markers,'[[[[[mark');
       const routePoints = await this.googleDirectionsService.getRoutePolyline(
         points
       );
-      console.log('Ruta generada:', routePoints);
+      // console.log('Ruta generada:', routePoints);
 
       if (routePoints?.length) {
         // Limpiar polyline anterior si existía

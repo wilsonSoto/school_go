@@ -1,31 +1,29 @@
 ion-item {
   .toggle-edit {
-    display: flex
-;
+    display: flex;
     flex-direction: column;
     align-items: flex-end;
-}
+  }
 }
 
 .input-wrapper.sc-ion-input-md {
-  --background: var(--ion-background-color);//#ffffff;
+  --background: var(--ion-background-color); //#ffffff;
 
   background: var(--background);
 }
 ion-input {
-  --background: var(--ion-background-color);// #ffffff !important;
+  --background: var(--ion-background-color); // #ffffff !important;
 
   background: var(--background);
 }
 
 ion-list {
-  margin-top:  0px !important;
+  margin-top: 0px !important;
 }
 
 ion-content {
   ion-item {
     ion-note {
-
       border-bottom: 1px solid #e9e1e1;
     }
     --border-color: #ffffff !important;
@@ -54,14 +52,14 @@ ion-content {
     height: auto;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }
 
 .no-image-placeholder {
   text-align: center;
   margin-top: 20px;
-  color: var(--ion-text-placeholder-color);//#888;
+  color: var(--ion-text-placeholder-color); //#888;
 }
 
 .image-preview-container {
@@ -78,8 +76,16 @@ ion-content {
     top: -4px;
     right: 82px;
     font-size: 24px; // Tamaño del ícono
-    color: var(--ion-color-danger, #eb445a); // Color rojo de Ionic o un color a tu elección
-    background-color: rgba(255, 255, 255, 0.7); // Fondo semi-transparente para visibilidad
+    color: var(
+      --ion-color-danger,
+      #eb445a
+    ); // Color rojo de Ionic o un color a tu elección
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.7
+    ); // Fondo semi-transparente para visibilidad
     border-radius: 50%; // Hace que el fondo sea circular
     padding: 2px; // Pequeño padding alrededor del ícono
     cursor: pointer; // Indica que es clickeable
@@ -111,42 +117,38 @@ ion-card {
       margin: 0 -6px;
     }
   }
-
-
 }
 
 .ion-list-button {
-    margin-top: 10px;
-    display: flex
-;
-    justify-content: center;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 .group-students {
-    margin-left: 11px;
+  margin-left: 11px;
 }
 
 .group {
-    border-bottom: 1px solid #e1dada;
-    /* margin-left: 8px; */
-    /* margin-right: 5px; */
-    padding-bottom: 5px;
+  border-bottom: 1px solid #e1dada;
+  /* margin-left: 8px; */
+  /* margin-right: 5px; */
+  padding-bottom: 5px;
 }
 // planned
-ion-accordion-group  {
-    margin-left: 0;
-    margin-right: 0;
+ion-accordion-group {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .split-layout {
   display: flex;
   height: 100%; // Ensure the flex container takes full height of ion-content
 
-    flex-direction: column-reverse;
-
+  flex-direction: column-reverse;
 }
 
 .p-full-5 {
-padding: 0 5px !important;
+  padding: 0 5px !important;
 }
 
 .list-panel {
@@ -179,10 +181,24 @@ padding: 0 5px !important;
     background-color: var(--ion-color-light);
   }
 }
-.action-button  {
+.action-button {
+  display: flex;
+  /* width: 34%; */
+  flex-direction: column;
+  height: 100px;
+  span {
     display: flex;
-    justify-content: space-around;
-    /* width: 34%; */
+    justify-content: space-between;
     flex-direction: column;
-    height: 89px;
+    height: 106px;
+  }
+}
+.chatbubbles {
+  font-size: 30px;
+  margin-right: 18px;
+}
+.driver {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

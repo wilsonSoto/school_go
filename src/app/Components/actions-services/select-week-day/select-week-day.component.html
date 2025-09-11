@@ -17,8 +17,13 @@
   <ion-list>
 <ion-item>
   <ion-label>Usar misma hora para todos</ion-label>
-  <ion-toggle [(ngModel)]="allDate" (ionChange)="applySameTimeToAllDays()"></ion-toggle>
+  <ion-toggle
+    [disabled]="!canUseSameTime"
+    [(ngModel)]="allDate"
+    (ionChange)="applySameTimeToAllDays()">
+  </ion-toggle>
 </ion-item>
+
 </ion-list>
   <form [formGroup]="weekDaysForm">
     <ion-item *ngFor="let weekDay of weeks; let i = index">
