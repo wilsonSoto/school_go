@@ -64,7 +64,7 @@ export class ReorderStudentsMapModalComponent
 {
   @Input() modal!: Components.IonModal;
   // @Input() activeMap: boolean = false;
-  @Input() isActiveAllStudents: boolean= true;
+  @Input() isActiveAllStudents: boolean = true;
   @Input() studentsForRoute: Student[] = [];
   @Input() studentIdsPickupOrderFormArray: any = [];
 
@@ -111,27 +111,24 @@ export class ReorderStudentsMapModalComponent
       if (this.isActiveAllStudents) {
         this.setReorderStudents();
       } else {
-        // console.log(this.studentIdsPickupOrderFormArray,'this.studentIdsPickupOrderFormArray');
-        
         this.reorderableStudentGroups = this.studentIdsPickupOrderFormArray;
       }
-    } else if (this.studentsForRoute && this.studentsForRoute.length > 0) {
-      this.reorderableStudentGroups = [
-        {
-          id: 'group-general',
-          name: 'General (Todos los estudiantes)',
-          students: [...this.studentsForRoute],
-          point_latitude: 0,
-          point_longitude: 0
-        },
-      ];
     }
-    // console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+    // else if (this.studentsForRoute && this.studentsForRoute.length > 0) {
+    //   this.reorderableStudentGroups = [
+    //     {
+    //       id: 'group-general',
+    //       name: 'General (Todos los estudiantes)',
+    //       students: [...this.studentsForRoute],
+    //       point_latitude: 0,
+    //       point_longitude: 0,
+    //     },
+    //   ];
+    // }
 
     this.markers = this.generateMarkersFromGroups(
       this.reorderableStudentGroups
     );
-    // console.log(this.markers, 'this.markers');
   }
 
   ngAfterViewInit() {
@@ -150,68 +147,69 @@ export class ReorderStudentsMapModalComponent
   }
 
   async onMarkerMoved(event: { id: string; lat: number; lng: number }) {
-  // console.log('🟢 Marcador movido:', event);
-  const index = Number(event.id);
+    // console.log('🟢 Marcador movido:', event);
+    const index = Number(event.id);
 
-  if (index >= 0 && index < this.markers.length) {
-    // Actualiza el marcador
-    this.markers[index].lat = event.lat;
-    this.markers[index].lng = event.lng;
+    if (index >= 0 && index < this.markers.length) {
+      // Actualiza el marcador
+      this.markers[index].lat = event.lat;
+      this.markers[index].lng = event.lng;
 
-    // Espera confirmación
-    const alert = await this.alertController.create({
-      header: '¿Actualizar ubicación?',
-      message: `¿Deseas aplicar esta nueva ubicación también en ${this.markers[index].name}?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Actualizar',
-          handler: () => {
-            const movedMarker = this.markers[index];
-            this.updateGroupOrStudentCoordinates(movedMarker);
-    // console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
-
+      // Espera confirmación
+      const alert = await this.alertController.create({
+        header: '¿Actualizar ubicación?',
+        message: `¿Deseas aplicar esta nueva ubicación también en ${this.markers[index].name}?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
           },
-        },
-      ],
-    });
+          {
+            text: 'Actualizar',
+            handler: () => {
+              const movedMarker = this.markers[index];
+              this.updateGroupOrStudentCoordinates(movedMarker);
+              // console.log(this.reorderableStudentGroups, 'this.reorderableStudentGroups');
+            },
+          },
+        ],
+      });
 
-    await alert.present();
-  } else {
-    console.warn('Índice fuera de rango');
-  }
-}
-
-
-updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
-  for (const group of this.reorderableStudentGroups) {
-    // 1. Verifica si es un grupo (coincide con group.id)
-    if (group.id === marker.id) {
-      group.point_latitude = marker.lat;
-      group.point_longitude = marker.lng;
-      // console.log(`📍 Coordenadas actualizadas para el grupo: ${group.name}`);
-      return;
+      await alert.present();
+    } else {
+      console.warn('Índice fuera de rango');
     }
+  }
 
-    // 2. Verifica si es un estudiante (coincide con student.id)
-    if (Array.isArray(group.students)) {
-      for (const student of group.students) {
-        if (student.id === marker.id) {
-          student.home_latitude = marker.lat;
-          student.home_longitude = marker.lng;
-          // console.log(`📍 Coordenadas actualizadas para el estudiante: ${student.name}`);
-          return;
+  updateGroupOrStudentCoordinates(marker: {
+    id: any;
+    lat: number;
+    lng: number;
+  }) {
+    for (const group of this.reorderableStudentGroups) {
+      // 1. Verifica si es un grupo (coincide con group.id)
+      if (group.id === marker.id) {
+        group.point_latitude = marker.lat;
+        group.point_longitude = marker.lng;
+        // console.log(`📍 Coordenadas actualizadas para el grupo: ${group.name}`);
+        return;
+      }
+
+      // 2. Verifica si es un estudiante (coincide con student.id)
+      if (Array.isArray(group.students)) {
+        for (const student of group.students) {
+          if (student.id === marker.id) {
+            student.home_latitude = marker.lat;
+            student.home_longitude = marker.lng;
+            // console.log(`📍 Coordenadas actualizadas para el estudiante: ${student.name}`);
+            return;
+          }
         }
       }
     }
+
+    console.warn('❌ No se encontró el grupo o estudiante para actualizar');
   }
-
-  console.warn('❌ No se encontró el grupo o estudiante para actualizar');
-}
-
 
   generateMarkersFromGroups(
     groups: any[]
@@ -262,8 +260,6 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
       (student) => !selectedStudentIds.includes(student.id)
     );
 
-    // console.log(filteredStudents, 'filteredStudents filteredStudents');
-    // console.log(selectedStudentIds, 'selectedStudentIds selectedStudentIds');
 
     if (
       !this.studentIdsPickupOrderFormArray.some(
@@ -287,11 +283,6 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
     ) {
       this.reorderableStudentGroups = [
         ...this.studentIdsPickupOrderFormArray,
-        // {
-        //   id: 'group-general',
-        //   name: 'General (Todos los estudiantes)',
-        //   students: filteredStudents,
-        // },
       ];
     }
   }
@@ -330,7 +321,7 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
                 name: groupName,
                 students: [],
                 point_latitude: 0,
-                point_longitude: 0
+                point_longitude: 0,
               });
 
               // this.updateMapVisualization();
@@ -453,7 +444,7 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
     await actionSheet.present();
   }
 
-  moveStudentToGroup11111(
+  moveStudentToGroup(
     student: Student,
     fromGroupId: string,
     toGroupId: string
@@ -464,103 +455,68 @@ updateGroupOrStudentCoordinates(marker: { id: any; lat: number; lng: number }) {
     const toGroup = this.reorderableStudentGroups.find(
       (g) => g.id === toGroupId
     );
-// console.log(fromGroupId,'fromGroupId fromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupIdfromGroupId');
-// console.log(toGroup,'toGroup toGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGrouptoGroup');
 
-    if (fromGroup && toGroup) {
-      const studentIndex = fromGroup.students.findIndex(
-        (s) => s.id === student.id
-      );
-      if (studentIndex > -1) {
-        const [movedStudent] = fromGroup.students.splice(studentIndex, 1);
-        toGroup.students.push(movedStudent);
-        this.toastService.presentToast(
-          `"${movedStudent.name}" movido a "${toGroup.name}"`,
-          'success'
-        );
-      }
-    } else {
+    if (!fromGroup || !toGroup) {
       this.toastService.presentToast(
         'Error al mover estudiante: grupos no encontrados.',
         'danger'
       );
+      return;
     }
-  }
 
-  moveStudentToGroup(
-  student: Student,
-  fromGroupId: string,
-  toGroupId: string
-): void {
-  const fromGroup = this.reorderableStudentGroups.find(g => g.id === fromGroupId);
-  const toGroup = this.reorderableStudentGroups.find(g => g.id === toGroupId);
+    const studentIndex = fromGroup.students.findIndex(
+      (s) => s.id === student.id
+    );
+    if (studentIndex === -1) return;
 
-  if (!fromGroup || !toGroup) {
-    this.toastService.presentToast('Error al mover estudiante: grupos no encontrados.', 'danger');
-    return;
-  }
+    const [movedStudent] = fromGroup.students.splice(studentIndex, 1);
+    toGroup.students.push(movedStudent);
 
-  const studentIndex = fromGroup.students.findIndex(s => s.id === student.id);
-  if (studentIndex === -1) return;
+    // 🧠 Actualizar puntos geográficos si aplica
+    if (toGroupId !== 'group-general') {
+      // Recalcular centroide
+      const wktPoints = toGroup.students
+        .filter((s) => s.home_latitude && s.home_longitude)
+        .map((s) => `POINT (${s.home_longitude} ${s.home_latitude})`);
 
-  const [movedStudent] = fromGroup.students.splice(studentIndex, 1);
-  toGroup.students.push(movedStudent);
-
-  // 🧠 Actualizar puntos geográficos si aplica
-  if (toGroupId !== 'group-general') {
-    // Recalcular centroide
-    const wktPoints = toGroup.students
-      .filter(s => s.home_latitude && s.home_longitude)
-      .map(s => `POINT (${s.home_longitude} ${s.home_latitude})`);
-
-    const centroid = getCentroid(wktPoints);
-    if (centroid) {
-      toGroup.point_latitude = centroid.lat;
-      toGroup.point_longitude = centroid.lon;
+      const centroid = getCentroid(wktPoints);
+      if (centroid) {
+        toGroup.point_latitude = centroid.lat;
+        toGroup.point_longitude = centroid.lon;
+      }
     }
-  }
 
-  if (fromGroupId !== 'group-general' && fromGroup.students.length > 0) {
-    // Recalcular centroide del grupo origen si aún tiene estudiantes
-    const wktPoints = fromGroup.students
-      .filter(s => s.home_latitude && s.home_longitude)
-      .map(s => `POINT (${s.home_longitude} ${s.home_latitude})`);
+    if (fromGroupId !== 'group-general' && fromGroup.students.length > 0) {
+      // Recalcular centroide del grupo origen si aún tiene estudiantes
+      const wktPoints = fromGroup.students
+        .filter((s) => s.home_latitude && s.home_longitude)
+        .map((s) => `POINT (${s.home_longitude} ${s.home_latitude})`);
 
-    const centroid = getCentroid(wktPoints);
-    if (centroid) {
-      fromGroup.point_latitude = centroid.lat;
-      fromGroup.point_longitude = centroid.lon;
+      const centroid = getCentroid(wktPoints);
+      if (centroid) {
+        fromGroup.point_latitude = centroid.lat;
+        fromGroup.point_longitude = centroid.lon;
+      }
+    } else if (
+      fromGroupId !== 'group-general' &&
+      fromGroup.students.length === 0
+    ) {
+      // Si quedó vacío, borra punto
+      fromGroup.point_latitude = 0;
+      fromGroup.point_longitude = 0;
     }
-  } else if (fromGroupId !== 'group-general' && fromGroup.students.length === 0) {
-    // Si quedó vacío, borra punto
-    fromGroup.point_latitude = 0;
-    fromGroup.point_longitude = 0;
-  }
 
-  this.toastService.presentToast(
-    `"${movedStudent.name}" movido a "${toGroup.name}"`,
-    'success'
-  );
-}
+    this.toastService.presentToast(
+      `"${movedStudent.name}" movido a "${toGroup.name}"`,
+      'success'
+    );
+  }
 
   dismissModal(action: 'cancel' | 'save' = 'cancel'): void {
     if (action === 'cancel') {
       this.modal.dismiss({ action: 'cancel' });
     } else {
       const finalOrderedStudents: Student[] = [];
-      // this.reorderableStudentGroups.forEach(group => {
-      //   group.students.forEach(student => {
-      //     finalOrderedStudents.push({
-      //       id: student.id,
-      //       home_latitude: student.home_latitude,
-      //       home_longitude: student.home_longitude,
-      //       name: student.name,
-      //       last_name: student.last_name,
-      //       address: student.address
-      //     });
-      //   });
-      // });
-
       this.modal.dismiss({
         action: 'save',
         reorderedStudentsWithCoords: this.reorderableStudentGroups,

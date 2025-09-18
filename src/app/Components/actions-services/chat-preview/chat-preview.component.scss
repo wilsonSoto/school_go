@@ -1,0 +1,54 @@
+:host { --kg-primary: #f3b802; --kg-primary-msm: #f3b802c7; --kg-primary-light: #E3F2FD; }
+
+.kg-header ion-toolbar { --background: var(--kg-primary); color: #fff; }
+.kg-header .name { font-weight: 700; }
+.kg-header .sub  { font-size: 12px; opacity: .9; margin-top: 2px; color: #eaf2ff; }
+
+.chat-scroll { height: 100%; overflow: auto; padding: 12px; background: #f6f7fb; }
+.date-sep { text-align: center; font-size: 12px; color: #6B7280; margin: 8px 0; }
+
+.bubble { max-width: 78%; padding: 10px 12px; border-radius: 16px; margin: 6px 0;
+          box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.bubble.remote { background: #fff; color: #111; margin-right: auto; }
+.bubble.mine   { background: var(--kg-primary-msm); color: #fff; margin-left: auto; }
+.bubble .meta  { font-size: 11px; opacity: .75; margin-top: 4px; }
+
+.typing { display: flex; gap: 6px; align-items: center; justify-content: center; margin: 8px 0; }
+.dot { width: 6px; height: 6px; background: #9CA3AF; border-radius: 50%;
+       animation: blink 1.2s infinite ease-in-out; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+.composer { padding: 6px 8px; background: #fff; border-top: 1px solid rgba(0,0,0,.06); }
+ion-textarea { --padding-start: 10px; --padding-end: 10px; }
+.send {
+  color: var(--kg-primary);
+}
+ion-icon {font-size: 25px;}
+
+.empty-chat {
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  .brand-logo { max-width: 240px; margin: 8px auto 16px; }
+  .empty-title { margin: 8px 0 4px; font-weight: 700; }
+  .empty-body { color: #4b5563; margin: 0 0 6px; }
+  .empty-hint { color: #6b7280; }
+}
+
+.chat-scroll { height: 100%; overflow: auto; padding: 12px; background: #f6f7fb; }
+.date-sep { text-align: center; font-size: 12px; color: #6B7280; margin: 8px 0; }
+.bubble { max-width: 78%; padding: 10px 12px; border-radius: 16px; margin: 6px 0; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.bubble.remote { background: #fff; color:#111; margin-right: auto; }
+.bubble.mine   { background: #0D47A1; color:#fff;  margin-left: auto; }
+.bubble .meta  { font-size: 11px; opacity: .75; margin-top: 4px; }
+.typing { display: flex; gap: 6px; align-items: center; justify-content: center; margin: 8px 0; }
+.dot { width: 6px; height: 6px; background: #9CA3AF; border-radius: 50%; animation: blink 1.2s infinite ease-in-out; }
+.dot:nth-child(2){ animation-delay: .2s; } .dot:nth-child(3){ animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }

@@ -109,7 +109,8 @@ export class RouteTrackingService {
         "name": data.name,
         "school_driver_id": data.driverId,
         "school_bus_id": data.busId,
-        "schedules": data.schedules
+        "schedules": data.schedules,
+        "route_type": data.route_type
     }
     };
     return this.httpClient.post(url, dataRoute).pipe(
@@ -120,11 +121,11 @@ export class RouteTrackingService {
   }
 
    updateStudentsInRoute (route_id: any, data: any) {
-      let url = `${this.appURl}/school/route/${route_id}/student`;
+      let url = `${this.appURl}/school/route/${route_id}/students`;
       // const {name, driverId, busId, schedules }
     const dataRoute = {
       params: {
-        "student_id": data
+        "student_ids": data
     }
     };
     return this.httpClient.post(url, dataRoute).pipe(
