@@ -46,6 +46,10 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
+
+  import { AlertController } from '@ionic/angular';
+
+
 @Component({
   standalone: true,
   selector: 'app-add-route',
@@ -62,7 +66,8 @@ export class AddRouteComponent implements OnInit {
     private fb: FormBuilder,
     private studentsService: StudentsService,
     private routeTrackingService: RouteTrackingService,
-    private toastService: ToastService
+    private toastService: ToastService,
+  private alertCtrl: AlertController
   ) {}
 
   action: string = '';
@@ -95,6 +100,7 @@ export class AddRouteComponent implements OnInit {
   private routeSubscription: Subscription | undefined;
 
   ruteForm!: FormGroup;
+studentsWithoutLocation: any[] = [];
 
   ngOnInit() {
     this.initForm();
@@ -114,6 +120,13 @@ export class AddRouteComponent implements OnInit {
     }
   }
 
+
+
+// constructor(
+//   private routeService: RouteService,
+//   private fb: FormBuilder,
+//   private alertCtrl: AlertController
+// ) {}
   private initial3!: string;
 
   private norm3(): string {
@@ -348,91 +361,187 @@ export class AddRouteComponent implements OnInit {
       home_longitude: student?.home_longitude,
     };
   }
-  // You need to fetch the driver and bus details if the route is being edited.
-  // Assuming your getRute() returns the full route object including driver and bus IDs
-  // and you have services to get the full objects by ID.
-  getRute() {
-    this.routeSubscription = this.routeService
-      .getRoute(this.route_id)
-      .pipe(
-        tap((response: any) => {
-          if (response.data) {
-            const routeData = response.data.school_route;
-            if (routeData?.schedules) {
-              this.setSchedules(routeData.schedules);
-            }
-            this.ruteForm.patchValue({
-              name: routeData.name,
-              route_type: routeData.route_type,
-              driverId: routeData?.school_driver?.id, // Assuming your backend provides these
-              busId: routeData?.school_bus?.id, // Assuming your backend provides these
-            });
-            // Fetch full driver and bus objects if only IDs are returned
-            if (routeData.school_driver?.id) {
-              this.selectedDriver = routeData.school_driver;
-            }
-            if (routeData.school_bus?.id) {
-              this.selectedBus = routeData.school_bus;
-            }
 
-            // Handle student_ids and student_ids_pickup_order if they exist in the route data
-            if (routeData.students && Array.isArray(routeData.students)) {
-              this.studentIdsFormArray.clear();
-              const students = routeData.students.map((st: any) => {
-                st.checked = true;
-                this.studentIdsFormArray.push(this.fb.control(st));
-                return {
-                  ...st,
-                };
-              });
-              // const allStudents = [ ...students]
-              const allStudents = [...routeData.pending_students, ...students];
+  // getRute444() {
+  //   this.routeSubscription = this.routeService
+  //     .getRoute(this.route_id)
+  //     .pipe(
+  //       tap((response: any) => {
+  //         if (response.data) {
+  //           const routeData = response.data.school_route;
+  //           if (routeData?.schedules) {
+  //             this.setSchedules(routeData.schedules);
+  //           }
+  //           this.ruteForm.patchValue({
+  //             name: routeData.name,
+  //             route_type: routeData.route_type,
+  //             driverId: routeData?.school_driver?.id, // Assuming your backend provides these
+  //             busId: routeData?.school_bus?.id, // Assuming your backend provides these
+  //           });
+  //           // Fetch full driver and bus objects if only IDs are returned
+  //           if (routeData.school_driver?.id) {
+  //             this.selectedDriver = routeData.school_driver;
+  //           }
+  //           if (routeData.school_bus?.id) {
+  //             this.selectedBus = routeData.school_bus;
+  //           }
 
-              // You might need to fetch full student objects based on these IDs if you plan to display them
-              this.loadStudents(allStudents);
-            }
+  //           // Handle student_ids and student_ids_pickup_order if they exist in the route data
+  //           if (routeData.students && Array.isArray(routeData.students)) {
+  //             this.studentIdsFormArray.clear();
+  //             const students = routeData.students.map((st: any) => {
+  //               st.checked = true;
+  //               this.studentIdsFormArray.push(this.fb.control(st));
+  //               return {
+  //                 ...st,
+  //               };
+  //             });
+  //             // const allStudents = [ ...students]
+  //             const allStudents = [...routeData.pending_students, ...students];
 
-            if (
-              routeData.route_points &&
-              Array.isArray(routeData.route_points)
-            ) {
-              this.studentIdsPickupOrderFormArray.clear();
-              routeData.route_points.forEach((route: any) => {
-                if (route.is_origin_point || route.is_target_point) {
-                  this.startAndEndOfTheRoute.push(route);
-                }
-                // Asegurarte de que route.students sea siempre un array
-                if (!Array.isArray(route.students)) {
-                  route.students = [route.students];
-                }
+  //             // You might need to fetch full student objects based on these IDs if you plan to display them
+  //             this.loadStudents(allStudents);
+  //           }
 
-                // Luego verifica si hay estudiantes
-                if (route.students.length > 0) {
-                  this.studentIdsPickupOrderFormArray.push(
-                    this.fb.control(route)
-                  );
-                  this.selectedStudentsForRoute.push(route);
-                }
-              });
-            }
-            this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
-            // después de setSchedules(), patchValue(), etc.
-            this.initial3 = this.norm3();
-            this.ruteForm.markAsPristine();
-            this.ruteForm.markAsUntouched();
+  //           if (
+  //             routeData.route_points &&
+  //             Array.isArray(routeData.route_points)
+  //           ) {
+  //             this.studentIdsPickupOrderFormArray.clear();
+  //             routeData.route_points.forEach((route: any) => {
+  //               if (route.is_origin_point || route.is_target_point) {
+  //                 this.startAndEndOfTheRoute.push(route);
+  //               }
+  //               // Asegurarte de que route.students sea siempre un array
+  //               if (!Array.isArray(route.students)) {
+  //                 route.students = [route.students];
+  //               }
+
+  //               // Luego verifica si hay estudiantes
+  //               if (route.students.length > 0) {
+  //                 this.studentIdsPickupOrderFormArray.push(
+  //                   this.fb.control(route)
+  //                 );
+  //                 this.selectedStudentsForRoute.push(route);
+  //               }
+  //             });
+  //           }
+  //           this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
+  //           // después de setSchedules(), patchValue(), etc.
+  //           this.initial3 = this.norm3();
+  //           this.ruteForm.markAsPristine();
+  //           this.ruteForm.markAsUntouched();
+  //         }
+  //       }),
+  //       catchError((err) => {
+  //         this.errorMessage =
+  //           'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+  //         return of([]);
+  //       }),
+  //       finalize(() => {
+  //         setTimeout(() => {}, 0);
+  //       })
+  //     )
+  //     .subscribe();
+  // }
+
+async presentStudentsWithoutLocation() {
+  if (this.studentsWithoutLocation.length === 0) return;
+
+  const message = this.studentsWithoutLocation
+    .map((st, i) => `${i + 1}. ${st.name || st.full_name || 'Sin nombre'}`)
+    .join('- -');
+
+  const alert = await this.alertCtrl.create({
+    header: 'Estudiantes sin ubicación',
+    message: message || 'Todos los estudiantes tienen ubicación.',
+    buttons: ['OK'],
+  });
+
+  await alert.present();
+}
+
+getRute() {
+  this.routeSubscription = this.routeService
+    .getRoute(this.route_id)
+    .pipe(
+      tap((response: any) => {
+        if (response.data) {
+          const routeData = response.data.school_route;
+
+          if (routeData?.schedules) {
+            this.setSchedules(routeData.schedules);
           }
-        }),
-        catchError((err) => {
-          this.errorMessage =
-            'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
-          return of([]);
-        }),
-        finalize(() => {
-          setTimeout(() => {}, 0);
-        })
-      )
-      .subscribe();
-  }
+
+          this.ruteForm.patchValue({
+            name: routeData.name,
+            route_type: routeData.route_type,
+            driverId: routeData?.school_driver?.id,
+            busId: routeData?.school_bus?.id,
+          });
+
+          if (routeData.school_driver?.id) {
+            this.selectedDriver = routeData.school_driver;
+          }
+          if (routeData.school_bus?.id) {
+            this.selectedBus = routeData.school_bus;
+          }
+
+          if (routeData.students && Array.isArray(routeData.students)) {
+            this.studentIdsFormArray.clear();
+            const students = routeData.students.map((st: any) => {
+              st.checked = true;
+              this.studentIdsFormArray.push(this.fb.control(st));
+              return { ...st };
+            });
+
+            const allStudents = [...routeData.pending_students, ...students];
+
+            // 🔹 Filtrar estudiantes sin lat/lng
+            this.studentsWithoutLocation = allStudents.filter(
+              (st: any) => !st.lat || !st.lng
+            );
+
+            this.loadStudents(allStudents);
+          }
+
+          if (routeData.route_points && Array.isArray(routeData.route_points)) {
+            this.studentIdsPickupOrderFormArray.clear();
+            routeData.route_points.forEach((route: any) => {
+              if (route.is_origin_point || route.is_target_point) {
+                this.startAndEndOfTheRoute.push(route);
+              }
+              if (!Array.isArray(route.students)) {
+                route.students = [route.students];
+              }
+              if (route.students.length > 0) {
+                this.studentIdsPickupOrderFormArray.push(this.fb.control(route));
+                this.selectedStudentsForRoute.push(route);
+              }
+            });
+          }
+
+          this.setReorderStudents(this.studentIdsPickupOrderFormArray.value);
+
+          this.initial3 = this.norm3();
+          this.ruteForm.markAsPristine();
+          this.ruteForm.markAsUntouched();
+
+          // 🔹 Mostrar popup si hay estudiantes sin ubicación
+          this.presentStudentsWithoutLocation();
+        }
+      }),
+      catchError((err) => {
+        this.errorMessage =
+          'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+        return of([]);
+      }),
+      finalize(() => {
+        setTimeout(() => {}, 0);
+      })
+    )
+    .subscribe();
+}
 
   setReorderStudents(dataPickUp: any) {
     const selectedStudentIds = dataPickUp
