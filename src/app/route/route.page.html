@@ -7,7 +7,7 @@
         </ion-col>
         <ion-col size="auto">
           <div>
-            <ion-avatar id="driver-bus-button">
+            <ion-avatar id="driver-bus">
               <img
                 alt="Silhouette of a person's head"
                 src="https://ionicframework.com/docs/img/demos/avatar.svg"
@@ -26,8 +26,7 @@
         clear-icon="trash-bin"
         (ionInput)="filterRoutes($event)"
         placeholder="Buscar por ruta, chofer o estudiante"
-      >
-      </ion-searchbar>
+      ></ion-searchbar>
 
       <ion-segment
         [(ngModel)]="typeSelect"
@@ -35,10 +34,10 @@
         mode="ios"
         (ionChange)="handleSegmentChange($event)"
       >
-        <ion-segment-button value="first" content-id="first">
-          <ion-label>Recogida </ion-label>
+        <ion-segment-button value="pickup" content-id="pickup">
+          <ion-label>Recogida</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="second" content-id="second">
+        <ion-segment-button value="delivery" content-id="delivery">
           <ion-label>Entrega</ion-label>
         </ion-segment-button>
       </ion-segment>
@@ -46,10 +45,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="">
+<ion-content [fullscreen]="true">
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+
   <div *ngIf="isLoading" class="loading-state ion-text-center">
     <ion-spinner name="circles"></ion-spinner>
     <p>Cargando Rutas...</p>
@@ -67,31 +67,31 @@
     <p>No hay información disponible para esta sección.</p>
   </div>
 
-  <ion-segment-view *ngIf="!isLoading && hasData">
-    <ion-segment-content id="first">
+  <!-- Contenido dinámico de rutas -->
+  <div *ngIf="!isLoading && hasData">
+    <div *ngIf="typeSelect === 'pickup'">
       <app-all-route
         *ngFor="let route of filtered_pickup"
         [route]="route"
         (click)="handleOpenRouteModal('edit',route)"
-      >
-      </app-all-route>
-    </ion-segment-content>
+      ></app-all-route>
+    </div>
 
-    <ion-segment-content id="second">
+    <div *ngIf="typeSelect === 'delivery'">
       <app-all-route
         *ngFor="let route of filtered_delivery"
         [route]="route"
         (click)="handleOpenRouteModal('edit',route)"
-      >
-      </app-all-route>
-    </ion-segment-content>
-  </ion-segment-view>
+      ></app-all-route>
+    </div>
+  </div>
 </ion-content>
 
-<ion-popover trigger="driver-bus-button" [dismissOnSelect]="true">
+<ion-popover trigger="driver-bus" [dismissOnSelect]="true">
   <ng-template>
     <ion-content>
       <ion-list>
+     
         <ion-item
           [button]="true"
           (click)="logoutAndGoToSignIn()"

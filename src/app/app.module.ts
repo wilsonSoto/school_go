@@ -72,6 +72,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     EditProfileComponent,
     UbicationModalComponent,
     VersionUpdateComponent,
+    // ChatComponent,
     // SelectWeekDayComponent,
     // AddRouteComponent,
     // AllRouteComponent,

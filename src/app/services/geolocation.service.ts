@@ -451,4 +451,126 @@ simulateMovement(startLat: number, startLng: number, intervalMs = 15000) {
   setInterval(move, intervalMs);
 }
 
+simulateMovementToMarkers(
+  startLat: number,
+  startLng: number,
+  targets: { lat: number; lng: number; id?: any }[],
+  stepMeters = 500,
+  intervalMs = 2000
+) {
+  if (!targets || targets.length === 0) {
+    console.warn('⚠️ No hay destinos para simular.');
+    return;
+  }
+
+  let currentLat = startLat;
+  let currentLng = startLng;
+  let targetIndex = 0;
+
+  const move = () => {
+    if (targetIndex >= targets.length) {
+      console.log('✅ Chofer llegó a todos los destinos.');
+      return;
+    }
+
+    const target = targets[targetIndex];
+    const { lat: destLat, lng: destLng } = target;
+
+    // Calcular vector dirección
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const toDeg = (rad: number) => (rad * 180) / Math.PI;
+
+    const R = 6371000; // radio Tierra en metros
+    const φ1 = toRad(currentLat);
+    const λ1 = toRad(currentLng);
+    const φ2 = toRad(destLat);
+    const λ2 = toRad(destLng);
+
+    const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
+    const x =
+      Math.cos(φ1) * Math.sin(φ2) -
+      Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
+    const bearing = Math.atan2(y, x);
+
+    // Calcular siguiente punto
+    const distRatio = stepMeters / R;
+    const φ3 = Math.asin(
+      Math.sin(φ1) * Math.cos(distRatio) +
+        Math.cos(φ1) * Math.sin(distRatio) * Math.cos(bearing)
+    );
+    const λ3 =
+      λ1 +
+      Math.atan2(
+        Math.sin(bearing) * Math.sin(distRatio) * Math.cos(φ1),
+        Math.cos(distRatio) - Math.sin(φ1) * Math.sin(φ3)
+      );
+
+    const nextLat = toDeg(φ3);
+    const nextLng = toDeg(λ3);
+
+    currentLat = nextLat;
+    currentLng = nextLng;
+
+    // Calcular distancia restante
+    const distance = this.getDistanceMeters(currentLat, currentLng, destLat, destLng);
+
+    // Crear posición simulada
+    const fakeCoords: GeolocationCoordinates = {
+      latitude: currentLat,
+      longitude: currentLng,
+      accuracy: 5,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      toJSON: () => ({
+        latitude: currentLat,
+        longitude: currentLng,
+        accuracy: 5,
+      }),
+    };
+
+    const fakePosition: GeolocationPosition = {
+      coords: fakeCoords,
+      timestamp: Date.now(),
+      toJSON: () => ({ coords: fakeCoords, timestamp: Date.now() }),
+    };
+
+    this.observerService.changeDriverLocation(fakePosition);
+
+    console.log(
+      `🚌 Moviéndose hacia destino ${targetIndex + 1}: distancia restante ${distance.toFixed(
+        2
+      )}m`
+    );
+
+    // Si llegamos a menos de 10 metros, pasamos al siguiente
+    if (distance < 10) {
+      console.log(`🎯 Llegó al destino ${targetIndex + 1}`);
+      targetIndex++;
+    }
+
+    if (targetIndex < targets.length) {
+      setTimeout(move, intervalMs);
+    } else {
+      console.log('🏁 Chofer llegó a todos los puntos.');
+    }
+  };
+
+  move();
+}
+
+// Utilidad para calcular distancia
+private getDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371000;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 }

@@ -15,7 +15,15 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <form [formGroup]="ruteForm">
-    <ion-list>
+     <ion-button *ngIf="activeBtnforRoute"
+      class="login-button"
+      type="button"
+      (click)="setSelectDriver()"
+      expand="block"
+    >
+      <span>Guardar</span>
+    </ion-button>
+    <!-- <ion-list> -->
       <ion-item>
         <ion-input
           type="text"
@@ -33,6 +41,13 @@
         >
           Nombre de la ruta es requerido.
         </ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-select fill="solid" placeholder="Seleccione Ruta" formControlName="route_type">
+          <div slot="label">Tipo de Ruta <ion-text color="danger">(Required)</ion-text></div>
+          <ion-select-option value="Recogida">Recogida</ion-select-option>
+          <ion-select-option value="Entrega">Entrega</ion-select-option>
+        </ion-select>
       </ion-item>
       <ion-item>
         <ion-input
@@ -54,7 +69,9 @@
           Dias de la ruta es requerido.
         </ion-note>
       </ion-item>
-    </ion-list>
+      <!-- <ion-list>
+    </ion-list> -->
+    <!-- </ion-list> -->
   </form>
 
   <ion-list class="ion-list-button">

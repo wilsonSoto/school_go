@@ -23,18 +23,13 @@ import {
   FormArray,
   FormControl,
 } from '@angular/forms';
-import { ParentService } from 'src/app/services/parents.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { SelectWeekDayComponent } from '../actions-services/select-week-day/select-week-day.component';
 import { CommonModule } from '@angular/common';
-import { SelectDriverBusComponent } from '../actions-services/select-driver-bus/select-driver-bus.component';
-import { SelectStudentsModalComponent } from '../actions-services/select-students-modal/select-students-modal.component';
-import { ReorderStudentsMapModalComponent } from '../actions-services/reorder-students-map-modal/reorder-students-map-modal.component';
 import { Student } from 'src/app/interfaces/student.interface';
 import { tap, catchError, finalize, switchMap, map } from 'rxjs/operators';
-import { Observable, of,interval, Subscription } from 'rxjs';
+import { Observable, of, interval, Subscription } from 'rxjs';
 import { StudentsService } from 'src/app/services/students.service';
 import { Driver } from 'src/app/interfaces/driver.interface'; // Import Driver interface
 import { Bus } from 'src/app/interfaces/bus.interface'; // Import Bus interface
@@ -47,9 +42,13 @@ import { LocationService } from 'src/app/services/geolocation.service';
 import { RouteTrackingPlannedService } from 'src/app/services/route-tracking-planned.service';
 import { getDistanceAndCheckRadius } from 'src/app/shared/utils/getDistanceAndCheckRadius';
 import { ObserverBetweenComponentsService } from 'src/app/services/observer-between-components.services';
-import { userRoleEnum } from 'src/types';
+import { hostUrlEnum, userRoleEnum } from 'src/types';
+import { FcmService } from 'src/app/services/fcm.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { cleanToken } from 'src/app/shared/utils/cleanToken';
+import { ChatPreviewComponent } from '../actions-services/chat-preview/chat-preview.component';
 
-  // import { interval, of, Subscription } from 'rxjs';
+// import { interval, of, Subscription } from 'rxjs';
 // import { switchMap, tap, catchError, finalize } from 'rxjs/operators';
 
 @Component({
@@ -76,6 +75,8 @@ export class PlannedRouteComponent implements OnInit, OnDestroy {
     private studentsService: StudentsService,
     private locationService: LocationService,
     private alertController: AlertController,
+    private fcmService: FcmService,
+    private storage: StorageService,
 
     private observerService: ObserverBetweenComponentsService,
     private toastService: ToastService
@@ -86,9 +87,9 @@ export class PlannedRouteComponent implements OnInit, OnDestroy {
 
   @ViewChild('timePopover') timePopover!: IonPopover;
   markers: any[] = [];
-// private locationS
+  // private locationS
 
-private locationSub!: Subscription;
+  private locationSub!: Subscription;
   rutaDelBus = false;
   maps = false;
   showCalendar = false;
@@ -98,7 +99,7 @@ private locationSub!: Subscription;
   selectedStudents: Student[] = [];
   selectedStudentsForRoute: Student[] = [];
   allStudents: any[] = [];
-  isAccordionSelect = 'third'
+  isAccordionSelect = 'third';
   isOpenApprovalStudents: boolean = false;
   isLoadingMap: boolean = true;
   errorMessage: string | null = null;
@@ -124,63 +125,149 @@ private locationSub!: Subscription;
   studentsInToSchoolGroup: any = [];
   userData: any = null;
 
-  get showBtnPermission() {
-// console.log(this.userData,'usertttttttttttttttttttttttttttttttttt');
+  get isShowButton(): boolean {
+    const role = this.showBtnPermission as unknown as string;
+    const state = this.planned_route?.state as unknown as string;
+    return role === 'partner' || state === 'to-start' || state === 'Completada';
+  }
 
+
+  get showBtnPermission() {
     if (
       this.userData?.roles?.some(
         (rol: any) => rol.external_id == userRoleEnum.partner
       )
     ) {
-      this.isAccordionSelect = 'first'
+      this.isAccordionSelect = 'first';
       return 'partner';
     } else if (
       this.userData?.roles?.some(
         (rol: any) => rol.external_id == userRoleEnum.driver
       )
     ) {
-      this.isAccordionSelect = 'third'
+      this.isAccordionSelect = 'third';
       this.rutaDelBus = true;
       return 'driver';
     }
     return 'admin';
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.route_id = this.route.snapshot.paramMap.get('routeId');
-    // this.userData = JSON.parse(localStorage.getItem('userData') ?? '');
-      this.userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
+    this.userData = JSON.parse(localStorage.getItem('userData') ?? '{}');
 
     if (this.route_id) {
       this.getRute();
     }
-    // this.observerService.currentMessage.subscribe(async (position) => {
-    //   if (position) {
-    //     const studentsNotVisited =
-    //       this.planned_route.route_points.students.filter((student: any) => {
-    //         return !this.planned_route.route_points.student_visiteds.some(
-    //           (visited: any) => visited.id === student.id
-    //         );
-    //       });
 
-    //     studentsNotVisited.forEach((student: any) => {
-    //       this.getDistanceAndCheckRadius(student, position);
-    //     });
-    //   }
-    // });
+    if (
+      this.userData?.roles?.some(
+        (rol: any) => rol.external_id == userRoleEnum.partner
+      )
+    ) {
+      try {
+        const position = await this.getLocation();
+        const { latitude, longitude } = position.coords ?? position;
+        const data = {
+          name: 'Mi ubicación',
+          lat: latitude,
+          lng: longitude,
+          id: '1-pt',
+        };
 
-    // this.observerService.driverLocation$.subscribe(async (position) => {
-    //   if (position) {
-    //     this.setdriverLocation(position);
-    //   }
-    // });
+        this.markers.push(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+
+async  sendProximityNotification() {
+    let token = 'n/a';
+    // alert(1);
+    this.storage.get(hostUrlEnum.FCM_TOKEN).then(async (resp) => {
+      token = JSON.stringify(resp);
+      // console.log(token, '11111111111111111111111111');
+      // alert(2);
+        let tokenReview = await cleanToken(token);
+  // try {
+
+  //   // si viene como '"abc"', lo parsea a abc
+  //   if (typeof raw === 'string' && raw.startsWith('"') && raw.endsWith('"')) {
+  //     raw = JSON.parse(raw);
+  //   }
+  // } catch (_) {}
+  // const cleanToken = String(raw).trim()
+  //   .replace(/^"+|"+$/g, '')  // quita " al inicio/fin
+  //   .replace(/^'+|'+$/g, ''); // quita ' al inicio/fin
+
+
+      const notificationData = {
+        token:  tokenReview ?? null,
+        msm: `Tu transporte está llegando cerca de ti (prueba)`,
+        title: 'Transporte escolar cerca',
+      };
+
+      if (notificationData.token) {
+        this.fcmService
+          .sendNotification(notificationData)
+          .pipe(
+            tap((response: any) => {
+              if (response.data) {
+                console.log(response);
+                console.log('✅ Notificación enviada', response);
+                this.toastService.presentToast(JSON.stringify(response));
+              }
+            }),
+            catchError((err) => {
+              this.isLoading = false;
+              this.toastService.presentToast(JSON.stringify(err));
+              this.toastService.presentToast(token);
+              this.toastService.presentToast(JSON.stringify(notificationData));
+
+              this.errorMessage =
+                'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
+              // this.reorderableStudentGroups = [];
+              return of([]);
+            }),
+            finalize(() => {
+              setTimeout(() => {}, 0);
+            })
+          )
+          .subscribe();
+      } else {
+        console.warn(`⚠️ No se encontró token FCM para prueba`);
+      }
+    });
   }
 
   ngOnDestroy() {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
-    this.stopDriverTracking()
+    this.stopDriverTracking();
+  }
+
+    async openChatModal(info: any) {
+      console.log('==================student==================');
+      console.log(info);
+      console.log('===============student=====================');
+    const modal = await this.modalController.create({
+      component: ChatPreviewComponent,
+      componentProps: {
+        infoMSM: info,
+        // subtitle: this.allStudents,
+      },
+      initialBreakpoint: 1,
+      breakpoints: [0, 1],
+    });
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data && data.action === 'select' && data.selectedStudentIds) {
+
+    }
   }
 
   handleRefresh(event: RefresherCustomEvent) {
@@ -226,7 +313,6 @@ private locationSub!: Subscription;
     return true;
   }
 
-
   // Handle checkbox change for a student
   onStudentCheckboxChange(event: CustomEvent, student: any): void {
     const isChecked = event.detail.checked;
@@ -271,16 +357,6 @@ private locationSub!: Subscription;
         );
         // return true;
       }
-      // } else {
-      //   this.toastService.presentToast(
-      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
-      //   );
-
-      //   console.log(
-      //     `❌ Fuera del área. Distancia: ${result.distance.toFixed(2)} m`
-      //   );
-      //   return false;
-      // }
     } catch (error) {
       // return false;
     }
@@ -382,103 +458,133 @@ private locationSub!: Subscription;
     };
   }
 
-  generateMarkersFromGroups22(groups: any[]): { lat: number; lng: number; name: string; id: any }[] {
-    const markers: { lat: number; lng: number; name: string; id: any; visit_order: number }[] = [];
+  // generateMarkersFromGroups22(
+  //   groups: any[]
+  // ): { lat: number; lng: number; name: string; id: any }[] {
+  //   const markers: {
+  //     lat: number;
+  //     lng: number;
+  //     name: string;
+  //     id: any;
+  //     visit_order: number;
+  //   }[] = [];
+
+  //   for (const group of groups) {
+  //     // Saltar si ya fue visitado
+  //     if (group.is_visited) continue;
+
+  //     const hasGroupCoords = group.point_latitude && group.point_longitude;
+
+  //     if (hasGroupCoords) {
+  //       markers.push({
+  //         lat: group.point_latitude,
+  //         lng: group.point_longitude,
+  //         name: group.name,
+  //         id: group.id,
+  //         visit_order: group.visit_order ?? 999, // por si no tiene valor
+  //       });
+  //     } else if (Array.isArray(group.students)) {
+  //       for (const student of group.students) {
+  //         const hasStudentCoords =
+  //           student.home_latitude && student.home_longitude;
+  //         if (hasStudentCoords) {
+  //           markers.push({
+  //             lat: student.home_latitude,
+  //             lng: student.home_longitude,
+  //             name: student.name,
+  //             id: student.id,
+  //             visit_order: group.visit_order ?? 999,
+  //           });
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   // Ordenar por visit_order
+  //   const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
+
+  //   return sorted.map(({ visit_order, ...rest }) => rest); // remover visit_order del resultado final
+  // }
+
+  generateMarkersFromGroups(groups: any[]): {
+    lat: number;
+    lng: number;
+    name: string;
+    id: any;
+      is_student_point?: boolean;
+    fcm_token?: string | boolean; // 👈 opcional, puede ser string o false
+  }[] {
+    const markers: {
+      lat: number;
+      lng: number;
+      name: string;
+      id: any;
+      is_student_point?: boolean;
+      fcm_token?: string | boolean;
+      visit_order: number;
+    }[] = [];
 
     for (const group of groups) {
       // Saltar si ya fue visitado
+      console.log(group, ';;lhhhhhhhhhhhhhhhhhh**********************************************************************************hhhhhhhhhhhhhh');
+
       if (group.is_visited) continue;
 
       const hasGroupCoords = group.point_latitude && group.point_longitude;
-
-      if (hasGroupCoords) {
-        markers.push({
-          lat: group.point_latitude,
-          lng: group.point_longitude,
-          name: group.name,
-          id: group.id,
-          visit_order: group.visit_order ?? 999 // por si no tiene valor
-        });
-      } else if (Array.isArray(group.students)) {
+      // const toke =
+      //   'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw2_RNzJ0xgU2g3NIsXyGdUqd9y4qa5lXtMUnxhLhjZMW23rHj5EpYPpJMxzKaPHDDNez_itINnPyM';
+     if (Array.isArray(group.students) && group.students.length > 0) {
         for (const student of group.students) {
-          const hasStudentCoords = student.home_latitude && student.home_longitude;
+          const hasStudentCoords =
+            student.home_latitude && student.home_longitude;
           if (hasStudentCoords) {
             markers.push({
               lat: student.home_latitude,
               lng: student.home_longitude,
               name: student.name,
               id: student.id,
-              visit_order: group.visit_order ?? 999
+          is_student_point: true,
+              fcm_token:
+                student.fcm_token ?? student.company?.fcm_token , // 👈 token del estudiante o empresa
+              visit_order: group.visit_order ?? 999,
             });
           }
         }
-      }
+      } else if (hasGroupCoords) {
+        markers.push({
+          lat: group.point_latitude,
+          lng: group.point_longitude,
+          name: group.name,
+          id: group.id,
+          is_student_point: group.is_student_point,
+          fcm_token: group.fcm_token , // 👈 aquí se asigna el token
+          visit_order: group.visit_order ?? 999,
+        });
+      }  
     }
 
-    // Ordenar por visit_order
+    // Ordenar por orden de visita
     const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
 
-    return sorted.map(({ visit_order, ...rest }) => rest); // remover visit_order del resultado final
+    // Eliminar el campo 'visit_order' antes de devolver
+    return sorted.map(({ visit_order, ...rest }) => rest);
   }
+  getVisiblePoints(route: any): any[] {
+  const type = (route.route_type || "").toLowerCase();
+  const showOrigin = type === "recogida";
+  const showTarget = type === "entrega";
 
-  generateMarkersFromGroups(groups: any[]): {
-  lat: number;
-  lng: number;
-  name: string;
-  id: any;
-  fcm_token?: string | boolean; // 👈 opcional, puede ser string o false
-}[] {
-  const markers: {
-    lat: number;
-    lng: number;
-    name: string;
-    id: any;
-    fcm_token?: string | boolean;
-    visit_order: number;
-  }[] = [];
-
-  for (const group of groups) {
-    // Saltar si ya fue visitado
-    console.log(group,';;lhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
-
-    if (group.is_visited) continue;
-
-    const hasGroupCoords = group.point_latitude && group.point_longitude;
-const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw2_RNzJ0xgU2g3NIsXyGdUqd9y4qa5lXtMUnxhLhjZMW23rHj5EpYPpJMxzKaPHDDNez_itINnPyM'
-    if (hasGroupCoords) {
-      markers.push({
-        lat: group.point_latitude,
-        lng: group.point_longitude,
-        name: group.name,
-        id: group.id,
-        fcm_token: group.fcm_token ?? toke , // 👈 aquí se asigna el token
-        visit_order: group.visit_order ?? 999,
-      });
-    } else if (Array.isArray(group.students)) {
-      for (const student of group.students) {
-        const hasStudentCoords = student.home_latitude && student.home_longitude;
-        if (hasStudentCoords) {
-          markers.push({
-            lat: student.home_latitude,
-            lng: student.home_longitude,
-            name: student.name,
-            id: student.id,
-            fcm_token: student.fcm_token ?? student.company?.fcm_token ?? toke, // 👈 token del estudiante o empresa
-            visit_order: group.visit_order ?? 999,
-          });
-        }
-      }
-    }
-  }
-
-  // Ordenar por orden de visita
-  const sorted = markers.sort((a, b) => a.visit_order - b.visit_order);
-
-  // Eliminar el campo 'visit_order' antes de devolver
-  return sorted.map(({ visit_order, ...rest }) => rest);
+  return route.route_points
+    .filter((p:any) =>
+      // siempre mostrar estudiantes y otros puntos normales
+      p.is_student_point ||
+      (!p.is_student_point && !p.is_origin_point && !p.is_target_point) ||
+      // mostrar solo uno de origen/destino
+      (showOrigin && p.is_target_point) ||
+      (showTarget && p.is_origin_point)
+    )
+    // .sort((a:any, b:any) => a.visit_order - b.visit_order);
 }
-
-
   getRute() {
     this.maps = false;
     this.isLoading = true;
@@ -496,35 +602,46 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
               return route;
             });
 
-            let driver: any = {}
+            let driver: any = {};
             // try {
-              const location = await this.getLocation();
-              driver.id = '1-dr';
-              driver.name = 'Ubicacion de chofer';
-              driver.point_latitude = location.latitude;
-              driver.point_longitude = location.longitude;
-              // let add: any = {}
-              // add.id = '1-add';
-              // add.name = 'Ubicacion de sambil';
-              // add.point_latitude = 18.482384;
-              // add.point_longitude = -69.911896;
-              routeData.route_points.students = [...students];
-              routeData.route_points.unshift(driver);
-              // routeData.route_points.push(add);
-              this.planned_route = routeData;
-              if (this.showBtnPermission !== 'partner') {
-                this.markers = this.generateMarkersFromGroups(
-                  routeData.route_points
-                );
-              }
+            const location = await this.getLocation();
+            driver.id = '1-dr';
+            driver.name = 'Ubicacion de chofer';
+            driver.is_student_point = false;
+            driver.point_latitude = location.latitude;
+            driver.point_longitude = location.longitude;
+            // let add: any = {}
+            // add.id = '1-add';
+            // add.name = 'Ubicacion de sambil';
+            // add.point_latitude = 18.482384;
+            // add.point_longitude = -69.911896;
+            routeData.route_points.students = [...students];
+            routeData.route_points.unshift(driver);
+            // routeData.route_points.push(add);
+            console.log('====================================');
+            console.log();
+            console.log('====================================');
+            this.planned_route = routeData;
+            if (this.showBtnPermission !== 'partner') {
+              const route_points = this.getVisiblePoints(routeData);
+console.log('================route_points====================');
+console.log(route_points);
+console.log('==============route_points======================');
+              this.markers = this.generateMarkersFromGroups(route_points);
+            }
 
             // } catch (error) {
             //   console.log(JSON.stringify(error),'No se pudo location la rutalocation------------------erereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-------------------------------------------------------------------------------------------------------------------------------------------' );
 
             // }
-            console.log(this.planned_route,'?????????????????????????????????////////@@@@@');
-            console.log(this.markers,'??????????????????????????dd???????////////@@@@@');
-
+            // console.log(
+            //   this.planned_route,
+            //   '?????????????????????????????????////////@@@@@'
+            // );
+            // console.log(
+            //   this.markers,
+            //   '??????????????????????????dd???????////////@@@@@'
+            // );
           }
           this.maps = true;
           this.isLoading = false;
@@ -561,20 +678,22 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
   }
   // request
   async getDriverCurrentLocation() {
-
     this.isLoading = true;
     this.errorMessage = null;
     this.maps = false;
     try {
       const position = await this.getLocation();
       const { latitude, longitude } = position.coords ?? position;
-    console.log(JSON.stringify(position),'No se pudo location la position-----------------------------position---------------------------------------------position-----------------------------------------------------------------------------------' );
+      console.log(
+        JSON.stringify(position),
+        'No se pudo location la position-----------------------------position---------------------------------------------position-----------------------------------------------------------------------------------'
+      );
 
       const data = {
         name: 'Mi ubicación',
         lat: latitude,
         lng: longitude,
-        id: '1-pt'
+        id: '1-pt',
       };
       this.routeTrackingPlannedService
         .getDriverCurrentLocation(this.route_id)
@@ -589,7 +708,6 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
               this.maps = true;
             }
             this.isLoading = false;
-
           }),
           catchError((err) => {
             this.maps = true;
@@ -609,112 +727,125 @@ const toke = 'ftzFexWbSsS0IOKWb1DNZV:APA91bFd5PxVCS7MLvei7baq5YZYS55FKW49EkfIJBw
       this.maps = true;
     }
   }
-// ub: Subscription;
+  // ub: Subscription;
 
-async startDriverTracking() {
-  // 🛑 Por si se repite la función, cancelamos la previa
-  if (this.locationSub) {
-    this.locationSub.unsubscribe();
-  }
+  async startDriverTracking() {
+    // 🛑 Por si se repite la función, cancelamos la previa
+    if (this.locationSub) {
+      this.locationSub.unsubscribe();
+    }
 
-   let position: any = {}
-   let data: any = {}
-  try {
-     position = await this.getLocation();
-          // if (position) {
-            // 🔹 Notificar a ObserverService
-            // this.observerService.changeDriverLocation(position);
-            console.log('📡 Posición actual:', position.coords);
+    let position: any = {};
+    let data: any = {};
+    try {
+      position = await this.getLocation();
+      // if (position) {
+      // 🔹 Notificar a ObserverService
+      // this.observerService.changeDriverLocation(position);
+      console.log('📡 Posición actual:', position.coords);
 
-            // 🔹 Tu lógica para markers
-            const { latitude, longitude } = position.coords ?? position;
-             data = {
-              name: 'Mi ubicación',
-              lat: latitude,
-              lng: longitude,
-              id: '1-pt'
-            };
+      // 🔹 Tu lógica para markers
+      const { latitude, longitude } = position.coords ?? position;
+      data = {
+        name: 'Mi ubicación',
+        lat: latitude,
+        lng: longitude,
+        id: '1-pt',
+        is_student_point: false,
 
-  } catch (error) {
-    console.log(error);
+      };
+    } catch (error) {
+      console.log(error);
+    }
 
-  }
+    // Cada 15 segundos
+    this.locationSub = interval(5000)
+      .pipe(
+        switchMap(async () => {
+          try {
+            // const position = await this.getLocation();
+            if (position) {
+              // 🔹 Notificar a ObserverService
+              // this.observerService.changeDriverLocation(position);
+              // console.log('📡 Posición actual:', position.coords);
 
+              // // 🔹 Tu lógica para markers
+              // const { latitude, longitude } = position.coords ?? position;
+              // const data = {
+              //   name: 'Mi ubicación',
+              //   lat: latitude,
+              //   lng: longitude,
+              //   id: '1-pt'
+              // };
 
-  // Cada 15 segundos
-  this.locationSub = interval(5000)
-    .pipe(
-      switchMap(async () => {
-        try {
-          // const position = await this.getLocation();
-          if (position) {
-            // 🔹 Notificar a ObserverService
-            // this.observerService.changeDriverLocation(position);
-            // console.log('📡 Posición actual:', position.coords);
+              return this.routeTrackingPlannedService
+                .getDriverCurrentLocation(this.route_id)
+                .pipe(
+                  tap((response: any) => {
+                    if (response.data) {
+                      response.data.id = '1-dr';
+                      console.log('1111111111111111111111111111111', response);
+                      this.markers = [];
+                      response.data.name = 'Ubicación de chofer';
+                      response.data.is_student_point = false;
+                      response.data.lat = response.data.latitude;
+                      console.log('222222222222222222222222222222');
 
-            // // 🔹 Tu lógica para markers
-            // const { latitude, longitude } = position.coords ?? position;
-            // const data = {
-            //   name: 'Mi ubicación',
-            //   lat: latitude,
-            //   lng: longitude,
-            //   id: '1-pt'
-            // };
+                      response.data.lng = response.data.longitude;
+                      this.markers.push(response.data);
+                      // this.markers.push(position);
+                      this.maps = true;
+                      let driverPosition: any = {
+                        coords: {},
+                      };
+                      // this.locationService.simulateMovement(response.data.latitude, response.data.longitude);
+                      console.log('3333333333333333333333333', response);
 
-            return this.routeTrackingPlannedService
-              .getDriverCurrentLocation(this.route_id)
-              .pipe(
-                tap((response: any) => {
-                  if (response.data) {
-               response.data.id = '1-dr';
-                    response.data.name = 'Ubicación de chofer';
-                    response.data.lat = response.data.latitude;
-                    response.data.lng = response.data.longitude;
-                    this.markers.push(response.data);
-                    // this.markers.push(data);
+                      driverPosition.coords.latitude = response.data.latitude;
+                      driverPosition.id = '1-dr';
+                      console.log(
+                        '444444444444444444444444444',
+                        driverPosition
+                      );
+
+                      driverPosition.coords.longitude = response.data.longitude;
+                      this.observerService.changeDriverLocation(driverPosition);
+                    }
+                    this.isLoading = false;
+                  }),
+                  catchError((err) => {
                     this.maps = true;
-                    let driverPosition: any = {}
-    this.locationService.simulateMovement(response.data.latitude, response.data.longitude);
-
-                    driverPosition.coords.latitude = response.data.latitude;
-                    driverPosition.coords.longitude =response.data.longitude;
-                    // this.observerService.changeDriverLocation(driverPosition);
-
-                  }
-                  this.isLoading = false;
-                }),
-                catchError((err) => {
-                  this.maps = true;
-                  this.isLoading = false;
-                  this.errorMessage =
-                    'Error al cargar el chofer. Por favor, inténtelo de nuevo.';
-                  return of([]);
-                }),
-                finalize(() => {
-                  this.maps = true;
-                  setTimeout(() => {}, 0);
-                })
-              )
-              .toPromise(); // 👈 convertimos observable a promesa porque estamos en async
+                    this.isLoading = false;
+                    this.errorMessage =
+                      'Error al cargar el chofer. Por favor, inténtelo de nuevo. Error: ' +
+                      err;
+                    return of([]);
+                  }),
+                  finalize(() => {
+                    this.maps = true;
+                    setTimeout(() => {}, 0);
+                  })
+                )
+                .toPromise(); // 👈 convertimos observable a promesa porque estamos en async
+            }
+          } catch (error) {
+            this.maps = true;
+            return of([]);
           }
-        } catch (error) {
-          this.maps = true;
-          return of([]);
-        }
-      })
-    )
-    .subscribe();
-}
-
-// 🛑 Para detener el tracking (ejemplo: al salir de la página)
-stopDriverTracking() {
-  alert(1)
-  if (this.locationSub) {
-  alert(2)
-
-    this.locationSub.unsubscribe();
+        })
+      )
+      .subscribe();
   }
-}
+
+  // 🛑 Para detener el tracking (ejemplo: al salir de la página)
+  stopDriverTracking() {
+    // alert(1)
+    if (this.locationSub) {
+      // alert(2)
+
+      this.locationSub.unsubscribe();
+    }
+  }
 
   getTheNextPoint() {
     const watchId = false;
@@ -730,7 +861,6 @@ stopDriverTracking() {
             if (response.data) {
             }
             this.isLoading = false;
-
           }),
           catchError((err) => {
             this.isLoading = false;
@@ -755,7 +885,6 @@ stopDriverTracking() {
   }
 
   async startTrackingLocation() {
-
     this.isLoading = true;
     this.errorMessage = null;
     // const watchId = false;
@@ -777,22 +906,23 @@ stopDriverTracking() {
             if (response) {
               // console.log(response);
               try {
-
-                const watchId: any = await this.locationService.startTrackingLocation();
+                const watchId: any =
+                  await this.locationService.startTrackingLocation();
                 if (watchId) {
                   localStorage.setItem('watchId', JSON.stringify(watchId));
                 }
               } catch (error) {
-                console.log(error,'333/////////////////////////////////');
-
+                console.log(error, '333/////////////////////////////////');
               }
             }
             this.isLoading = false;
-
           }),
           catchError((err) => {
             this.isLoading = false;
-      console.log(err,'ereer00000000000000000000000000000000000000000000000000000000000000000rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
+            console.log(
+              err,
+              'ereer00000000000000000000000000000000000000000000000000000000000000000rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
+            );
 
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
@@ -806,8 +936,10 @@ stopDriverTracking() {
         )
         .subscribe();
     } catch (error) {
-      console.log(error,'ereerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
-
+      console.log(
+        error,
+        'ereerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
+      );
     }
   }
 
@@ -831,11 +963,11 @@ stopDriverTracking() {
             if (response.data) {
               console.log(response);
             }
-      this.isLoading = false;
-    }),
+            this.isLoading = false;
+          }),
           catchError((err) => {
-      this.isLoading = false;
-      // console.error('Error fetching students:', err);
+            this.isLoading = false;
+            // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
@@ -891,22 +1023,21 @@ stopDriverTracking() {
       // const location = await this.getLocation();
       // this.routeSubscription = this.routeService
 
-    this.isLoading = true;
-    this.errorMessage = null;
+      this.isLoading = true;
+      this.errorMessage = null;
       this.routeTrackingPlannedService
         .markARouteAsVisited(this.route_id, data)
         .pipe(
           tap((response: any) => {
             if (response.data) {
               console.log(response);
-              this.getRute()
+              this.getRute();
             }
-      this.isLoading = false;
-
+            this.isLoading = false;
           }),
           catchError((err) => {
-      this.isLoading = false;
-      console.error('Error fetching students:', err);
+            this.isLoading = false;
+            console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar al actualizar la visita. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
@@ -946,12 +1077,11 @@ stopDriverTracking() {
               console.log(response);
               this.stopTrackingLocation();
             }
-      this.isLoading = false;
-
+            this.isLoading = false;
           }),
           catchError((err) => {
-      this.isLoading = false;
-      // console.error('Error fetching students:', err);
+            this.isLoading = false;
+            // console.error('Error fetching students:', err);
             this.errorMessage =
               'Error al cargar los estudiantes. Por favor, inténtelo de nuevo.';
             // this.reorderableStudentGroups = [];
