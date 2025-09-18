@@ -10,12 +10,12 @@ export class ToastService {
     private toastCtrl: ToastController
   ) {}
 
-  async presentToast(msm: string, style: string = 'custom-danger-toast', time: number = 2000) {
+  async presentToast(msm: string, style: any = 'custom-danger-toast', time: number = 2000) {
    const qtyTime =  style == 'custom-danger-toast' ? null : time
-
+const cssStyle = style == 1 ? 'custom-success-toast' : style
     const toast = await this.toastCtrl.create({
       message: msm,
-      cssClass: style,
+      cssClass: cssStyle,
       buttons: [
         {
           icon: 'close',

@@ -1,0 +1,97 @@
+<ion-header class="ion-no-border kg-header">
+  <ion-toolbar>
+    <ion-title>
+      <div class="title">
+        <div *ngIf="infoMSM?.father_name" class="name">{{ infoMSM?.father_name }} & {{ infoMSM?.mother_name }}</div>
+        <div class="name">{{ infoMSM?.name }}</div>
+        <div *ngIf="infoMSM?.father_name" class="sub">({{ infoMSM?.name }})</div>
+      </div>
+    </ion-title>
+ <ion-buttons slot="end">
+      <ion-button (click)="dismissModal('cancel')">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- <ion-content [fullscreen]="true">
+  <!- <div *ngIf="false" class="chat-scroll" (scroll)="onScroll($event)">
+    <div class="date-sep">HOY</div>
+
+    <div
+      *ngFor="let m of messages; trackBy: trackById"
+      class="bubble"
+      [class.mine]="isMine(m)"
+      [class.remote]="!isMine(m)"
+    >
+      <div class="text">{{ m.text }}</div>
+      <div class="meta">{{ m.createdAt | date: 'shortTime' }}</div>
+    </div>
+
+    <div class="typing" *ngIf="typing">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+  </div> ->
+  <div>
+    <ion-img
+  src="../../../../assets/images/logo-back.png"
+  alt="EscolarGo"
+></ion-img>
+  </div>
+</ion-content> -->
+
+<ion-content [fullscreen]="true">
+  <!-- Estado EN CONSTRUCCIÓN -->
+  <div *ngIf="!chatEnabled" class="empty-chat">
+    <ion-chip color="warning" class="mb-2">
+      <ion-icon name="construct-outline"></ion-icon>
+      <ion-label>Estamos trabajando en el chat</ion-label>
+    </ion-chip>
+
+    <ion-img src="../../../../assets/images/logo-back.png" alt="EscolarGo" class="brand-logo"></ion-img>
+
+    <h2 class="empty-title">{{ infoMsg.title }}</h2>
+    <p class="empty-body">{{ infoMsg.body }}</p>
+    <ion-note class="empty-hint">{{ infoMsg.hint }}</ion-note>
+  </div>
+
+  <!-- Cuando el chat esté activo, muestra el timeline real -->
+  <div *ngIf="chatEnabled" class="chat-scroll" (scroll)="onScroll($event)">
+    <div class="date-sep">HOY</div>
+
+    <div *ngFor="let m of messages; trackBy: trackById"
+         class="bubble"
+         [class.mine]="isMine(m)"
+         [class.remote]="!isMine(m)">
+      <div class="text">{{ m.text }}</div>
+      <div class="meta">{{ m.createdAt | date:'shortTime' }}</div>
+    </div>
+
+    <div class="typing" *ngIf="typing">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+  </div>
+</ion-content>
+
+
+<ion-footer class="composer">
+  <ion-item lines="none">
+    <!-- <ion-buttons slot="start">
+      <ion-button fill="clear"><ion-icon name="camera-outline"></ion-icon></ion-button>
+      <ion-button fill="clear"><ion-icon name="mic-outline"></ion-icon></ion-button>
+    </ion-buttons> -->
+
+    <ion-textarea
+      auto-grow="true"
+      rows="1"
+      placeholder="Escribe una notificación"
+      [(ngModel)]="text"
+      (keyup.enter)="send()">
+    </ion-textarea>
+
+    <ion-buttons slot="end">
+      <ion-button  [disabled]="!text?.trim()" (click)="send()">
+        <ion-icon [ngClass]="{'send': text?.trim()}" class="send" name="send"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+</ion-footer>

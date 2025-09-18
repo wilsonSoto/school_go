@@ -1,6 +1,5 @@
-
-<ion-content [fullscreen]="true" class="ion-padding login-content ">
-  <div class="content" >
+<ion-content [fullscreen]="true" class="ion-padding login-content">
+  <div class="content">
     <div class="login-box">
       <img src="../../assets/images/logo.png" alt="Logo" class="logo" />
 
@@ -20,9 +19,16 @@
         <!-- <ion-button expand="block" type="submit" class="ion-margin-top" color="primary" size="large" expand="block">
           Entrar
         </ion-button> -->
-<ion-button expand="block" type="button" (click)="addTokenNotificationAndLogin()" class="ion-margin-top" color="primary" size="large">
-  Entrar
-  <ion-spinner *ngIf="mostrarAnimacion"></ion-spinner>
+        <ion-button
+          expand="block"
+          type="button"
+          (click)="addTokenNotificationAndLogin()"
+          class="ion-margin-top"
+          color="primary"
+          size="large"
+        >
+          Entrar
+          <ion-spinner *ngIf="mostrarAnimacion"></ion-spinner>
           <!-- <ng-container *ngIf="!mostrarAnimacion; else loadingButtonContent">
           </ng-container>
           <ng-template #loadingButtonContent>
@@ -31,28 +37,33 @@
             </ng-template> -->
         </ion-button>
 
-            <!-- <ion-button class="login-button" type="submit" size="large" expand="block">
+        <!-- <ion-button class="login-button" type="submit" size="large" expand="block">
               <ion-spinner *ngIf="isIdentifying$ | async"></ion-spinner> Acceder
             </ion-button> -->
 
-        <ion-button expand="block" fill="clear" class="ion-text-center" routerLink="/register">
+        <!-- <ion-button expand="block" fill="clear" class="ion-text-center" routerLink="/register">
           ¿No tienes cuenta? Regístrate
-        </ion-button>
+        </ion-button> -->
+        <ion-item>
+          <ion-checkbox formControlName="save_credentials" labelPlacement="end">
+            Recordar contraseña
+          </ion-checkbox>
+          <!-- [checked]="isStudentSelected(student.id)" -->
+          <!-- (ionChange)="onStudentCheckboxChange($event, student)" -->
+        </ion-item>
       </form>
     </div>
-      <!-- <div class="loading-message" *ngIf="mostrarAnimacion">
+    <!-- <div class="loading-message" *ngIf="mostrarAnimacion">
       <p>Iniciando sesión...</p>
     </div> -->
 
-       <!-- <ion-button expand="block" type="button" (click)="changeLanguage('es')" class="ion-margin-top" color="primary" size="large">
+    <!-- <ion-button expand="block" type="button" (click)="changeLanguage('es')" class="ion-margin-top" color="primary" size="large">
 WELCOME
       </ion-button> -->
-      <div class="logo-back">
-
-        <div >
-          <ion-label>Copyright &copy; <b>Kabay Gruop </b> </ion-label>
-        </div>
+    <div class="logo-back">
+      <div>
+        <ion-label>Copyright &copy; <b>Kabay Gruop </b> </ion-label>
       </div>
-
+    </div>
   </div>
 </ion-content>

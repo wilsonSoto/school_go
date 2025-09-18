@@ -24,6 +24,7 @@ import {
 
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms'; // Import Reactive Forms modules
 import { Router } from '@angular/router'; // Assuming you might use router for defaultHref
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   standalone: true,
@@ -42,6 +43,7 @@ export class SelectWeekDayComponent implements OnInit {
   @Input() modal!: Components.IonModal;
 
   @Input() currentSchedules: any = null;
+  @Input() route_type: any = null;
   @Output() weekDaySelected = new EventEmitter<string>();
   allDate: boolean = false;
 
@@ -55,49 +57,49 @@ export class SelectWeekDayComponent implements OnInit {
 
   weeks: WeekDay[] = [
     {
-      day: 0,
+      day: '0',
       name: 'Lunes',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 1,
+      day: '1',
       name: 'Martes',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 2,
+      day: '2',
       name: 'Miércoles',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 3,
+      day: '3',
       name: 'Jueves',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 4,
+      day: '4',
       name: 'Viernes',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 5,
+      day: '5',
       name: 'Sábado',
       session_start_time: '',
       session_end_time: '',
       checked: false,
     },
     {
-      day: 6,
+      day: '6',
       name: 'Domingo',
       session_start_time: '',
       session_end_time: '',
@@ -112,29 +114,33 @@ export class SelectWeekDayComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private toastService: ToastService,
     private router: Router // If you need router for defaultHref
   ) {}
 
   ngOnInit() {
     this.initForm();
 
-
     // Populate form if currentSchedules has data
     if (this.currentSchedules && this.currentSchedules.length > 0) {
-      this.currentSchedules.forEach((incomingSchedule: IncomingRouteSchedule) => {
-        const dayId = parseInt(incomingSchedule.day, 10); // Convert string 'day' to number
-        const weekDayToUpdate = this.weeks.find(w => w.day === dayId);
+      this.currentSchedules.forEach(
+        (incomingSchedule: IncomingRouteSchedule) => {
+          const dayId = incomingSchedule.day; // Convert string 'day' to number
+          const weekDayToUpdate = this.weeks.find((w) => w.day == dayId);
 
-        if (weekDayToUpdate) {
-          // Update the `weeks` array item's properties
-          weekDayToUpdate.checked = true;
-          weekDayToUpdate.session_start_time = incomingSchedule.session_start_time;
-          weekDayToUpdate.session_end_time = incomingSchedule.session_end_time;
+          if (weekDayToUpdate) {
+            // Update the `weeks` array item's properties
+            weekDayToUpdate.checked = true;
+            weekDayToUpdate.session_start_time =
+              incomingSchedule.session_start_time;
+            weekDayToUpdate.session_end_time =
+              incomingSchedule.session_end_time;
 
-          // Add this updated weekDay to the FormArray
-          this.addDayToForm(weekDayToUpdate);
+            // Add this updated weekDay to the FormArray
+            this.addDayToForm(weekDayToUpdate);
+          }
         }
-      });
+      );
     }
   }
 
@@ -149,64 +155,66 @@ export class SelectWeekDayComponent implements OnInit {
     });
   }
 
+  get canUseSameTime(): boolean {
+    const days = this.daysFormArray?.controls as FormGroup[] | undefined;
+    if (!days || days.length === 0) return false;
+    return days.some(
+      (g) =>
+        !!g.get('session_start_time')?.value &&
+        !!g.get('session_end_time')?.value
+    );
+  }
+
   get daysFormArray(): FormArray {
     return this.weekDaysForm.get('days') as FormArray;
   }
 
   isActiveAllDay() {
-    // console.log(event,'......................');
-
-    // console.log(this.currentSchedules,'this.currentSchedules');
-    console.log(this.daysFormArray,'this.currentSthis.daysFormArraychedules');
     let data: any = {};
     if (this.allDate) {
-       this.weeks.forEach((d: any) => {
-       data = {
+      this.weeks.forEach((d: any) => {
+        data = {
           day: d.day,
           name: d.name,
           session_start_time: this.daysFormArray?.value[0]?.session_start_time,
           session_end_time: this.daysFormArray?.value[0]?.session_end_time,
           checked: true,
-        }
+        };
 
         this.addDayToForm(data);
-
       });
-      return
+      return;
     }
     this.weekDaysForm = this.fb.group({
       days: this.fb.array([]), // This FormArray will hold selected days' time info
     });
   }
 
-
   // In your SelectWeekDayComponent class:
-  getStartTimeControl(dayId: number): FormControl | any {
+  getStartTimeControl(dayId: any): FormControl | any {
     const dayFormGroup = this.findDayFormGroup(dayId);
     return (dayFormGroup?.get('session_start_time') as FormControl) || String;
   }
 
-  getCheckedControl(dayId: number): FormControl | any {
+  getCheckedControl(dayId: any): FormControl | any {
     const dayFormGroup = this.findDayFormGroup(dayId);
     return (dayFormGroup?.get('checked') as FormControl) || String;
   }
 
-  getEndTimeControl(dayId: number): FormControl | any {
+  getEndTimeControl(dayId: any): FormControl | any {
     const dayFormGroup = this.findDayFormGroup(dayId);
     return (dayFormGroup?.get('session_end_time') as FormControl) || String;
   }
   // Helper to find a day's FormGroup in the FormArray
-  findDayFormGroup(dayId: number): FormGroup | undefined {
+  findDayFormGroup(dayId: string): FormGroup | undefined {
     return this.daysFormArray.controls.find(
-      (control) => (control as FormGroup).get('day')?.value === dayId
+      (control) => (control as FormGroup).get('day')?.value == dayId
     ) as FormGroup;
   }
 
   // Adds a day's FormGroup to the FormArray
   addDayToForm(day: WeekDay) {
     if (!this.findDayFormGroup(day.day)) {
-      console.log(day,'22222222222222222222222222222222222');
-
       // Only add if not already present
       this.daysFormArray.push(
         this.fb.group({
@@ -218,11 +226,10 @@ export class SelectWeekDayComponent implements OnInit {
         })
       );
     }
-      console.log(day,'333333333333333333333333333333333333');
   }
 
   // Removes a day's FormGroup from the FormArray
-  removeDayFromForm(dayId: number) {
+  removeDayFromForm(dayId: any) {
     const index = this.daysFormArray.controls.findIndex(
       (control) => (control as FormGroup).get('day')?.value === dayId
     );
@@ -293,22 +300,34 @@ export class SelectWeekDayComponent implements OnInit {
 
   // Method to be called when you want to submit/get the form data
   submitForm() {
-    console.log('selec copmonent Form Data:', this.weekDaysForm.value);
-    // Here you would typically send this data to your service
-    // e.g., this.routeService.updateRouteDays(this.weekDaysForm.value);
-
-    this.modal.dismiss({
-      selectedWeekDays: this.weekDaysForm.value,
-      action: 'proceed',
-    });
+    console.log('===============this.weekDaysForm.value=====================');
+    console.log(this.route_type);
+    console.log(this.weekDaysForm.value);
+    console.log('==============this.weekDaysForm.value======================');
+    if (this.route_type?.trim() && this.weekDaysForm.value.days.length > 0) {
+      this.modal.dismiss({
+        selectedWeekDays: this.weekDaysForm.value,
+        action: 'proceed',
+      });
+    } else if (!this.route_type?.trim()) {
+      this.toastService.presentToast(
+        'El tipo de ruta es requerido para actualizar la ruta'
+      );
+      this.modal.dismiss(this.weekDaysForm.value); // Pass the form data
+    } else {
+      this.toastService.presentToast(
+        'El tipo de ruta es requerido para actualizar la ruta'
+      );
+      this.modal.dismiss(this.weekDaysForm.value); // Pass the form data
+    }
   }
 
-  applySameTimeToAllDays() {
+  applySameTimeToAllDays222222222222222222222222() {
     const [firstDay] = this.daysFormArray.value;
-  
+
     if (this.allDate && firstDay) {
       this.daysFormArray.clear();
-  
+
       this.weeks.forEach((day) => {
         const newDay = {
           day: day.day,
@@ -317,11 +336,11 @@ export class SelectWeekDayComponent implements OnInit {
           session_end_time: firstDay.session_end_time,
           checked: true,
         };
-  
+
         // Marcar como checked en el modelo base también
-        const week = this.weeks.find(w => w.day === day.day);
+        const week = this.weeks.find((w) => w.day === day.day);
         if (week) week.checked = true;
-  
+
         this.addDayToForm(newDay);
       });
     } else {
@@ -329,11 +348,46 @@ export class SelectWeekDayComponent implements OnInit {
       this.weeks.forEach((w) => (w.checked = false));
     }
   }
-  
+
+  applySameTimeToAllDays() {
+    // evita aplicar si aún no hay horas
+    if (!this.canUseSameTime) {
+      this.allDate = false;
+      this.toastService?.presentToast?.(
+        'Selecciona al menos un día con hora de inicio y fin'
+      );
+      return;
+    }
+
+    // toma el primer día válido como plantilla
+    const days = this.daysFormArray.controls as FormGroup[];
+    const firstValid = days.find(
+      (g) =>
+        !!g.get('session_start_time')?.value &&
+        !!g.get('session_end_time')?.value
+    )!;
+    const start = firstValid.get('session_start_time')!.value;
+    const end = firstValid.get('session_end_time')!.value;
+
+    this.daysFormArray.clear();
+    this.weeks.forEach((day) => {
+      // marca también el modelo base
+      const w = this.weeks.find((x) => x.day === day.day);
+      if (w) w.checked = true;
+
+      this.addDayToForm({
+        day: day.day,
+        name: day.name,
+        session_start_time: start,
+        session_end_time: end,
+        checked: true,
+      });
+    });
+  }
 }
 
 interface WeekDay {
-  day: number;
+  day: string;
   name: string;
   session_start_time: string;
   session_end_time: string;
