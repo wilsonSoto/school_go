@@ -127,3 +127,38 @@ ion-card {
 form ion-item {
   padding: 5px 0;
 }
+
+.route-form {
+  ion-item.modern-item {
+    border-radius: 16px;
+    margin: 8px 0;
+    --background: #f8f9fa;
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    --min-height: 60px;
+    box-shadow: 1px 1px 1px rgba(184, 181, 88, 0.67);
+  }
+
+  ion-note {
+    font-size: 0.8rem;
+    color: var(--ion-color-danger);
+    margin-left: 32px;
+  }
+}
+ion-item {
+  --border-color: rgba(0, 0, 0, 0.1); /* Gris claro */
+}
+.mandatory {
+  font-size: 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+ion-select {
+  position: relative;
+}
+.save-btn{
+    /* margin-top: 0px; */
+    font-weight: bold;
+    font-size: 0.9rem;
+}
