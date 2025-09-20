@@ -16,6 +16,42 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+
+  <!-- Cámara / Fotos -->
+  <key>NSCameraUsageDescription</key>
+  <string>Necesitamos la cámara para tomar fotos y escanear.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Necesitamos acceder a tus fotos para seleccionar imágenes.</string>
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>Necesitamos guardar imágenes en tu galería.</string>
+
+  <!-- Ubicación (Leaflet / Google Maps / seguimiento en primer plano) -->
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>Usamos tu ubicación para mostrar tu posición en el mapa.</string>
+
+  <!-- Si también quieres ubicación en segundo plano, añade ESTO (opcional) -->
+  <!-- y activa Background Modes -> Location updates en Xcode -->
+  <!--
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>Usamos tu ubicación incluso en segundo plano para seguimiento continuo.</string>
+  -->
+
+  <!-- Notificaciones push -->
+  <!-- No hay una clave de Info.plist para pedir permiso; se hace por código,
+      pero sí debes activar capacidades. Para soportar “Remote notifications”
+      en segundo plano, añade: -->
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>remote-notification</string>
+    <!-- Si usas ubicación en segundo plano, añade también: -->
+    <!-- <string>location</string> -->
+  </array>
+
+  <!-- Barra de estado / teclado / hápticos: sin permisos extra, pero puedes controlar apariencia -->
+  <key>UIViewControllerBasedStatusBarAppearance</key>
+  <true/>
+
+
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>

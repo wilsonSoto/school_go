@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <ion-buttons *ngIf="action !== 'edit'" slot="start">
       <ion-back-button [defaultHref]="defaultHref" />
@@ -13,6 +13,22 @@
 
     <ion-buttons *ngIf="action == 'edit'" slot="end">
       <ion-button (click)="modal.dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <ion-toolbar>
+    <!-- Back nativo solo si no estás en edición -->
+    <!-- <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref"></ion-back-button>
+    </ion-buttons> -->
+
+    <!-- Título simple (uniforme en iOS/Android) -->
+    <ion-title>Chofer</ion-title>
+
+    <!-- Botón Cerrar cuando action == 'edit' -->
+    <ion-buttons *ngIf="action === 'edit'" slot="end">
+      <ion-button (click)="modal.dismiss()">Cerrar</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

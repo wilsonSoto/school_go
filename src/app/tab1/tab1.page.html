@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
@@ -27,7 +27,30 @@
   (ionInput)="filterParents($event)">
 </ion-searchbar>
 
-    <!-- <ion-searchbar mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar> -->
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <!-- Barra 1: título + avatar -->
+  <ion-toolbar mode="md"> <!-- fuerza estilo Material también en iOS -->
+    <ion-title>Padres o Tutores</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-avatar id="parent-button">
+        <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra 2: buscador -->
+  <ion-toolbar>
+    <ion-searchbar
+      mode="ios"
+      show-clear-button="always"
+      clear-icon="trash-bin"
+      (ionInput)="filterParents($event)"
+      placeholder="Buscar padre o tutor">
+    </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
@@ -50,7 +73,7 @@
     <ion-icon name="information-circle-outline" color="medium"></ion-icon>
     <p>No hay padres ni tutores disponibles.</p>
   </div>
-  
+
   <span *ngIf="!isLoading && hasData">
     <app-parents
       *ngFor="let parent of filteredParents"

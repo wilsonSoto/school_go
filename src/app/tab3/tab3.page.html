@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
@@ -26,6 +26,29 @@
       (ionInput)="filterRoutes($event)"
       placeholder="Buscar por ruta, chofer o estudiante"
     >
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <!-- Barra 1: título + avatar -->
+  <ion-toolbar mode="md"> <!-- fuerza estilo Material también en iOS -->
+    <ion-title>Planificación de Rutas</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-avatar id="popover-button">
+        <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra 2: buscador -->
+  <ion-toolbar>
+    <ion-searchbar
+      mode="ios"
+      show-clear-button="always"
+      clear-icon="trash-bin"
+      (ionInput)="filterRoutes($event)"
+      placeholder="Buscar por ruta, chofer o estudiante">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
@@ -66,7 +89,7 @@
   <ng-template>
     <ion-content>
       <ion-list>
-     
+
         <ion-item
           [button]="true"
           (click)="logoutAndGoToSignIn()"
