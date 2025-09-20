@@ -1,8 +1,21 @@
-<ion-header>
+<!-- <ion-header>
   <ion-toolbar>
     <ion-title>Perfil</ion-title>
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/edit-profile']">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <ion-toolbar>
+    <!-- Título -->
+    <ion-title>Perfil</ion-title>
+
+    <!-- Botón editar perfil -->
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/edit-profile']" routerDirection="forward">
         <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
     </ion-buttons>

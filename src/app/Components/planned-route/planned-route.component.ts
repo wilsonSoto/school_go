@@ -560,7 +560,7 @@ async  sendProximityNotification() {
           fcm_token: group.fcm_token , // 👈 aquí se asigna el token
           visit_order: group.visit_order ?? 999,
         });
-      }  
+      }
     }
 
     // Ordenar por orden de visita
@@ -684,10 +684,10 @@ console.log('==============route_points======================');
     try {
       const position = await this.getLocation();
       const { latitude, longitude } = position.coords ?? position;
-      console.log(
-        JSON.stringify(position),
-        'No se pudo location la position-----------------------------position---------------------------------------------position-----------------------------------------------------------------------------------'
-      );
+      // console.log(
+      //   JSON.stringify(position),
+      //   'No se pudo location la position-----------------------------position---------------------------------------------position-----------------------------------------------------------------------------------'
+      // );
 
       const data = {
         name: 'Mi ubicación',
@@ -765,30 +765,17 @@ console.log('==============route_points======================');
           try {
             // const position = await this.getLocation();
             if (position) {
-              // 🔹 Notificar a ObserverService
-              // this.observerService.changeDriverLocation(position);
-              // console.log('📡 Posición actual:', position.coords);
-
-              // // 🔹 Tu lógica para markers
-              // const { latitude, longitude } = position.coords ?? position;
-              // const data = {
-              //   name: 'Mi ubicación',
-              //   lat: latitude,
-              //   lng: longitude,
-              //   id: '1-pt'
-              // };
-
               return this.routeTrackingPlannedService
                 .getDriverCurrentLocation(this.route_id)
                 .pipe(
                   tap((response: any) => {
                     if (response.data) {
                       response.data.id = '1-dr';
-                      console.log('1111111111111111111111111111111', response);
+                      // console.log('1111111111111111111111111111111', response);
                       this.markers = [];
                       response.data.name = 'Ubicación de chofer';
                       response.data.is_student_point = false;
-                      response.data.lat = response.data.latitude;
+                      // response.data.lat = response.data.latitude;
                       console.log('222222222222222222222222222222');
 
                       response.data.lng = response.data.longitude;

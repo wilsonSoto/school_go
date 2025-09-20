@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="defaultHref" />
@@ -11,7 +11,19 @@
       </ion-row>
     </div>
   </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <ion-toolbar>
+    <!-- Botón normal en iOS style -->
+   <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <!-- Título -->
+    <ion-title>Editar Ruta</ion-title>
+  </ion-toolbar>
 </ion-header>
+
 
 <ion-content [fullscreen]="true" class="ion-padding">
 <form [formGroup]="ruteForm" class="route-form" mode="ios">

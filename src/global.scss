@@ -12,7 +12,7 @@
 // /* Core CSS required for Ionic components to work properly */
 // @import "@ionic/angular/css/core.css";
 
-// /* Basic CSS for apps built with Ionic */  
+// /* Basic CSS for apps built with Ionic */
 // @import "@ionic/angular/css/normalize.css";
 // @import "@ionic/angular/css/structure.css";
 // @import "@ionic/angular/css/typography.css";
@@ -309,11 +309,11 @@
    :root {
     --ion-color-scheme: light; /* Fuerza el modo claro */
   }
-  
+
   html {
     color-scheme: light; /* Evita que el navegador aplique dark */
   }
-  
+
    :root {
   --ion-color-rose: #f6df9652;
   --ion-color-rose-rgb: 252 245 221;
@@ -376,6 +376,14 @@ ion-header {
               0 1px 10px 0 rgba(154, 147, 147, 0.12) !important;
 }
 
+ion-header ion-buttons  {
+    padding-top: 5px;
+    margin-right: 17px;
+    ion-avatar {
+        width: 35px;
+        height: 35px;
+    }
+}
 ion-card {
   box-shadow: none;
 }
