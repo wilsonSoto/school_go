@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <ion-buttons *ngIf="action !== 'edit'" slot="start">
       <ion-back-button [defaultHref]="defaultHref" />
@@ -11,7 +11,18 @@
       </ion-row>
     </div>
   </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <ion-toolbar>
+    <!-- Botón normal en iOS style -->
+   <ion-buttons *ngIf="action !== 'edit'" slot="start">
+      <ion-back-button [defaultHref]="defaultHref" />
+    </ion-buttons>
+    <!-- Título -->
+    <ion-title>Ruta Planeada</ion-title>
+  </ion-toolbar>
 </ion-header>
+
 
 <ion-content [fullscreen]="true" class="p-full-5">
   <!-- <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

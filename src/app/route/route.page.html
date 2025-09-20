@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
@@ -42,6 +42,47 @@
         </ion-segment-button>
       </ion-segment>
     </div>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <!-- Barra 1: título + avatar -->
+  <ion-toolbar mode="md">
+    <ion-title>Rutas programadas</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-avatar id="driver-bus">
+        <img
+          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          alt="Avatar"
+        />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra 2: buscador -->
+  <ion-toolbar>
+    <ion-searchbar
+      mode="ios"
+      show-clear-button="always"
+      clear-icon="trash-bin"
+      (ionInput)="filterRoutes($event)"
+      placeholder="Buscar por ruta, chofer o estudiante">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Barra 3: segment -->
+  <ion-toolbar>
+    <ion-segment
+      [(ngModel)]="typeSelect"
+      mode="ios"
+      (ionChange)="handleSegmentChange($event)">
+      <ion-segment-button value="pickup">
+        <ion-label>Recogida</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="delivery">
+        <ion-label>Entrega</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
@@ -91,7 +132,7 @@
   <ng-template>
     <ion-content>
       <ion-list>
-     
+
         <ion-item
           [button]="true"
           (click)="logoutAndGoToSignIn()"
