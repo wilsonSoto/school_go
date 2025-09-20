@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
@@ -27,9 +27,35 @@
           <ion-label>Vehiculo</ion-label>
         </ion-segment-button>
       </ion-segment>
-          <!-- <ion-searchbar size="mediun" mode="ios" show-clear-button="always" clear-icon="trash-bin" value="Custom Clear Icon"></ion-searchbar> -->
         </div>
       </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <!-- Barra superior: título + avatar -->
+  <ion-toolbar>
+    <ion-title>Chofer y Vehículo</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-avatar>
+        <img
+          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          alt="Avatar" />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra de segment -->
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="typeSelect" mode="ios">
+      <ion-segment-button value="first">
+        <ion-label>Chofer</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="second">
+        <ion-label>Vehículo</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">

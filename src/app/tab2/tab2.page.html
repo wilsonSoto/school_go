@@ -1,4 +1,4 @@
-<ion-header class="i-header">
+<!-- <ion-header class="i-header">
   <ion-toolbar>
     <div class="i-toolbar-inner">
       <ion-row class="i-toolbar">
@@ -44,6 +44,49 @@
       </ion-segment>
     </div>
   </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <!-- Barra superior: título + avatar -->
+  <ion-toolbar mode="md"> <!-- mode="md" fuerza un estilo consistente -->
+    <ion-title>Choferes y Vehículos</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-avatar id="driver-bus-button">
+        <img
+          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          alt="Avatar"
+        />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Barra de búsqueda -->
+  <ion-toolbar>
+    <ion-searchbar
+      mode="ios"
+      show-clear-button="always"
+      clear-icon="trash-bin"
+      placeholder="Buscar chofer o vehículo"
+      (ionInput)="filterData($event)">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Barra de segment -->
+  <ion-toolbar>
+    <ion-segment
+      [(ngModel)]="typeSelect"
+      mode="ios"
+      (ionChange)="handleSegmentChange($event)"
+    >
+      <ion-segment-button value="driver">
+        <ion-label>Choferes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="vehicle">
+        <ion-label>Vehículos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="">
@@ -65,8 +108,8 @@
     <ion-icon name="information-circle-outline" color="medium"></ion-icon>
     <p>No hay información disponible para esta sección.</p>
   </div>
-  
-  
+
+
   <ion-segment-view *ngIf="!isLoading && hasData">
     <ion-segment-content *ngIf="typeSelect == 'driver'" id="driver">
       <app-drivers

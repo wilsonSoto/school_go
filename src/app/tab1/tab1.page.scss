@@ -2,3 +2,11 @@
 //   background-color: #f4f4f4 !important;
 
 // }
+
+ion-header ion-toolbar ion-buttons  {
+    padding-top: 5px;
+    ion-avatar {
+        width: 35px;
+        height: 35px;
+    }
+}
