@@ -31,3 +31,20 @@
      font-weight: 800;
  }
 }
+/* perfil.page.scss */
+ion-thumbnail {
+  width: 56px;
+  height: 56px;
+  --border-radius: 8px;
+}
+
+ion-modal ion-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+ion-list-header{
+  padding-bottom: 25px;
+  margin-top: 10px;
+}
