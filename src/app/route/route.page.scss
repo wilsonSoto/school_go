@@ -7,3 +7,21 @@ ion-toolbar {
         // width: 500px;
     }
 }
+/* Quita el padding del toolbar que contiene el segment */
+ion-header > ion-toolbar:nth-of-type(3) {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+/* Haz que el segment ocupe todo el ancho */
+ion-header ion-toolbar ion-segment {
+  width: 100%;
+  --margin-start: 0;
+  --margin-end: 0;
+}
+
+/* Reparte el ancho entre los botones */
+ion-header ion-toolbar ion-segment ion-segment-button {
+  flex: 1 1 0;   /* cada botón ocupa la misma porción */
+  max-width: 100%;
+}
