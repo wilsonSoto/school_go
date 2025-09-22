@@ -36,7 +36,8 @@
   <ion-list>
     <ion-item>
       <ion-icon name="mail-outline" slot="start"></ion-icon>
-      <ion-label>{{ user.email }} <span *ngIf="!user.email">No Data</span></ion-label>
+      <ion-label>{{ user.email || 'No Data' }}</ion-label>
+
     </ion-item>
 
     <ion-item>
@@ -55,6 +56,33 @@
     </ion-item>
   </ion-list>
 
+
+  <!-- Documentos -->
+<ion-list *ngIf="company?.images?.length">
+  <ion-item>
+    <ion-list-header>Documentos</ion-list-header>
+  </ion-item>
+
+  <ion-item *ngFor="let f of company?.images" (click)="preview(f)">
+    <ion-thumbnail slot="start">
+      <ion-img [src]="f.url" alt="{{ f.name }}"></ion-img>
+    </ion-thumbnail>
+
+    <ion-label>
+      <h3>{{ f.name }}</h3>
+      <p *ngIf="f.type === 'image'">Imagen</p>
+    </ion-label>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="preview(f); $event.stopPropagation()">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="download(f); $event.stopPropagation()">
+        <ion-icon name="download-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+</ion-list>
 
   <!-- Acciones -->
    <div class="btn">
@@ -86,4 +114,27 @@
     <ion-item (click)="manageUsers()">Administrar usuarios</ion-item>
     <ion-item (click)="viewReports()">Ver reportes</ion-item>
   </ion-list>
+
+
 </ion-content>
+
+<!-- Modal de preview -->
+<ion-modal [isOpen]="viewerOpen" (didDismiss)="viewerOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ activeFile?.name }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="viewerOpen = false">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-img *ngIf="activeFile?.type === 'image'" [src]="activeFile?.url" alt="{{ activeFile?.name }}"></ion-img>
+      <!-- Si luego agregas PDFs/links, aquí puedes poner un iframe o abrir con @capacitor/browser -->
+    </ion-content>
+  </ng-template>
+</ion-modal>

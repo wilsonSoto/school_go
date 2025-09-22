@@ -5,6 +5,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from 'src/app/services/login.service';
 
 
+interface CompanyFile {
+  id: number;
+  name: string;
+  sequence: number;
+  url: string;
+  type: 'image' | 'pdf' | 'link';
+}
+
 @Component({
   standalone: false,
   selector: 'app-profile',
@@ -22,13 +30,41 @@ export class ProfileComponent implements OnInit {
     ) {}
 
     user: any = {
-  name: 'Wilson Soto',
-  email: 'wilson@example.com',
-  posts: 24,
-  followers: 120,
-  following: 80
 };
 
+company: any = {}
+  companyFiles: CompanyFile[] = [
+    {
+      id: 11,
+      name: 'Datos de Transferencia',
+      sequence: 10,
+      url: 'https://kabaygroup.com/api/image/company.image/11/image_1920/',
+      type: 'image'
+    },
+    {
+      id: 12,
+      name: 'Contrato de Servicio',
+      sequence: 10,
+      url: 'https://kabaygroup.com/api/image/company.image/12/image_1920/',
+      type: 'image'
+    }
+  ];
+
+  viewerOpen = false;
+  activeFile?: CompanyFile;
+
+  preview(file: CompanyFile) {
+    this.activeFile = file;
+    this.viewerOpen = true;
+  }
+
+  download(file: CompanyFile) {
+    const a = document.createElement('a');
+    a.href = file.url;
+    a.target = '_blank';
+    a.download = (file.name || 'documento').replace(/\s+/g, '_');
+    a.click();
+  }
 editProfile() {
   console.log('Editar perfil');
 }
@@ -48,8 +84,9 @@ goToSettings() {
 
 
   ngOnInit(): void {
-      this.user = JSON.parse(localStorage.getItem('userData') ?? '{}')?.userInfo;
-
+      const data = JSON.parse(localStorage.getItem('userData') ?? '{}');
+this.user = data?.userInfo;
+this.company = data?.company;
     console.log(this.user,'l;l;l;l');
 
   }
