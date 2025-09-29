@@ -77,6 +77,9 @@ export class AppComponent implements OnInit {
         if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
           localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
+        } else {
+          localStorage.removeItem('studentsWithoutLocation');
+
         }
       },
       error: (err: any) => {

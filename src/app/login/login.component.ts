@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
   }
   ngOnInit(): void {
     const operatingSystem = isMobileOrWebOperatingSystem()
-  
+
     this.loginForm = this.fb.group({
       // email: ['', [Validators.required, Validators.email]],
       login: ['', [Validators.required]],
@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
 
      if (login.save_credentials) {
       this.loginForm.patchValue(login);
-      
+
     }
     this.storage.get(hostUrlEnum.FCM_TOKEN).then((resp) => {
       this.token = JSON.stringify(resp);
@@ -96,7 +96,7 @@ export class LoginComponent implements OnInit {
     }
 
     if (this.loginForm.value.save_credentials) {
-      
+
       localStorage.setItem('save_credentials', JSON.stringify(this.loginForm.value))
     } else {
       localStorage.removeItem('save_credentials')
@@ -168,6 +168,9 @@ export class LoginComponent implements OnInit {
             JSON.stringify(studentsWithoutLocation)
           );
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
+        }else {
+          localStorage.removeItem('studentsWithoutLocation');
+
         }
       },
       error: (err: any) => {
