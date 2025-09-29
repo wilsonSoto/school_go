@@ -15,7 +15,7 @@ import { AuthService } from 'src/app/services/login.service';
 export class UbicationModalComponent implements OnInit {
   @Input() students: any[] = [];
   isLoading: boolean = true;
-  
+
   studentsWithoutLocation: any[] = [];
 isSaving: boolean = false;
 sendUpdateStudentLocation: any = []
@@ -93,7 +93,7 @@ get allStudentsLoactionActive () {
   }
 
   async closeModal() {
-    this.studentsWithoutLocation = [...this.studentsWithoutLocation, ...this.sendUpdateStudentLocation]
+    this.studentsWithoutLocation = []
     await this.logoutAndGoToSignIn()
     this.modalCtrl.dismiss(this.students);
   }
