@@ -3,9 +3,6 @@
 	"appName": "EscolarGo",
 	"webDir": "www",
 	"plugins": {
-		"GoogleMap": {
-			"apiKey": "AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao"
-		},
 		"PushNotifications": {
 			"presentationOptions": [
 				"badge",
