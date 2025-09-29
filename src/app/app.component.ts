@@ -56,10 +56,13 @@ export class AppComponent implements OnInit {
       this.translate.use('es'); // Si no, usa el idioma por defecto
     }
   }
+    async delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   getParent() {
     this.parentService.getParent(this.userData?.partner_id).subscribe({
-      next: (response: any) => {
+      next: async (response: any) => {
     //       const studentsWithoutLocation2 = response.data.students.map((student: any) => {
     //   return {
     //     ...student,
@@ -76,6 +79,9 @@ export class AppComponent implements OnInit {
         );
         if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
           localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
+        this.toastService.presentToast('Algunos estudiantes no tienen ubicación');
+    // await this.delay(2000);
+
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
         } else {
           localStorage.removeItem('studentsWithoutLocation');

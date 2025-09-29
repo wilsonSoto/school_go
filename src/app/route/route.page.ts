@@ -62,6 +62,7 @@ export class RoutePage implements OnInit {
   }
   ngOnInit(): void {
       const currentRoute = this.router.url;
+console.log(this.userData,'[[[initttttttttttttttttttttttttttttttttttttttttttttttttt]]]');
 
     if (this.userData?.partner_id && currentRoute !== '/sign-in' && currentRoute !== '/') {
       this.getParent();
@@ -187,9 +188,12 @@ console.log(selected);
     });
   }
 
+    async delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
     getParent() {
     this.parentService.getParent(this.userData?.partner_id).subscribe({
-      next: (response: any) => {
+      next: async (response: any) => {
         const studentsWithoutLocation = response.data.students.filter(
           (student: any) =>
             !student.home_latitude ||
@@ -199,6 +203,9 @@ console.log(selected);
         );
         if (studentsWithoutLocation && studentsWithoutLocation.length > 0) {
           localStorage.setItem('studentsWithoutLocation', JSON.stringify(studentsWithoutLocation));
+          this.toastService.presentToast('Algunos estudiantes no tienen ubicación');
+    // await this.delay(2000);
+
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
         }else {
           localStorage.removeItem('studentsWithoutLocation');

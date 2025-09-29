@@ -285,7 +285,7 @@ console.log('📱 Tipo de dispositivo: 22222222222222222222222222222222222222222
       localStorage.setItem('watchId', JSON.stringify(newWatchId))
     }
   );
- alert(7)
+//  alert(7)
 
   return newWatchId;
 }
