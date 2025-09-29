@@ -154,7 +154,7 @@ export class LoginComponent implements OnInit {
     }
 
     this.parentService.getParent(this.userData?.partner_id).subscribe({
-      next: (response: any) => {
+      next: async (response: any) => {
         const studentsWithoutLocation = response.data.students.filter(
           (student: any) =>
             !student.home_latitude ||
@@ -167,6 +167,9 @@ export class LoginComponent implements OnInit {
             'studentsWithoutLocation',
             JSON.stringify(studentsWithoutLocation)
           );
+          this.toastService.presentToast('Algunos estudiantes no tienen ubicación');
+    // await this.delay(2000);
+
           this.router.navigateByUrl('/pending-location', { replaceUrl: true });
         }else {
           localStorage.removeItem('studentsWithoutLocation');
