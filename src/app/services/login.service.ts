@@ -1,4 +1,4 @@
-import { hostUrlEnum, userDataEnum } from '../../types'
+import { hostUrlEnum, userDataEnum } from '../../types';
 import { map } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
@@ -13,7 +13,7 @@ export class AuthService {
   private authState = new BehaviorSubject<boolean>(false);
   private TOKEN_KEY = 'auth-token';
   private apiUrl = 'https://tu-backend.com/api'; // ⚡ Cambia por tu API
-  appURl = hostUrlEnum.is_production ? hostUrlEnum.prod : hostUrlEnum.develop
+  appURl = hostUrlEnum.is_production ? hostUrlEnum.prod : hostUrlEnum.develop;
 
   constructor(private httpClient: HttpClient, private storage: Storage) {
     this.initStorage();
@@ -41,20 +41,19 @@ export class AuthService {
   }
 
   /** Hacer login contra el backend y guardar token */
-   login(dataLogin: any) {
+  login(dataLogin: any) {
     // const res: any = await this.httpClient.post(`${this.apiUrl}/login`, { email, password }).toPromise();
 
-
     const params = {
-      "params": dataLogin
-    }
-    const url = this.appURl +'/authenticate';
+      params: dataLogin,
+    };
+    const url = this.appURl + '/authenticate';
     return this.httpClient.post(url, params).pipe(
-      map(async(res: any) => {
+      map(async (res: any) => {
         if (res?.result.token) {
           await this.storage.set(this.TOKEN_KEY, res.result.token);
           // await this.storage.set(userDataEnum, res.result);
-          localStorage.setItem(userDataEnum,JSON.stringify(res.result))
+          localStorage.setItem(userDataEnum, JSON.stringify(res.result));
           this.authState.next(true);
         }
         return res.result;
@@ -66,8 +65,16 @@ export class AuthService {
   /** Cerrar sesión */
   async logout() {
     await this.storage.remove(this.TOKEN_KEY);
-    localStorage.removeItem(userDataEnum)
-    localStorage.clear()
+
+    const login = JSON.parse(localStorage.getItem('save_credentials') || '{}');
+
+    localStorage.removeItem(userDataEnum);
+    localStorage.clear();
+    if (login.save_credentials) {
+      localStorage.setItem('save_credentials', JSON.stringify(login));
+    } else {
+      localStorage.removeItem('save_credentials');
+    }
     this.authState.next(false);
   }
 

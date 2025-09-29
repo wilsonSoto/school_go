@@ -6,6 +6,15 @@
     <ion-spinner name="circles"></ion-spinner>
     <p>Cargando ubicación...</p>
   </div>
+  
+  <ion-row *ngIf="studentsWithoutLocation.length == 0" class="ion-justify-content-end">
+     <ion-col size="auto">
+       <ion-button size="small" fill="outline" (click)="manualRefresh()">
+         <ion-icon name="refresh-outline" slot="start"></ion-icon>
+         Refrescar
+       </ion-button>
+     </ion-col>
+   </ion-row>
   <ion-grid class="responsive-layout">
     <ion-row>
       <!-- Columna Izquierda: Imagen -->
