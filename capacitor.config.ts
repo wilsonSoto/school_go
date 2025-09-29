@@ -5,9 +5,9 @@ const config: CapacitorConfig = {
   appName: 'EscolarGo',
   webDir: 'www',
   plugins: {
-    GoogleMap: {
-      apiKey: 'AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao', // <--- ¡COLOCA TU CLAVE API REAL AQUÍ!
-    },
+    // GoogleMap: {
+    //   apiKey: 'AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao', // <--- ¡COLOCA TU CLAVE API REAL AQUÍ!
+    // },
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
     },
