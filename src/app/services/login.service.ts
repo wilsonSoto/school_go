@@ -43,8 +43,8 @@ export class AuthService {
   /** Hacer login contra el backend y guardar token */
    login(dataLogin: any) {
     // const res: any = await this.httpClient.post(`${this.apiUrl}/login`, { email, password }).toPromise();
-    
-    
+
+
     const params = {
       "params": dataLogin
     }
@@ -67,6 +67,7 @@ export class AuthService {
   async logout() {
     await this.storage.remove(this.TOKEN_KEY);
     localStorage.removeItem(userDataEnum)
+    localStorage.clear()
     this.authState.next(false);
   }
 
