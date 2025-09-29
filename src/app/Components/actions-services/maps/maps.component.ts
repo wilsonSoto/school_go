@@ -52,13 +52,18 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
   ) {}
   markerSelected: any = null;
   private notifiedStudents: Set<any> = new Set();
+  userData: any = '';
 
   ngOnInit() {
     // this.locationService.simulateMovement(19.3971, -70.5864);
   }
 
   async ngAfterViewInit() {
-    await this.googleMapsLoader.load('AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao');
+
+    this.userData = await JSON.parse(localStorage.getItem('userData') || 'null')
+    ?.userInfo;
+    const mapsApiKey =   this.userData.mapsApiKey ?? 'AIzaSyDtmiNwQ0ENlzy3taEnwcHck41TXOWbWao'
+    await this.googleMapsLoader.load(mapsApiKey);
     const mapElement = this.mapContainer.nativeElement;
 
     this.map = new google.maps.Map(mapElement, {
@@ -86,7 +91,7 @@ export class MapsComponent implements AfterViewInit, OnDestroy {
     //     // console.log(studentsNotification,'/////?????????????????????????');
     //         // this.toastService.presentToast(JSON.stringify(studentsNotification), 1);
     //         // this.toastService.presentToast(JSON.stringify(this.markers), 1);
-        
+
     //     for (const marker of studentsNotification) {
     //       // alert(1)
     //       if (marker.id !== '1-dr') {
